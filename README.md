@@ -36,6 +36,11 @@ Cách quen thuộc là băm tài liệu thành từng đoạn, nhúng mỗi đo�
 
 PageIndex bỏ hẳn lớp đó. Tài liệu nghiêm túc nào cũng đã có sẵn cấu trúc — mục lục của PDF, style Heading của Word, cấp tiêu đề của AsciiDoc — nên thay vì phá đi rồi dựng lại bằng vector, nó giữ nguyên và biến việc tìm kiếm thành việc đi trong cây mục lục. Claude nhìn cây, chọn mục, mở ra đọc. Vì biết mình đã mở mục nào nên trích dẫn đi kèm là chuyện đương nhiên, không phải tính năng gắn thêm.
 
+<p align="center">
+  <a href="https://pageindex.ai/"><img src="assets/pageindex-flow.png" alt="Tài liệu, đi trong cây mục lục, trả lời kèm bằng chứng" width="820"></a>
+</p>
+<p align="center"><sub>Tài liệu &rarr; đi trong cây mục lục &rarr; trả lời kèm trang trích dẫn. Hình của <a href="https://pageindex.ai/">pageindex.ai</a>.</sub></p>
+
 Còn nếu chỉ hỏi Claude mà không có lớp này? Nó chỉ nắm được những gì bạn kịp dán vào, và phần còn lại nó lấp bằng suy đoán — nghe rất thuyết phục. Sự khác biệt không nằm ở chỗ model thông minh hơn, mà ở chỗ nó đang đọc đúng trang.
 
 Chi tiết cơ chế: [Cách nó làm việc](docs/how-it-works.md).
