@@ -1,22 +1,25 @@
 # cc-pageindex
 
-<p>
-  <a href="https://pageindex.ai/"><img src="assets/pageindex.png" alt="PageIndex" height="24"></a>
-  &nbsp;&nbsp;×&nbsp;&nbsp;
-  <a href="https://claude.com/claude-code"><img src="assets/claude.svg" alt="Claude" height="22" style="vertical-align:middle"> <strong>Claude Code</strong></a>
+<p align="center">
+  <a href="https://pageindex.ai/"><img src="assets/pageindex.png" alt="PageIndex" height="22" style="vertical-align:middle"></a>
+  &nbsp;&nbsp;<strong>×</strong>&nbsp;&nbsp;
+  <a href="https://claude.com/claude-code"><img src="assets/claude.svg" alt="Claude" height="22" style="vertical-align:middle"></a>
+  &nbsp;<strong>Claude Code</strong>
 </p>
 
-<p>
-  <a href="https://claude.com/claude-code"><img src="https://img.shields.io/badge/Claude%20Code-skill-d97757" alt="Claude Code skill"></a>
-  <a href="https://pageindex.ai/"><img src="https://img.shields.io/badge/PageIndex-vectorless%20RAG-4e86d2" alt="PageIndex"></a>
+<p align="center">
+  <img src="https://img.shields.io/badge/Claude%20Code-skill-d97757" alt="Claude Code skill">
+  <img src="https://img.shields.io/badge/PageIndex-vectorless%20RAG-4e86d2" alt="PageIndex">
   <img src="https://img.shields.io/badge/python-3.10%2B-3776ab?logo=python&logoColor=white" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-lightgrey" alt="macOS, Linux, Windows">
   <img src="https://img.shields.io/badge/pdf%20%C2%B7%20docx%20%C2%B7%20pptx%20%C2%B7%20adoc%20%C2%B7%20md%20%C2%B7%20txt-informational" alt="Định dạng hỗ trợ">
 </p>
 
-Hỏi đáp trên tài liệu dài ngay trong Claude Code — báo cáo, hợp đồng, spec màn hình tiếng Nhật, sách nội bộ.
+> **Tài liệu dài, câu hỏi ngắn.** Dán cả file vào chat thì tốn token và tràn context. Tìm tay trong 230 file spec thì mất cả buổi. Hỏi AI mà không có tài liệu thì nó bịa.
+>
+> Skill này index tài liệu **một lần**, rồi mỗi câu hỏi chỉ đọc đúng vài mục liên quan — kèm trích dẫn để lần về đúng trang. Bước tìm "đọc chỗ nào" chạy ngay trên máy, không gọi model, không tốn token.
 
-Tài liệu được index một lần thành cây mục lục. Mỗi câu hỏi, công cụ xếp hạng các mục **ngay trên máy, không gọi model, không tốn token**, rồi Claude chỉ đọc đúng vài mục liên quan thay vì nuốt cả tài liệu.
+Hoạt động với báo cáo, hợp đồng, spec màn hình tiếng Nhật, sách nội bộ — bất cứ thứ gì dài tới mức không muốn đọc lại từ đầu.
 
 ```
 Bạn:    Trong spec 会員管理, 退会処理 cập nhật cột email thế nào?
