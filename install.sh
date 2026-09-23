@@ -23,6 +23,25 @@ case "${1:-}" in
   *) echo "Usage: ${BASH_SOURCE[0]} [--uninstall]" >&2; exit 2 ;;
 esac
 
+# uv fetches a Python of its own when the machine has none, so it is enough
+# on its own; without it the system interpreter has to be new enough for the
+# dependencies (pageindex needs 3.10).
+require_python() {
+  command -v uv >/dev/null 2>&1 && return 0
+  if ! command -v python3 >/dev/null 2>&1; then
+    echo "Python is missing, and so is uv. Install either one, then run this again:" >&2
+    echo "  uv:     curl -LsSf https://astral.sh/uv/install.sh | sh" >&2
+    echo "  python: https://www.python.org/downloads/ (3.10 or newer)" >&2
+    exit 1
+  fi
+  if ! python3 -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; then
+    echo "python3 is $(python3 -V 2>&1), but 3.10 or newer is required." >&2
+    echo "Install a newer Python, or install uv, which fetches one for you:" >&2
+    echo "  curl -LsSf https://astral.sh/uv/install.sh | sh" >&2
+    exit 1
+  fi
+}
+
 shopt -s nullglob
 found=false
 
@@ -47,6 +66,7 @@ for skill in "$here"/skills/*/; do
 
   if [[ -f "$skill/requirements.txt" ]]; then
     echo "==> $name: building the virtualenv"
+    require_python
     if command -v uv >/dev/null 2>&1; then
       uv venv "$skill/.venv" --python 3.12
       uv pip install --quiet --python "$skill/.venv/bin/python" \

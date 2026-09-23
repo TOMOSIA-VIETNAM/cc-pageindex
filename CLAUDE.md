@@ -25,7 +25,7 @@ skills/pageindex/.venv/bin/python skills/pageindex/tools/pi.py <command>
 
 `pi.py --help` lists the commands and prints the resolved store path. `SKILL.md` documents what each command is for and the order they run in; read it before changing behaviour, since it is the contract the agent follows.
 
-There is no test suite. Verify changes by running the tool against real documents and comparing the output to the previous run: `index`/`index-adoc` report node and unit counts, `tree <doc>` prints the whole structure, and those numbers must not move when a change is meant to preserve behaviour.
+There is no test suite. Verify changes by running the tool against real documents and comparing the output to the previous run: `index` reports node and unit counts, `tree <doc>` prints the whole structure, and those numbers must not move when a change is meant to preserve behaviour.
 
 ## Architecture
 
@@ -48,23 +48,29 @@ Two fields are this tool's additions to the library's node shape: `lines` (the n
 
 ### One indexing pipeline, several readers
 
-Three routes produce one tree shape:
+Every source lands on one tree shape:
 
 | Source | How the tree is built |
 | --- | --- |
 | PDF with a text layer | `page_index_flash(pdf, summary=False, optimize=False)` — layout statistics, no LLM |
 | PDF without one | page images the session reads into `page-NNNN.md` files, then the markdown heading reader |
+| `.docx` | Word's `Heading 1..9` paragraph styles |
+| `.pptx` | one node per slide; the unit is the slide, not a block of lines |
 | A directory of `.adoc` files | the AsciiDoc heading reader |
+| `.md` | the library's own markdown heading reader |
+| `.txt`, or anything with no headings of its own | headings the session writes after reading `chunks`, validated against the text |
 
-The last two share everything after heading extraction: `extract_node_text_content` and `build_tree_from_nodes` come from `pageindex.page_index_md` and are used as they ship. Only the heading readers differ, and they return the library's own shape (`{node_title, line_num, level}`).
+Everything but the PDF and the deck shares the same path after heading extraction: `extract_node_text_content` and `build_tree_from_nodes` come from `pageindex.page_index_md` and are used as they ship, then `blocked_document()` cuts the lines into units. Only the heading readers differ, and they return the library's own shape (`{node_title, line_num, level}`).
 
-**Adding a format means writing one heading reader, nothing else.** Do not add a fourth route with its own tree builder — that duplication was already removed once.
+`cmd_index` dispatches on the path; `source_lines()` is the one place that maps a suffix to a reader, and `chunks` uses it too so an outline is written against the same lines the index will number.
+
+**Adding a format means writing one heading reader and one line in the dispatch, nothing else.** Do not add a route with its own tree builder or its own `index` subcommand — both duplications were removed once already.
 
 `headings_to_tree()` is the glue the library does not provide: it turns line numbers into the store's addressing. Every node gets `start_index`/`end_index` spanning its descendants, for navigation, and `lines` covering only its own prose, so a summary describes that section instead of everything filed under it.
 
 ### Read units
 
-Reads address a document by unit: a page for a PDF, a fixed-size block of lines for an AsciiDoc tree. Each AsciiDoc block opens with a `// <file> line <N>` marker, which is how an answer cites a source file rather than a meaningless block number. `units_to_lines()` maps between the two.
+Reads address a document by unit: a page for a PDF, a slide for a deck, a fixed-size block of lines for everything else. Each AsciiDoc block opens with a `// <file> line <N>` marker, which is how an answer cites a source file rather than a meaningless block number. `units_to_lines()` maps between the two.
 
 ### Retrieval
 

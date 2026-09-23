@@ -30,7 +30,7 @@ Hai loại nguồn:
 
 Khi thêm hoặc cập nhật một tài liệu:
 
-0. Nguồn AsciiDoc: `pi.py index-adoc <thư mục>` — một thư mục chức năng thành một document, xong trong vài giây, bỏ qua bước 1–3 dưới đây.
+0. Nguồn AsciiDoc: `pi.py index <thư mục>` — một thư mục chức năng thành một document, xong trong vài giây, bỏ qua bước 1–3 dưới đây.
 1. Nguồn PDF: `pi.py probe` kiểm tra input — có text layer thật hay là bản scan/ảnh, và có ký tự CJK hay không.
 2. Nhánh scan/ảnh: `pi.py render` xuất PNG từng trang, session Claude đọc ảnh và viết `page-NNNN.md` sạch (thay cho OCR trả phí của PageIndex Cloud); heading markdown chính là cấu trúc cây.
 3. Nhánh có text layer: `pi.py index` chạy Flash local ở chế độ chỉ lấy cấu trúc — thuần heuristic layout, không tốn LLM.
@@ -40,7 +40,7 @@ Khi thêm hoặc cập nhật một tài liệu:
 ```mermaid
 flowchart TD
   A[Tài liệu mới/cập nhật] --> Z{PDF hay thư mục adoc?}
-  Z -- adoc --> Y[index-adoc: cây từ cấp heading]
+  Z -- adoc --> Y[index: cây từ cấp heading]
   Y --> F
   Z -- PDF --> B{probe: có text layer?}
   B -- Không --> C[render PNG + subagent vision viết page-NNNN.md]

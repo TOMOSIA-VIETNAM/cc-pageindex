@@ -1,14 +1,29 @@
 # cc-pageindex
 
-Skill cho Claude Code để hỏi đáp trên tài liệu dài: báo cáo, hợp đồng, spec màn hình tiếng Nhật, sách nội bộ.
+<p>
+  <img src="assets/pageindex.svg" alt="PageIndex" height="15" style="vertical-align:middle">
+  &nbsp;<strong>PageIndex</strong>
+  &nbsp;&nbsp;×&nbsp;&nbsp;
+  <img src="assets/claude.svg" alt="Claude" height="20" style="vertical-align:middle">
+  &nbsp;<strong>Claude Code</strong>
+</p>
 
-Tài liệu được index một lần thành cây mục lục. Khi hỏi, công cụ xếp hạng các mục ngay trên máy — không gọi model, không tốn token — rồi Claude chỉ đọc đúng vài mục liên quan thay vì nuốt cả tài liệu.
+Hỏi đáp trên tài liệu dài ngay trong Claude Code — báo cáo, hợp đồng, spec màn hình tiếng Nhật, sách nội bộ.
 
-Hỗ trợ file PDF (kể cả bản scan) và thư mục AsciiDoc (`.adoc`).
+Tài liệu được index một lần thành cây mục lục. Mỗi câu hỏi, công cụ xếp hạng các mục **ngay trên máy, không gọi model, không tốn token**, rồi Claude chỉ đọc đúng vài mục liên quan thay vì nuốt cả tài liệu.
+
+```
+Bạn:    Trong spec 会員管理, 退会処理 cập nhật cột email thế nào?
+
+Claude: Ghi email thành "<địa chỉ cũ>_<thời điểm hiện tại>", đồng thời đặt
+        status = 退会, encrypted_password = chuỗi ngẫu nhiên 20 ký tự đã hash,
+        phone_number = NULL, quit_at = thời điểm hiện tại.
+        Nguồn: 2.1.会員詳細画面_機能詳細.adoc, dòng 110.
+```
 
 ## Cài đặt
 
-Cần Python 3.12 trở lên. Có [uv](https://github.com/astral-sh/uv) thì nhanh hơn, không có cũng chạy.
+Cần **[uv](https://github.com/astral-sh/uv)** hoặc **Python 3.10+**. Có uv thì khỏi cài Python, uv tự tải bản nó cần.
 
 ```bash
 git clone git@github.com:tms-minhtang1/cc-pageindex.git
@@ -16,65 +31,40 @@ cd cc-pageindex
 ./install.sh
 ```
 
-Windows chạy `.\install.ps1` thay cho `./install.sh`.
+Windows: `.\install.ps1`. Gỡ: `./install.sh --uninstall`.
 
-Script dựng môi trường Python riêng rồi liên kết skill vào `~/.claude/skills/`. Mở session Claude Code ở thư mục nào cũng dùng được.
-
-Gỡ: `./install.sh --uninstall`.
+Script dựng môi trường Python riêng rồi liên kết skill vào `~/.claude/skills/`. Sau đó mở session Claude Code ở thư mục nào cũng dùng được.
 
 ## Dùng
 
-Nói chuyện với Claude, không cần gõ lệnh.
-
-**Lần đầu với một tài liệu — index:**
+**Index — một lần cho mỗi tài liệu:**
 
 ```
 Dùng skill pageindex, index file ~/Documents/bao-cao-2025.pdf
 ```
 
-Mất vài phút cho tài liệu dài: dựng cây rất nhanh, phần lâu là viết tóm tắt cho từng mục. Chỉ làm một lần cho mỗi tài liệu.
-
-Thư mục spec AsciiDoc cũng vậy:
+**Hỏi — ở bất kỳ session nào sau đó:**
 
 ```
-Index thư mục ~/code/du-an/documents/spec-docs/admin/会員管理
+Dùng skill pageindex. Doanh thu quý 3 trong báo cáo 2025 là bao nhiêu?
 ```
 
-**Sau đó — hỏi:**
+Claude trả lời kèm trích dẫn: số trang với PDF, số slide với PowerPoint, tên file và dòng với AsciiDoc. Lần theo trích dẫn để kiểm chứng.
 
-```
-Dùng skill pageindex. Trong báo cáo 2025, doanh thu quý 3 là bao nhiêu?
-```
+Nhận `.pdf` (kể cả bản scan), `.docx`, `.pptx`, `.md`, `.txt`, và thư mục `.adoc`.
 
-Claude trả lời kèm số trang, hoặc tên file và dòng với tài liệu AsciiDoc. Bấm theo trích dẫn để kiểm chứng.
+## Tìm hiểu thêm
 
-**Hỏi ở session mới không cần index lại.** Tài liệu đã index nằm trong kho dùng chung, mọi session đều thấy.
-
-## Xem kho tài liệu
-
-```bash
-PI=~/.claude/skills/pageindex
-
-$PI/.venv/bin/python $PI/tools/pi.py list           # tài liệu đã có
-$PI/.venv/bin/python $PI/tools/pi.py tree <tên>     # cây mục lục + tình trạng tóm tắt
-$PI/.venv/bin/python $PI/tools/pi.py html --out xem.html   # trang web xem cây, tìm kiếm được
-```
-
-`xem.html` mở bằng trình duyệt, gấp mở từng nhánh, tìm theo tên bảng hay tên cột.
-
-## Dữ liệu nằm ở đâu
-
-| Hệ điều hành | Đường dẫn |
+| | |
 | --- | --- |
-| macOS, Linux | `~/.local/share/pageindex` |
-| Windows | `%LOCALAPPDATA%\pageindex` |
-
-Đổi bằng biến môi trường `PAGEINDEX_STORE`.
-
-Kho này chứa **bản sao toàn bộ nội dung tài liệu đã index**. Đừng đặt trong thư mục được đồng bộ lên mây (Documents của iCloud, OneDrive) nếu tài liệu là của khách hàng. Đừng commit vào git.
+| [Định dạng tài liệu](docs/formats.md) | Loại nào index miễn phí, loại nào tốn token, và vì sao |
+| [Cách nó làm việc](docs/how-it-works.md) | Công cụ làm gì, Claude làm gì, luồng trả lời một câu hỏi |
+| [Kho tài liệu](docs/store.md) | Nằm ở đâu, chứa gì, cách xem và xoá |
 
 ## Giới hạn
 
-- Ảnh trong tài liệu chưa được đọc. Câu hỏi về bố cục màn hình hay nội dung nằm trong ảnh sẽ trả lời thiếu.
-- Xếp hạng theo từ khoá, không theo ngữ nghĩa. Hỏi bằng từ khác hẳn chữ trong tài liệu thì kết quả kém — dùng đúng từ tài liệu dùng.
-- Câu bắt liệt kê cả tài liệu ("có những nhân vật nào") không hợp với xếp hạng; Claude sẽ chuyển sang đọc toàn bộ cây mục lục, chậm hơn.
+Ảnh trong tài liệu chưa được đọc, trừ khi tài liệu là PDF bản scan. Câu hỏi về bố cục màn hình hay nội dung nằm trong ảnh sẽ trả lời thiếu.
+
+---
+
+Dựng trên thư viện [PageIndex](https://github.com/VectifyAI/PageIndex) (vectorless RAG), chạy như một skill của [Claude Code](https://claude.com/claude-code). Đây không phải sản phẩm chính thức của hai bên; logo thuộc về chủ sở hữu tương ứng.

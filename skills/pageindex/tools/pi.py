@@ -27,6 +27,7 @@ import sys
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
 STORE_NAME = "pageindex"
 PAGE_FILE = re.compile(r"^page-(\d+)\.md$")
@@ -49,7 +50,9 @@ SUMMARY_PREVIEW = 300
 # heading parsers, and saying "flash" for those would misname them.
 INDEX_MODE = {"detected": "flash", "bookmarks": "flash", "hybrid": "flash",
               "pages": "flash", "unreadable": "flash",
-              "markdown-headings": "markdown", "adoc-headings": "asciidoc"}
+              "markdown-headings": "markdown", "adoc-headings": "asciidoc",
+              "docx-headings": "docx", "pptx-slides": "pptx",
+              "written-headings": "outline", "blocks": "blocks"}
 
 
 def fail(message: str) -> "NoReturn":  # type: ignore[name-defined]
@@ -155,7 +158,14 @@ def walk(nodes, parent=None):
 # ── probe ────────────────────────────────────────────────────────────────
 
 def cmd_probe(args) -> None:
-    texts = pdf_page_texts(args.pdf)
+    path = Path(os.path.abspath(os.path.expanduser(args.pdf)))
+    if path.suffix.lower() != ".pdf":
+        fail(f"`probe` reads PDFs; {path.suffix or 'this file'} is not one. "
+             "Only a PDF can be missing a text layer — every other source "
+             "either carries its text or is not supported. Run `index` on it.")
+    if not path.is_file():
+        fail(f"No such file: {path}")
+    texts = pdf_page_texts(str(path))
     lengths = [len(text.strip()) for text in texts]
     thin = [index + 1 for index, size in enumerate(lengths)
             if size < MIN_PAGE_CHARS]
@@ -163,7 +173,7 @@ def cmd_probe(args) -> None:
     cjk = len(CJK.findall(joined))
     needs_ocr = bool(lengths) and len(thin) / len(lengths) > OCR_PAGE_RATIO
     emit({
-        "pdf": os.path.abspath(args.pdf),
+        "pdf": str(path),
         "pages": len(texts),
         "chars_total": sum(lengths),
         "pages_without_text": thin[:50],
@@ -360,33 +370,76 @@ def save_document(store, args, raw_name: str, structure: list,
             "next": "Fill summaries: `nodes` then `set-summaries`."}
 
 
+TEXT_SUFFIXES = {".txt", ".text", ".md", ".markdown"}
+# What a reader found on its own, when it found anything
+DOCUMENT_SOURCE = {".docx": "docx-headings", ".md": "markdown-headings",
+                   ".markdown": "markdown-headings"}
+
+
 def cmd_index(args) -> None:
-    pdf_path = os.path.abspath(os.path.expanduser(args.pdf))
-    if not os.path.isfile(pdf_path):
-        fail(f"No such file: {pdf_path}")
+    """One entry for every source: the path decides which reader runs."""
+    path = Path(os.path.abspath(os.path.expanduser(args.path)))
     store = open_store(args)
 
-    page_texts = pdf_page_texts(pdf_path)
+    if path.is_dir():
+        structure, units = adoc_document(path, args.block_lines,
+                                         not args.no_recurse)
+        source = "adoc-headings"
+    elif not path.is_file():
+        fail(f"No such file or directory: {path}")
+    elif path.suffix.lower() == ".pdf":
+        structure, units, source = pdf_index(path, args)
+    elif path.suffix.lower() == ".pptx":
+        if args.headings:
+            fail("A deck is already divided by slide; --headings does not "
+                 "apply to it.")
+        structure, units = pptx_document(path)
+        source = "pptx-slides"
+    elif (path.suffix.lower() == ".docx"
+          or path.suffix.lower() in TEXT_SUFFIXES):
+        lines, found = source_lines(path)
+        headings = (read_headings(args.headings, lines) if args.headings
+                    else found)
+        structure, units = blocked_document(lines, headings,
+                                            args.block_lines)
+        source = ("written-headings" if args.headings
+                  else DOCUMENT_SOURCE.get(path.suffix.lower(), "blocks")
+                  if headings else "blocks")
+    else:
+        fail(f"No reader for {path.suffix or 'a file without a suffix'}. "
+             f"Supported: .pdf, .docx, .pptx, "
+             f"{', '.join(sorted(TEXT_SUFFIXES))}, or a directory of .adoc "
+             "files. Convert anything else to one of these first.")
+
+    if not structure:
+        # every unit stays reachable even when nothing names a section
+        structure = page_nodes(units)
+        source = "pages" if path.suffix.lower() == ".pdf" else "blocks"
+    result = save_document(store, args, args.name or path.name, structure,
+                           units, source, str(path))
+    if source == "blocks" or (len(structure) == 1 and len(units) > 5
+                              and not structure[0].get("nodes")):
+        result["warning"] = (
+            "This document carries no usable structure of its own, so the "
+            "tree cannot guide a search. Run `chunks` on it, read the text, "
+            "write the headings you find, and index again with --headings.")
+    emit(result)
+
+
+def pdf_index(path: Path, args) -> tuple[list, list[str], str]:
+    """A PDF: its own layout, or the markdown written from its page images."""
+    page_texts = pdf_page_texts(str(path))
     if args.md:
         page_texts = read_page_markdown(args.md, len(page_texts))
         lines, line_unit = units_to_lines(page_texts)
         headings, _ = markdown_headings("\n".join(lines))
-        structure, source = (headings_to_tree(headings, lines, line_unit),
-                             "markdown-headings")
-        if not structure:
-            structure, source = page_nodes(page_texts), "pages"
-    else:
-        if not any(text.strip() for text in page_texts):
-            fail("The PDF has no text layer. Render the pages with `render`, "
-                 "write page-NNNN.md files, then re-run index with --md.")
-        structure, source = flash_structure(pdf_path)
-        if not structure:
-            structure, source = page_nodes(page_texts), "pages"
-
-    name = args.name or os.path.basename(pdf_path)
-    emit(save_document(store, args, name, structure, page_texts,
-                       source, pdf_path))
-
+        return (headings_to_tree(headings, lines, line_unit), page_texts,
+                "markdown-headings")
+    if not any(text.strip() for text in page_texts):
+        fail("The PDF has no text layer. Render the pages with `render`, "
+             "write page-NNNN.md files, then index again with --md.")
+    structure, source = flash_structure(str(path))
+    return structure, page_texts, source
 
 
 # ── asciidoc ─────────────────────────────────────────────────────────────
@@ -464,6 +517,16 @@ def adoc_document(directory: Path, block_lines: int,
                          "level": 0})
         headings.extend(adoc_headings(marked, offset))
 
+    return blocked_document(lines, headings, block_lines)
+
+
+def blocked_document(lines: list[str], headings: list[dict],
+                     block_lines: int) -> tuple[list, list[str]]:
+    """Lines cut into fixed-size read units, and the tree over them.
+
+    The unit for anything that is not paginated: a document with no pages of
+    its own still needs an address a read can ask for.
+    """
     units = ["\n".join(lines[start:start + block_lines])
              for start in range(0, len(lines), block_lines)]
     line_unit = [index // block_lines for index in range(len(lines))]
@@ -482,20 +545,184 @@ def insert_markers(body: list[str], relative: str, block_lines: int,
     return out
 
 
-def cmd_index_adoc(args) -> None:
-    directory = Path(os.path.abspath(os.path.expanduser(args.dir)))
-    if not directory.is_dir():
-        fail(f"Not a directory: {directory}")
-    if args.block_lines < 10:
-        fail("--block-lines below 10 makes the read unit useless")
-    structure, page_texts = adoc_document(directory, args.block_lines,
-                                          not args.no_recurse)
-    store = open_store(args)
-    result = save_document(store, args, args.name or directory.name, structure,
-                           page_texts, "adoc-headings", str(directory))
-    result["files"] = len(structure)
-    result["block_lines"] = args.block_lines
-    emit(result)
+# ── word, powerpoint, plain text ─────────────────────────────────────────
+
+HEADING_STYLE = re.compile(r"^Heading (\d)$")
+
+
+def docx_lines(path: Path) -> tuple[list[str], list[dict]]:
+    """A Word document as lines, with the headings its styles already record.
+
+    Word keeps outline level in the paragraph style, so the hierarchy is in
+    the file and costs nothing to read. Tables are flattened to tab-separated
+    rows, in the place they occupy in the body.
+    """
+    import docx
+    from docx.table import Table
+    from docx.text.paragraph import Paragraph
+
+    document = docx.Document(str(path))
+    lines: list[str] = []
+    headings: list[dict] = []
+
+    for child in document.element.body.iterchildren():
+        tag = child.tag.split("}")[-1]
+        if tag == "p":
+            paragraph = Paragraph(child, document)
+            style = (paragraph.style.name or "") if paragraph.style else ""
+            text = paragraph.text.strip()
+            if text and style == "Title":
+                headings.append({"node_title": text,
+                                 "line_num": len(lines) + 1, "level": 1})
+            elif text:
+                match = HEADING_STYLE.match(style)
+                if match:
+                    headings.append({"node_title": text,
+                                     "line_num": len(lines) + 1,
+                                     # Word counts outline levels from 1; a
+                                     # Title sits above them and takes that
+                                     "level": int(match.group(1)) + 1})
+            lines.append(paragraph.text)
+        elif tag == "tbl":
+            for row in Table(child, document).rows:
+                lines.append("\t".join(cell.text.replace("\n", " ")
+                                       for cell in row.cells))
+    if not any(line.strip() for line in lines):
+        fail(f"No text in {path}")
+    return lines, headings
+
+
+def pptx_document(path: Path) -> tuple[list, list[str]]:
+    """A PowerPoint deck: one slide is one node and one read unit.
+
+    Slides are already the unit a reader cites, so a citation from this
+    document names a slide number rather than a block of lines.
+    """
+    from pptx import Presentation
+
+    deck = Presentation(str(path))
+    units: list[str] = []
+    headings: list[dict] = []
+    lines: list[str] = []
+    line_unit: list[int] = []
+
+    for number, slide in enumerate(deck.slides, start=1):
+        title = ""
+        if slide.shapes.title is not None:
+            title = (slide.shapes.title.text or "").strip()
+        body = [f"// slide {number}"]
+        if title:
+            body.append(title)
+        for shape in slide.shapes:
+            if shape is slide.shapes.title or not shape.has_text_frame:
+                continue
+            text = (shape.text_frame.text or "").strip()
+            if text:
+                body.append(text)
+        if slide.has_notes_slide:
+            notes = (slide.notes_slide.notes_text_frame.text or "").strip()
+            if notes:
+                body.append(f"Notes: {notes}")
+        if not title:
+            # decks built from generic placeholders carry no title shape; the
+            # first line on the slide is what a reader would call it
+            title = next((line for line in body[1:] if line.strip()), "")
+            title = title.splitlines()[0].strip() if title else ""
+        headings.append({"node_title": title or f"Slide {number}",
+                         "line_num": len(lines) + 1, "level": 1})
+        unit = "\n".join(body)
+        units.append(unit)
+        for line in unit.split("\n"):
+            lines.append(line)
+            line_unit.append(number - 1)
+    if not units:
+        fail(f"No slides in {path}")
+    return headings_to_tree(headings, lines, line_unit), units
+
+
+def text_lines(path: Path) -> tuple[list[str], list[dict]]:
+    """Plain text: lines, and the markdown headings if it happens to have any.
+
+    A `.txt` file carries no structure at all. Markdown does, and the reader
+    for it is the library's own.
+    """
+    body = path.read_text(encoding="utf-8", errors="replace")
+    if not body.strip():
+        fail(f"No text in {path}")
+    if path.suffix.lower() in {".md", ".markdown"}:
+        headings, lines = markdown_headings(body)
+        return lines, headings
+    return body.splitlines(), []
+
+
+def source_lines(path: Path) -> tuple[list[str], list[dict]]:
+    """The lines a written outline would number, for any readable source."""
+    if path.suffix.lower() == ".docx":
+        return docx_lines(path)
+    if path.suffix.lower() in TEXT_SUFFIXES:
+        return text_lines(path)
+    fail(f"`chunks` reads .docx and text files; {path.suffix or 'this file'} "
+         "is not one. A PDF uses `render` and page images instead, and a deck "
+         "is already divided by slide.")
+
+
+def read_headings(headings_path: str, lines: list[str]) -> list[dict]:
+    """Headings supplied for a structureless document, checked against it.
+
+    Each one must name a line that really contains it, which is the same
+    check pageindex runs on a model-generated outline: a heading that does
+    not appear is a heading nobody can navigate to.
+    """
+    path = Path(os.path.expanduser(headings_path))
+    try:
+        supplied = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        fail(f"Cannot read the headings file {path}: {error}")
+    if isinstance(supplied, dict):
+        supplied = supplied.get("headings", [])
+    if not isinstance(supplied, list) or not supplied:
+        fail('The headings file must hold a list of '
+             '{"title": ..., "line": ..., "level": ...} entries.')
+
+    headings, problems = [], []
+    for entry in supplied:
+        try:
+            title = str(entry["title"]).strip()
+            line = int(entry["line"])
+            level = int(entry.get("level", 1))
+        except (KeyError, TypeError, ValueError):
+            problems.append(f"malformed entry: {entry!r}")
+            continue
+        if not 1 <= line <= len(lines):
+            problems.append(f"line {line} is outside 1-{len(lines)}: {title!r}")
+        elif title not in lines[line - 1]:
+            problems.append(f"line {line} does not contain {title!r}")
+        else:
+            headings.append({"node_title": title, "line_num": line,
+                             "level": max(1, level)})
+    if problems:
+        fail("Headings that do not match the text: " + "; ".join(problems[:10]))
+    headings.sort(key=lambda entry: entry["line_num"])
+    return headings
+
+
+def cmd_chunks(args) -> None:
+    """The text to read when deciding where a structureless document divides."""
+    path = Path(os.path.abspath(os.path.expanduser(args.file)))
+    if not path.is_file():
+        fail(f"No such file: {path}")
+    lines, _ = source_lines(path)
+    chunks = []
+    for start in range(0, len(lines), args.lines):
+        body = lines[start:start + args.lines]
+        chunks.append({"first_line": start + 1, "last_line": start + len(body),
+                       "text": "\n".join(f"{start + offset + 1}: {line}"
+                                         for offset, line in enumerate(body))})
+    emit({"file": str(path), "lines": len(lines), "chunks": chunks,
+          "next": 'Read each chunk and write the headings you find to a JSON '
+                  'list of {"title", "line", "level"}, quoting each title '
+                  'exactly as the line spells it. Then index with '
+                  '--headings <that file>.'})
 
 
 # ── summaries ────────────────────────────────────────────────────────────
@@ -885,27 +1112,31 @@ def build_parser() -> argparse.ArgumentParser:
     render.add_argument("--scale", type=float, default=2.0)
     render.set_defaults(func=cmd_render)
 
-    index = sub.add_parser("index", help="index a PDF into the store")
-    index.add_argument("pdf")
-    index.add_argument("--md", help="directory of page-NNNN.md files to use "
-                                    "as the page text instead of the text layer")
-    index.add_argument("--name", help="stored name (default: the file name)")
+    index = sub.add_parser("index", help="index a document into the store")
+    index.add_argument("path", help=".pdf, .docx, .pptx, a text file, or a "
+                                    "directory of .adoc files")
+    index.add_argument("--md", help="PDF only: directory of page-NNNN.md files "
+                                    "to use instead of the text layer")
+    index.add_argument("--headings", help="text files only: JSON headings to "
+                                          "build the tree from (see `chunks`)")
+    index.add_argument("--block-lines", type=int, default=60,
+                       help="lines per read unit where a document has no "
+                            "pages of its own (default: 60)")
+    index.add_argument("--no-recurse", action="store_true",
+                       help="directories only: skip subdirectories")
+    index.add_argument("--name", help="stored name (default: the file or "
+                                      "directory name)")
     index.add_argument("--replace", action="store_true",
                        help="replace a document already stored under that name")
     index.set_defaults(func=cmd_index)
 
-    adoc = sub.add_parser("index-adoc",
-                          help="index a directory of AsciiDoc files as one "
-                               "document")
-    adoc.add_argument("dir")
-    adoc.add_argument("--name", help="stored name (default: the directory name)")
-    adoc.add_argument("--replace", action="store_true",
-                      help="replace a document already stored under that name")
-    adoc.add_argument("--block-lines", type=int, default=60,
-                      help="lines per read unit (default: 60)")
-    adoc.add_argument("--no-recurse", action="store_true",
-                      help="only the .adoc files directly in the directory")
-    adoc.set_defaults(func=cmd_index_adoc)
+    chunks = sub.add_parser("chunks",
+                            help="numbered text of a structureless file, to "
+                                 "read before writing its headings")
+    chunks.add_argument("file")
+    chunks.add_argument("--lines", type=int, default=200,
+                        help="lines per chunk (default: 200)")
+    chunks.set_defaults(func=cmd_chunks)
 
     nodes = sub.add_parser("nodes", help="nodes and their text, for writing "
                                          "summaries")

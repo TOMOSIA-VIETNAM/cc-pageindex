@@ -19,6 +19,24 @@ $config = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR }
           else { Join-Path $HOME ".claude" }
 $skillsDir = Join-Path $config "skills"
 
+# uv fetches a Python of its own when the machine has none; without it the
+# system interpreter has to be new enough (pageindex needs 3.10).
+function Require-Python {
+    if (Get-Command uv -ErrorAction SilentlyContinue) { return }
+    $python = Get-Command python -ErrorAction SilentlyContinue
+    if (-not $python) {
+        throw ("Python is missing, and so is uv. Install either one, then run " +
+               "this again: uv (https://astral.sh/uv) or Python 3.10 or newer " +
+               "(https://www.python.org/downloads/).")
+    }
+    $version = (& python -c "import sys; print('%d.%d' % sys.version_info[:2])")
+    if ([version]$version -lt [version]"3.10") {
+        throw ("python is $version, but 3.10 or newer is required. Install a " +
+               "newer Python, or install uv, which fetches one for you: " +
+               "https://astral.sh/uv")
+    }
+}
+
 $skills = Get-ChildItem -Path (Join-Path $here "skills") -Directory |
           Where-Object { Test-Path (Join-Path $_.FullName "SKILL.md") }
 if (-not $skills) { throw "No skills found under $here\skills" }
@@ -39,6 +57,7 @@ foreach ($skill in $skills) {
     $requirements = Join-Path $skill.FullName "requirements.txt"
     if (Test-Path $requirements) {
         Write-Host "==> $($skill.Name): building the virtualenv"
+        Require-Python
         $venv = Join-Path $skill.FullName ".venv"
         if (Get-Command uv -ErrorAction SilentlyContinue) {
             uv venv $venv --python 3.12

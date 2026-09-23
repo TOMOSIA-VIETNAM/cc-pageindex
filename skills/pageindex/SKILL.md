@@ -1,13 +1,14 @@
 ---
 name: pageindex
-description: Answer questions about long documents — PDFs and AsciiDoc specification trees (reports, contracts, screen specs, Japanese client documents) — by indexing them once into a navigable tree, ranking its sections against the question without a model, and reading only those sections. Use when asked to index a document or a directory of specs, to search or answer questions inside indexed material, or when a document is too long to read file by file. Indexing and answering are separate jobs; an already indexed document is never re-indexed. The tool needs no LLM API key: this session writes every piece of generated text itself.
+description: Answer questions about long documents — PDF, Word, PowerPoint, Markdown, plain text, and AsciiDoc specification trees (reports, contracts, screen specs, decks, Japanese client documents) — by indexing them once into a navigable tree, ranking its sections against the question without a model, and reading only those sections. Use when asked to index a document or a directory of specs, to search or answer questions inside indexed material, or when a document is too long to read file by file. Indexing and answering are separate jobs; an already indexed document is never re-indexed. The tool needs no LLM API key: this session writes every piece of generated text itself.
 ---
 
 # PageIndex document retrieval
 
 Index a document into a tree of sections, then answer questions by walking the
 tree and reading only the sections that matter, instead of loading everything.
-Two kinds of source: a PDF, or a directory of AsciiDoc (`.adoc`) files.
+Sources: `.pdf`, `.docx`, `.pptx`, `.md`, `.txt`, and directories of AsciiDoc
+(`.adoc`) files.
 
 **Indexing and answering are separate jobs.** Indexing is done once per
 document and serves every question anyone will ever ask of it, so nothing about
@@ -34,8 +35,18 @@ Two layers, strictly separated:
 The tool runs on a virtualenv at `.venv` beside this file, built by the
 `install.sh` at the root of the repository this skill lives in — that script
 also links the skill into the personal skills directory, and `--uninstall`
-removes the link. If `.venv` is missing, run that script; do not install
-anything by hand. Every command is then:
+removes the link.
+
+**If `.venv` is missing, nothing here runs.** Follow the skill's own directory
+to where it really lives (it is usually a link into a checkout) and run
+`install.sh` from that repository's root. Do not install packages by hand and
+do not build the virtualenv yourself — the script is the one place that knows
+what goes in it. If the skill was copied rather than linked, so no `install.sh`
+sits above it, say so and stop: it needs the repository. If the script reports
+that Python or uv is missing, relay its message; installing a language runtime
+is the person's decision, not yours.
+
+Every command is then:
 
 ```bash
 <skill-dir>/.venv/bin/python <skill-dir>/tools/pi.py <command> ...
@@ -54,15 +65,37 @@ questions and must not be indexed again — re-indexing throws away the summarie
 it carries. Never point the store at a temporary directory; the tool refuses
 one.
 
-Reads address a document by **unit**: a page for a PDF, a fixed-size block of
-lines for an AsciiDoc tree. `index` and `index-adoc` report how many units a
-document has.
+Reads address a document by **unit** — a page, a slide, or a block of lines,
+depending on the source. `index` reports how many units a document has.
 
-## Indexing a PDF
+## Indexing
 
-Only after `pi.py list` shows the document is not there yet.
+Only after `pi.py list` shows the document is not there yet. One command reads
+every source; the path decides which reader runs.
 
-**1. Probe the PDF.**
+```bash
+pi.py index <file or directory>
+```
+
+| Source | Where the tree comes from | Costs a model pass? |
+| --- | --- | --- |
+| `.pdf` with a text layer | The page layout and any bookmarks | No |
+| `.pdf` that is scanned | Headings you write while reading page images | Yes, once |
+| `.docx` | Word's own `Heading 1..9` styles | No |
+| `.pptx` | One node per slide, titled by the slide | No |
+| Directory of `.adoc` | The `=` heading levels, one node per file above them | No |
+| `.md` | Its `#` headings | No |
+| `.txt` | Nothing — headings you write after reading the text | Yes, once |
+
+Whatever the source, check the result before moving on: `flat: true`, or a
+`warning`, means the tree cannot guide a search and the document needs written
+headings instead.
+
+Anything else — `.doc`, `.ppt`, `.xls`, `.xlsx` — has no reader. Convert it to
+one of the formats above first; a spreadsheet in particular has no hierarchy to
+index and is better turned into a document that does.
+
+### PDF
 
 ```bash
 pi.py probe report.pdf
@@ -72,19 +105,11 @@ pi.py probe report.pdf
 pages are images. `cjk_chars` tells you whether the document is Japanese or
 Chinese.
 
-**2a. Text-layer route — index directly.**
+A text-layer PDF indexes directly. On success `structure_source` is `detected`,
+`bookmarks` or `hybrid`; `flat: true` means no hierarchy was found, and that
+document takes the scanned route below.
 
-```bash
-pi.py index report.pdf
-```
-
-The tree comes from the PDF's layout and bookmarks. Check the result:
-`structure_source` is `detected`, `bookmarks` or `hybrid` on success, and
-`flat: true` means no hierarchy was found and every page became its own node —
-when that happens, treat the document as the OCR route below, which derives the
-tree from headings you write.
-
-**2b. OCR route — read the pages, then index.**
+A scanned PDF needs its pages read first:
 
 ```bash
 pi.py render report.pdf --out pages/ --pages 1-20
@@ -110,12 +135,10 @@ For a long scan, render and read in batches of 10–20 pages, and dispatch the
 batches to parallel subagents that write the markdown files; each batch is
 independent.
 
-## Indexing a directory of AsciiDoc files
-
-Again, only if `pi.py list` does not already show it.
+### A directory of AsciiDoc files
 
 ```bash
-pi.py index-adoc specs/会員管理
+pi.py index specs/会員管理
 ```
 
 One directory becomes one document, so pick the directory that matches how
@@ -125,17 +148,59 @@ limits it to the files directly inside), and builds the tree from the `=`
 heading levels: one node per file, that file's heading hierarchy underneath.
 Headings inside delimited blocks are not mistaken for structure.
 
-Nothing here needs a model — the headings are already the structure, so an
-AsciiDoc tree indexes in seconds and goes straight to the summary step.
-
-The text is cut into blocks of `--block-lines` lines (60 by default) and each
-block opens with a `// <file> line <N>` marker. Those markers are how an answer
-cites its source: name the file and the heading, not the block number. Lower
-`--block-lines` for tighter reads on dense specs; raise it for prose.
-
 Images referenced with `image::` are not read. When a question turns on what a
 screenshot shows, open that PNG yourself from the path in the macro, relative to
 the indexed directory.
+
+### Word and PowerPoint
+
+```bash
+pi.py index handbook.docx
+pi.py index onboarding.pptx
+```
+
+Word carries outline level in its paragraph styles, so the hierarchy is already
+in the file. A `.docx` written without heading styles has no hierarchy to find,
+and the result says so — give it written headings, as for plain text below.
+
+A deck is divided by slide: one slide is one node and one read unit, and each
+unit opens with a `// slide <N>` marker, so an answer cites a slide number.
+Speaker notes are indexed with the slide.
+
+### Plain text, and documents with no headings
+
+A `.txt` file carries no structure at all, and so does a `.docx` written
+entirely in body text. Indexing one anyway gives a node per block, which keeps
+every line reachable but guides no search. Write the headings instead — the one
+generative pass these formats need:
+
+```bash
+pi.py chunks notes.txt --lines 200
+```
+
+Read each chunk (every line is numbered) and decide where the document really
+divides. Write what you find as JSON, quoting each title exactly as its line
+spells it:
+
+```json
+[{"title": "Refund process", "line": 42, "level": 1},
+ {"title": "Held transactions", "line": 96, "level": 2}]
+```
+
+```bash
+pi.py index notes.txt --headings headings.json
+```
+
+A title that does not appear on the line it claims is rejected, so copy from
+the text rather than paraphrasing. Headings above sections that a reader would
+actually look for beat headings for every paragraph.
+
+### Read units
+
+Reads address a document by unit, and what a unit is depends on the source: a
+page for a PDF, a slide for a deck, and a fixed-size block of `--block-lines`
+lines (60 by default) for everything else. Lower `--block-lines` for tighter
+reads on dense material; raise it for prose.
 
 ## Summaries
 
@@ -277,8 +342,8 @@ until the response's `pagination.has_more` is false.
 | --- | --- |
 | `probe PDF` | Page count, text-layer quality, CJK content, `text-layer` or `ocr` route |
 | `render PDF --out DIR [--pages 1-20] [--scale 2.0]` | Page images to read |
-| `index PDF [--md DIR] [--name N] [--replace]` | Build and store the tree for a PDF |
-| `index-adoc DIR [--name N] [--replace] [--block-lines N] [--no-recurse]` | Build and store the tree for a directory of `.adoc` files |
+| `index PATH [--md DIR] [--headings FILE] [--block-lines N] [--no-recurse] [--name N] [--replace]` | Build and store the tree for any supported source |
+| `chunks FILE [--lines N]` | Numbered text of a structureless file, to read before writing its headings |
 | `nodes DOC [--leaves\|--parents] [--ready] [--all] [--no-text] [--max-chars N]` | Sections needing a summary, with their text |
 | `set-summaries DOC --from FILE` | Write summaries and the document description into the tree |
 | `list` | Stored documents — always the first call |
