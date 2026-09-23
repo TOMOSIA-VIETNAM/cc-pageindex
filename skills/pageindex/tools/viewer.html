@@ -158,12 +158,35 @@ mark { background: var(--hit); color: inherit; border-radius: 2px; }
 
 .float { position: absolute; background: var(--panel); border: 1px solid var(--line);
   border-radius: 10px; box-shadow: var(--shadow); }
-.legend { top: 14px; left: 14px; padding: 6px 10px; font-size: 12px;
-  color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap;
-  align-items: center; max-width: calc(100% - 28px); pointer-events: none; }
-.legend span { display: inline-flex; align-items: center; gap: 5px; }
-.legend svg { width: 12px; height: 12px; }
-.legend circle { stroke-width: 1.4; }
+.stats { top: 14px; left: 14px; width: 300px; font-size: 12px;
+  max-width: calc(100% - 28px); }
+.stats-head { display: flex; width: 100%; align-items: center; gap: 8px;
+  justify-content: space-between; border: 0; background: none; padding: 8px 12px;
+  font-size: 13px; font-weight: 600; text-align: left; border-radius: 10px; }
+.stats-head svg { width: 14px; height: 14px; flex: none; fill: none;
+  stroke: var(--muted); stroke-width: 2; stroke-linecap: round;
+  stroke-linejoin: round; transition: transform .16s; }
+.stats-head[aria-expanded="false"] svg { transform: rotate(-90deg); }
+.stats-body { padding: 0 12px 10px; }
+.levels { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 8px;
+  align-items: center; margin-bottom: 10px; max-height: 150px; overflow-y: auto; }
+.lv-name, .lv-n { font-family: var(--mono); color: var(--muted); }
+.lv-n { text-align: right; color: var(--ink); }
+.lv-track { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.lv-bar { height: 100%; border-radius: 3px; background: var(--accent); min-width: 2px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line);
+  background: var(--bg); border-radius: 999px; padding: 3px 9px 3px 7px;
+  font-size: 12px; }
+.chip:not(:disabled):hover { border-color: var(--accent); }
+.chip:disabled { cursor: default; }
+.chip[aria-pressed="true"] { border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.chip svg { width: 12px; height: 12px; }
+.chip circle { stroke-width: 1.4; }
+.chip.warn:not(:disabled) { color: var(--warn); }
+.hint { margin: 8px 0 0; color: var(--muted); font-size: 11.5px; }
+@media (prefers-reduced-motion: reduce) { .stats-head svg { transition: none; } }
 .zoom { left: 14px; bottom: 14px; display: flex; align-items: center; padding: 3px; }
 .zoom button { border: 0; background: none; width: 36px; height: 36px;
   border-radius: 7px; display: grid; place-items: center; }
@@ -197,6 +220,10 @@ mark { background: var(--hit); color: inherit; border-radius: 2px; }
   overflow-wrap: anywhere; }
 .dmeta { margin: 0 0 10px; font-family: var(--mono); font-size: 12px;
   color: var(--muted); }
+.dstats { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px;
+  margin: 0 0 12px; font-size: 12.5px; }
+.dstats dt { color: var(--muted); }
+.dstats dd { margin: 0; font-family: var(--mono); }
 .dsum { margin: 0 0 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .dsum.empty { color: var(--warn); font-style: italic; }
 .dactions { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -213,7 +240,7 @@ mark { background: var(--hit); color: inherit; border-radius: 2px; }
   .list { padding: 16px; }
   .graph { min-height: 70vh; }
   .sum { margin-left: 22px; }
-  .mini, .legend { display: none; }
+  .mini { display: none; }
   .detail { top: auto; left: 12px; right: 12px; bottom: 60px; width: auto;
     max-height: 55%; }
 }
@@ -251,12 +278,20 @@ mark { background: var(--hit); color: inherit; border-radius: 2px; }
           <g id="world"><g id="edges"></g><g id="nodes"></g></g>
         </svg>
       </div>
-      <div class="float legend" aria-hidden="true">
-        <span><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor"/></svg>summarized</span>
-        <span style="color:var(--warn)"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-dasharray="2.4 2"/></svg>no summary</span>
-        <span><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="currentColor" stroke="currentColor"/></svg>collapsed</span>
-        <span>drag to move · ⌘/Ctrl + scroll to zoom · click a circle to fold</span>
-      </div>
+      <section id="stats" class="float stats" aria-label="Tree statistics">
+        <button id="statsToggle" class="stats-head" aria-expanded="true" aria-controls="statsBody">
+          <span id="statsLine"></span><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div id="statsBody" class="stats-body">
+          <div id="levels" class="levels" role="list" aria-label="Sections per level"></div>
+          <div class="chips">
+            <button class="chip" id="chipSummarized" disabled><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor"/></svg><span></span></button>
+            <button class="chip warn" id="chipMissing" aria-pressed="false" title="Show only sections without a summary"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-dasharray="2.4 2"/></svg><span></span></button>
+            <button class="chip" id="chipFolded" title="Unfold every branch"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="currentColor" stroke="currentColor"/></svg><span></span></button>
+          </div>
+          <p class="hint">drag to move · ⌘/Ctrl + scroll to zoom · click a circle to fold</p>
+        </div>
+      </section>
       <div class="float zoom" role="group" aria-label="Zoom">
         <button id="zoomOut" aria-label="Zoom out" title="Zoom out (−)"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
         <button id="zoomLevel" aria-label="Reset zoom to 100%" title="Reset to 100% (0)">100%</button>
@@ -274,6 +309,7 @@ mark { background: var(--hit); color: inherit; border-radius: 2px; }
         </div>
         <h3 id="dTitle"></h3>
         <p class="dmeta" id="dMeta"></p>
+        <dl class="dstats" id="dStats"></dl>
         <p class="dsum" id="dSum"></p>
         <div class="dactions">
           <button id="dToggle"></button>
@@ -442,7 +478,7 @@ const GRAPH = {
 const board = $("board"), stage = $("stage"), world = $("world");
 const edgesG = $("edges"), nodesG = $("nodes");
 const mini = $("mini"), miniG = $("miniNodes"), miniView = $("miniView");
-const detail = $("detail");
+const detail = $("detail"), stats = $("stats");
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
 const narrow = matchMedia("(max-width: 720px)");
 const cam = {x: 0, y: 0, k: 1};
@@ -679,6 +715,96 @@ function relayout() {
   render();
   light(selected && isShown(selected) ? selected : null);
   apply();
+  updateStats();
+}
+
+/* statistics */
+
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many || one + "s"}`;
+
+// Counts over everything below a node, at every depth, folded or not.
+function treeStats(node) {
+  const stats = {sections: 0, leaves: 0, summarized: 0, levels: []};
+  const walk = parent => {
+    for (const child of parent.children) {
+      stats.sections++;
+      if (!child.children.length) stats.leaves++;
+      if (child.summary) stats.summarized++;
+      const level = child.depth - node.depth - 1;
+      stats.levels[level] = (stats.levels[level] || 0) + 1;
+      walk(child);
+    }
+  };
+  walk(node);
+  return stats;
+}
+
+function updateStats() {
+  const stats = treeStats(graph.root);
+  $("statsLine").textContent = [plural(stats.sections, "section"),
+    plural(stats.levels.length, "level"), plural(stats.leaves, "leaf", "leaves")].join(" · ");
+  const levels = $("levels");
+  levels.replaceChildren();
+  const widest = Math.max(1, ...stats.levels);
+  stats.levels.forEach((count, index) => {
+    const track = element("div", "lv-track");
+    const bar = element("div", "lv-bar");
+    bar.style.width = `${count / widest * 100}%`;
+    track.append(bar);
+    const name = element("span", "lv-name", `L${index + 1}`);
+    name.setAttribute("role", "listitem");
+    name.setAttribute("aria-label", `level ${index + 1}: ${plural(count, "section")}`);
+    levels.append(name, track, element("span", "lv-n", count));
+  });
+  const missing = stats.sections - stats.summarized;
+  $("chipSummarized").lastElementChild.textContent =
+    `${stats.summarized}/${stats.sections} summarized`;
+  const chipMissing = $("chipMissing");
+  chipMissing.lastElementChild.textContent = `${missing} no summary`;
+  chipMissing.disabled = !missing && !onlyMissing.checked;
+  chipMissing.setAttribute("aria-pressed", String(onlyMissing.checked));
+  const folded = graph.all.filter(node => node.collapsed && node.children.length && isShown(node));
+  const hidden = folded.reduce((total, node) => total + descendants(node), 0);
+  const chipFolded = $("chipFolded");
+  chipFolded.lastElementChild.textContent = folded.length
+    ? `${plural(folded.length, "folded branch", "folded branches")} · ${hidden} hidden`
+    : "nothing folded";
+  chipFolded.disabled = !folded.length;
+}
+
+function setStatsOpen(open) {
+  $("statsToggle").setAttribute("aria-expanded", String(open));
+  $("statsBody").hidden = !open;
+  try { localStorage.setItem("pageindex-viewer-stats", open ? "open" : "closed"); } catch (error) {}
+}
+$("statsToggle").onclick = () =>
+  setStatsOpen($("statsToggle").getAttribute("aria-expanded") !== "true");
+$("chipMissing").onclick = () => { onlyMissing.checked = !onlyMissing.checked; filter(); };
+$("chipFolded").onclick = () => unfoldAll();
+{
+  let stored = null;
+  try { stored = localStorage.getItem("pageindex-viewer-stats"); } catch (error) {}
+  setStatsOpen(stored ? stored === "open" : !narrow.matches);
+}
+
+function detailStats(node) {
+  const doc = data.documents[current], stats = treeStats(node), rows = [];
+  if (!node.isRoot) rows.push(["Level", node.depth]);
+  if (node.children.length) {
+    rows.push(["Children", node.children.length]);
+    // only when they add something: with no grandchildren both equal the children
+    if (stats.sections > node.children.length) rows.push(["Below", stats.sections]);
+    if (stats.leaves !== stats.sections) rows.push(["Leaves", stats.leaves]);
+    rows.push(["Summarized", `${stats.summarized}/${stats.sections}`]);
+  }
+  if (!node.isRoot && node.start != null && doc.units) {
+    const span = (node.end ?? node.start) - node.start + 1, share = span / doc.units * 100;
+    rows.push(["Coverage", `${span} of ${doc.units} units (${share.toFixed(share < 10 ? 1 : 0)}%)`]);
+  }
+  const list = $("dStats");
+  list.replaceChildren();
+  for (const [term, value] of rows) list.append(element("dt", "", term), element("dd", "", value));
+  list.hidden = !rows.length;
 }
 
 // Light a node's path from the root and everything under it; the rest dims.
@@ -711,11 +837,15 @@ function apply() {
   drawMiniView();
 }
 
-// The part of the board not covered by the detail panel.
+// The part of the board not covered by the statistics card on the left or the
+// detail panel on the right. On a narrow screen both sit over the board instead.
 function viewport() {
   const rect = board.getBoundingClientRect();
-  const covered = !detail.hidden && !narrow.matches ? detail.offsetWidth + 28 : 0;
-  return {w: Math.max(rect.width - covered, 1), h: rect.height, rect};
+  const statsOpen = !$("statsBody").hidden && !narrow.matches;
+  const left = statsOpen ? stats.offsetLeft + stats.offsetWidth : 0;
+  const right = !detail.hidden && !narrow.matches ? detail.offsetWidth + 28 : 0;
+  const w = Math.max(rect.width - left - right, 1), h = rect.height;
+  return {left, w, h, cx: left + w / 2, cy: h / 2};
 }
 
 function moveTo(target, instant) {
@@ -742,14 +872,14 @@ function zoomAt(px, py, factor) {
 
 function zoomCentre(factor) {
   const view = viewport();
-  zoomAt(view.w / 2, view.h / 2, factor);
+  zoomAt(view.cx, view.cy, factor);
 }
 
 function fitTo(nodes, maxZoom, instant) {
   const box = bounds(nodes), view = viewport(), pad = GRAPH.fitPad;
   const k = clampZoom(Math.min((view.w - 2 * pad) / box.w, (view.h - 2 * pad) / box.h, maxZoom));
-  moveTo({k, x: view.w / 2 - (box.x0 + box.w / 2) * k,
-          y: view.h / 2 - (box.y0 + box.h / 2) * k}, instant);
+  moveTo({k, x: view.cx - (box.x0 + box.w / 2) * k,
+          y: view.cy - (box.y0 + box.h / 2) * k}, instant);
 }
 const fitAll = instant => fitTo(graph.visible, 1, instant);
 
@@ -760,19 +890,19 @@ function openView() {
   const fit = Math.min((view.w - 2 * pad) / box.w, (view.h - 2 * pad) / box.h, 1);
   if (fit >= GRAPH.readableZoom) { fitAll(true); return; }
   const k = GRAPH.readableZoom, root = graph.root;
-  const x = layoutMode === "tree" ? pad - box.x0 * k : view.w / 2 - root.x * k;
-  moveTo({k, x, y: view.h / 2 - root.y * k}, true);
+  const x = layoutMode === "tree" ? view.left + pad - box.x0 * k : view.cx - root.x * k;
+  moveTo({k, x, y: view.cy - root.y * k}, true);
 }
 
 function centreOn(node) {
   const view = viewport(), k = Math.max(cam.k, 0.9);
   const [a, b] = extent(node);
-  moveTo({k, x: view.w / 2 - (a[0] + b[0]) / 2 * k, y: view.h / 2 - (a[1] + b[1]) / 2 * k});
+  moveTo({k, x: view.cx - (a[0] + b[0]) / 2 * k, y: view.cy - (a[1] + b[1]) / 2 * k});
 }
 
 function onScreen(node) {
   const view = viewport(), x = cam.x + node.x * cam.k, y = cam.y + node.y * cam.k;
-  return x > 20 && y > 20 && x < view.w - 20 && y < view.h - 20;
+  return x > view.left + 20 && y > 20 && x < view.left + view.w - 20 && y < view.h - 20;
 }
 
 /* folding and selection */
@@ -820,8 +950,8 @@ function showDetail(node) {
   const meta = node.isRoot
     ? [doc.units != null && `${doc.units} units`, doc.source]
     : [node.id && `#${node.id}`, units(node.start, node.end)];
-  if (node.children.length) meta.push(`${descendants(node)} subsections`);
   $("dMeta").textContent = meta.filter(Boolean).join(" · ");
+  detailStats(node);
   const sum = $("dSum");
   sum.textContent = node.summary || (node.isRoot ? "No description." : "No summary yet.");
   sum.classList.toggle("empty", !node.summary);
@@ -997,8 +1127,8 @@ function miniJump(e) {
   const point = new DOMPoint(e.clientX, e.clientY).matrixTransform(mini.getScreenCTM().inverse());
   const view = viewport();
   cancelAnimationFrame(flight);
-  cam.x = view.w / 2 - point.x * cam.k;
-  cam.y = view.h / 2 - point.y * cam.k;
+  cam.x = view.cx - point.x * cam.k;
+  cam.y = view.cy - point.y * cam.k;
   apply();
 }
 mini.addEventListener("pointerdown", e => { mini.setPointerCapture(e.pointerId); miniJump(e); });
@@ -1038,11 +1168,14 @@ q.addEventListener("keydown", e => {
   $("hits").textContent = `${hitAt + 1} / ${hitList.length}`;
 });
 
-$("expand").onclick = () => {
-  if (activeView === "list") { setAll(false); listFilter(); return; }
+function unfoldAll() {
   for (const node of graph.all) node.collapsed = false;
   relayout();
   fitAll();
+}
+$("expand").onclick = () => {
+  if (activeView === "list") { setAll(false); listFilter(); return; }
+  unfoldAll();
 };
 $("collapse").onclick = () => {
   if (activeView === "list") { setAll(true); return; }
