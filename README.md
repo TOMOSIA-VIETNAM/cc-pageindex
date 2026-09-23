@@ -15,11 +15,11 @@
   <img src="https://img.shields.io/badge/pdf%20%C2%B7%20docx%20%C2%B7%20pptx%20%C2%B7%20adoc%20%C2%B7%20md%20%C2%B7%20txt-informational" alt="Định dạng hỗ trợ">
 </p>
 
-> **Tài liệu dài, câu hỏi ngắn.** Dán cả file vào chat thì tốn token và tràn context. Tìm tay trong 230 file spec thì mất cả buổi. Hỏi AI mà không có tài liệu thì nó bịa.
+> Một bộ spec ba trăm trang chẳng trả lời được gì cho tới khi có người mở đúng trang. Dán trọn nó vào chat thì đốt token và tràn context, mà càng dài model càng đọc lướt. Không đưa tài liệu thì nó vẫn trả lời, trôi chảy và sai.
 >
-> Skill này index tài liệu **một lần**, rồi mỗi câu hỏi chỉ đọc đúng vài mục liên quan — kèm trích dẫn để lần về đúng trang. Bước tìm "đọc chỗ nào" chạy ngay trên máy, không gọi model, không tốn token.
+> Người thật không làm vậy. Họ liếc mục lục, nhảy thẳng tới mục cần, đọc vài trang rồi trả lời — và chỉ được ra mình lấy từ đâu. Skill này cho Claude làm đúng như thế.
 
-Hoạt động với báo cáo, hợp đồng, spec màn hình tiếng Nhật, sách nội bộ — bất cứ thứ gì dài tới mức không muốn đọc lại từ đầu.
+Dùng được với báo cáo, hợp đồng, spec màn hình tiếng Nhật, sách nội bộ — bất cứ thứ gì dài tới mức bạn không muốn đọc lại từ đầu.
 
 ```
 Bạn:    Trong spec 会員管理, 退会処理 cập nhật cột email thế nào?
@@ -29,6 +29,16 @@ Claude: Ghi email thành "<địa chỉ cũ>_<thời điểm hiện tại>", đ�
         phone_number = NULL, quit_at = thời điểm hiện tại.
         Nguồn: 2.1.会員詳細画面_機能詳細.adoc, dòng 110.
 ```
+
+## Vì sao không phải vector RAG
+
+Cách quen thuộc là băm tài liệu thành từng đoạn, nhúng mỗi đoạn thành một vector, rồi lấy những đoạn nằm gần câu hỏi nhất trong không gian đó. Cái giá phải trả là cấu trúc: một điều khoản bị cắt rời khỏi mục nó thuộc về, một bảng bị đứt làm đôi, và người đọc mất luôn manh mối rằng đoạn này nằm trong chương nào. Tệ hơn, "gần giống về ngôn từ" không đồng nghĩa với "chỗ chứa câu trả lời" — hỏi quy định nào áp dụng cho một trường hợp, thì đoạn giống câu hỏi nhất thường là đoạn nhắc lại chính câu hỏi, còn đoạn quy định lại dùng từ khác hẳn. Chưa kể bạn phải nuôi thêm một embedding model và một vector database, rồi index lại mỗi lần tài liệu đổi.
+
+PageIndex bỏ hẳn lớp đó. Tài liệu nghiêm túc nào cũng đã có sẵn cấu trúc — mục lục của PDF, style Heading của Word, cấp tiêu đề của AsciiDoc — nên thay vì phá đi rồi dựng lại bằng vector, nó giữ nguyên và biến việc tìm kiếm thành việc đi trong cây mục lục. Claude nhìn cây, chọn mục, mở ra đọc. Vì biết mình đã mở mục nào nên trích dẫn đi kèm là chuyện đương nhiên, không phải tính năng gắn thêm.
+
+Còn nếu chỉ hỏi Claude mà không có lớp này? Nó chỉ nắm được những gì bạn kịp dán vào, và phần còn lại nó lấp bằng suy đoán — nghe rất thuyết phục. Sự khác biệt không nằm ở chỗ model thông minh hơn, mà ở chỗ nó đang đọc đúng trang.
+
+Chi tiết cơ chế: [Cách nó làm việc](docs/how-it-works.md).
 
 ## Cài đặt
 
