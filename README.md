@@ -1,11 +1,17 @@
 # cc-pageindex
 
 <p>
-  <img src="assets/pageindex.svg" alt="PageIndex" height="15" style="vertical-align:middle">
-  &nbsp;<strong>PageIndex</strong>
+  <a href="https://pageindex.ai/"><img src="assets/pageindex.png" alt="PageIndex" height="24"></a>
   &nbsp;&nbsp;×&nbsp;&nbsp;
-  <img src="assets/claude.svg" alt="Claude" height="20" style="vertical-align:middle">
-  &nbsp;<strong>Claude Code</strong>
+  <a href="https://claude.com/claude-code"><img src="assets/claude.svg" alt="Claude" height="22" style="vertical-align:middle"> <strong>Claude Code</strong></a>
+</p>
+
+<p>
+  <a href="https://claude.com/claude-code"><img src="https://img.shields.io/badge/Claude%20Code-skill-d97757" alt="Claude Code skill"></a>
+  <a href="https://pageindex.ai/"><img src="https://img.shields.io/badge/PageIndex-vectorless%20RAG-4e86d2" alt="PageIndex"></a>
+  <img src="https://img.shields.io/badge/python-3.10%2B-3776ab?logo=python&logoColor=white" alt="Python 3.10+">
+  <img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-lightgrey" alt="macOS, Linux, Windows">
+  <img src="https://img.shields.io/badge/pdf%20%C2%B7%20docx%20%C2%B7%20pptx%20%C2%B7%20adoc%20%C2%B7%20md%20%C2%B7%20txt-informational" alt="Định dạng hỗ trợ">
 </p>
 
 Hỏi đáp trên tài liệu dài ngay trong Claude Code — báo cáo, hợp đồng, spec màn hình tiếng Nhật, sách nội bộ.
@@ -67,4 +73,4 @@ Nhận `.pdf` (kể cả bản scan), `.docx`, `.pptx`, `.md`, `.txt`, và thư 
 
 ---
 
-Dựng trên thư viện [PageIndex](https://github.com/VectifyAI/PageIndex) (vectorless RAG), chạy như một skill của [Claude Code](https://claude.com/claude-code). Đây không phải sản phẩm chính thức của hai bên; logo thuộc về chủ sở hữu tương ứng.
+Dựng trên [PageIndex](https://pageindex.ai/) ([source](https://github.com/VectifyAI/PageIndex)) — tree-index và truy xuất không cần vector — chạy như một skill của [Claude Code](https://claude.com/claude-code). Đây không phải sản phẩm chính thức của hai bên; logo thuộc về chủ sở hữu tương ứng.
