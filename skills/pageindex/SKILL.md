@@ -350,7 +350,7 @@ until the response's `pagination.has_more` is false.
 | `retrieve "QUESTION" [--doc NAME] [--top N]` | Rank the indexed sections against a question, no model involved |
 | `read DOC --nodes 0037,0038` | The full text of those sections |
 | `tree DOC [--summary] [--depth N] [--width N]` | The stored tree as an indented outline, with the nodes still missing a summary marked |
-| `html --out FILE [--doc NAME]` | A self-contained page of the stored trees: collapsible, searchable, offline |
+| `html --out FILE [--doc NAME]` | A self-contained page of the stored trees, offline: a board to drag and zoom with the sections as a node graph (tree or radial), plus a collapsible list; both searchable |
 | `structure DOC [--part N]` | The tree: titles, summaries, unit ranges |
 | `page DOC --pages 12-18` | The text of those units |
 | `remove DOC` | Delete a document from the store |

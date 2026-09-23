@@ -34,7 +34,7 @@ $PI/.venv/bin/python $PI/tools/pi.py tree <tên>     # cây mục lục + tình 
 $PI/.venv/bin/python $PI/tools/pi.py html --out xem.html
 ```
 
-`xem.html` mở bằng trình duyệt: gấp mở từng nhánh, tìm theo tên bảng hay tên cột. Trang này nhúng nguyên văn tóm tắt của tài liệu — gửi cho ai thì cân nhắc như gửi chính tài liệu.
+`xem.html` mở bằng trình duyệt. Tab Graph vẽ các mục thành đồ thị node trên một board: kéo để di chuyển, ⌘/Ctrl + cuộn để zoom, click vòng tròn để gấp mở nhánh, click tên mục để xem tóm tắt, hover để thấy đường đi từ gốc. Tab List là dạng danh sách gấp mở được. Cả hai tìm được theo tên bảng hay tên cột. Trang này nhúng nguyên văn tóm tắt của tài liệu — gửi cho ai thì cân nhắc như gửi chính tài liệu.
 
 ## Xoá một tài liệu
 
