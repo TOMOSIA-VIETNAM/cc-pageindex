@@ -6,7 +6,7 @@
 <title>Document index</title>
 <style>
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
   --bg: #f7f6f2; --panel: #ffffff; --line: #e3e1dc; --ink: #1c1b19;
   --muted: #6d6a64; --accent: #5b45e0; --warn: #b4520f; --hit: #ffe9a8;
   --edge: #a29e94; --dot: #d6d3cb;
@@ -15,15 +15,22 @@
   --sans: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP",
           sans-serif;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #131317; --panel: #1c1c21; --line: #2e2d35; --ink: #e9e7e4;
-    --muted: #9a958d; --accent: #a892ff; --warn: #e2883f; --hit: #4a3f14;
-    --edge: #5f5c66; --dot: #2a2930;
-    --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 6px 20px rgb(0 0 0 / .35);
-  }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #131317; --panel: #1c1c21; --line: #2e2d35; --ink: #e9e7e4;
+  --muted: #9a958d; --accent: #a892ff; --warn: #e2883f; --hit: #4a3f14;
+  --edge: #5f5c66; --dot: #2a2930;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 6px 20px rgb(0 0 0 / .35);
 }
 * { box-sizing: border-box; }
+.head-tools { display: flex; gap: 8px; align-items: center; flex: none; }
+.theme { border: 1px solid var(--line); background: var(--panel); width: 36px;
+  height: 36px; border-radius: 8px; display: grid; place-items: center; }
+.theme:hover { border-color: var(--muted); }
+.theme svg { width: 17px; height: 17px; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.theme .moon, :root[data-theme="dark"] .theme .sun { display: none; }
+:root[data-theme="dark"] .theme .moon { display: block; }
 [hidden] { display: none !important; }
 html, body { height: 100%; }
 body {
@@ -245,6 +252,13 @@ mark { background: var(--hit); color: inherit; border-radius: 2px; }
     max-height: 55%; }
 }
 </style>
+<script>
+// Light unless this viewer chose dark before; set here so the page never flashes light.
+try {
+  if (localStorage.getItem("pageindex-viewer-theme") === "dark")
+    document.documentElement.dataset.theme = "dark";
+} catch (error) {}
+</script>
 </head>
 <body>
 <div class="shell">
@@ -252,9 +266,15 @@ mark { background: var(--hit); color: inherit; border-radius: 2px; }
   <main>
     <header class="head">
       <div><h2 id="docName"></h2><p id="docMeta"></p></div>
-      <div class="seg" role="tablist" aria-label="View">
-        <button role="tab" id="tabGraph" aria-controls="graphView">Graph</button>
-        <button role="tab" id="tabList" aria-controls="listView">List</button>
+      <div class="head-tools">
+        <div class="seg" role="tablist" aria-label="View">
+          <button role="tab" id="tabGraph" aria-controls="graphView">Graph</button>
+          <button role="tab" id="tabList" aria-controls="listView">List</button>
+        </div>
+        <button class="theme" id="theme" aria-pressed="false" aria-label="Dark theme" title="Dark theme">
+          <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <svg class="moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
       </div>
     </header>
     <div class="bar">
@@ -1231,6 +1251,15 @@ function select(index) {
   needsFit = true;
   if (activeView === "graph") { needsFit = false; openView(); }
 }
+
+function setTheme(dark) {
+  if (dark) document.documentElement.dataset.theme = "dark";
+  else delete document.documentElement.dataset.theme;
+  $("theme").setAttribute("aria-pressed", String(dark));
+  try { localStorage.setItem("pageindex-viewer-theme", dark ? "dark" : "light"); } catch (error) {}
+}
+$("theme").onclick = () => setTheme(document.documentElement.dataset.theme !== "dark");
+$("theme").setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "dark"));
 
 $("foot").textContent = `generated ${data.generated} from ${data.store}`;
 let savedView = "graph";
