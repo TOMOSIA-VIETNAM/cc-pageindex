@@ -1,6 +1,6 @@
 ---
 name: pageindex
-description: Answer questions about long documents — PDF, Word, PowerPoint, Markdown, plain text, and AsciiDoc specification trees (reports, contracts, screen specs, decks, Japanese client documents) — by indexing them once into a navigable tree, ranking its sections against the question without a model, and reading only those sections. Use when asked to index a document or a directory of specs, to search or answer questions inside indexed material, or when a document is too long to read file by file. Indexing and answering are separate jobs; an already indexed document is never re-indexed. The tool needs no LLM API key: this session writes every piece of generated text itself.
+description: Answer questions about long documents — PDF, Word, PowerPoint, Markdown, plain text, and AsciiDoc specification trees (reports, contracts, screen specs, decks, Japanese client documents) — by indexing them once into a navigable tree, ranking its sections against the question without a model, and reading only those sections. Use when asked to index a document or a directory of specs, to search or answer questions inside indexed material, to preview or browse what has been indexed, or when a document is too long to read file by file. Indexing and answering are separate jobs; an already indexed document is never re-indexed. The tool needs no LLM API key: this session writes every piece of generated text itself.
 ---
 
 # PageIndex document retrieval
@@ -336,6 +336,34 @@ past its own boundary.
 A tree too large for one response comes back paginated: increment `--part N`
 until the response's `pagination.has_more` is false.
 
+## Previewing
+
+When the user asks to preview, view or browse a document, write a page with
+`html` and give them its path. The page is one self-contained file that opens
+offline in any browser; there is nothing to install or serve.
+
+Preview one document unless the user asks for the whole store:
+
+- They name a document, or the conversation is about one (it was just indexed,
+  or questions are being answered from it): `html --doc NAME` for that one.
+  `--doc` repeats, for the few they name together.
+- They ask for the store, everything, or what is indexed, or no document is in
+  play: `html` with no `--doc`, which puts every document on one page with a
+  list to switch between them.
+- Unclear which: preview the document the conversation last dealt with, and
+  say in one line that the whole store can be previewed too.
+
+The reason for the narrow default: the page embeds every summary verbatim, and
+a preview is often made to be sent to someone. A whole-store page shares every
+other document's summaries along with the one they meant, and grows by roughly
+100 KB per document.
+
+Name the file after what it shows, so previews do not overwrite each other: the
+document's name for one document (`<document name>.html`), `pageindex-store.html`
+for the whole store. Write it in the user's working directory unless they give a
+path. Say what it contains when handing it over if they may share it: the
+document's summaries and structure, not its full text.
+
 ## Commands
 
 | Command | Purpose |
@@ -350,7 +378,7 @@ until the response's `pagination.has_more` is false.
 | `retrieve "QUESTION" [--doc NAME] [--top N]` | Rank the indexed sections against a question, no model involved |
 | `read DOC --nodes 0037,0038` | The full text of those sections |
 | `tree DOC [--summary] [--depth N] [--width N]` | The stored tree as an indented outline, with the nodes still missing a summary marked |
-| `html --out FILE [--doc NAME]` | A self-contained page of the stored trees, offline: a board to drag and zoom with the sections as a node graph (tree or radial), plus a collapsible list; both searchable |
+| `html --out FILE [--doc NAME ...]` | A self-contained page of the stored trees, offline: a board to drag and zoom with the sections as a node graph (tree or radial), plus a collapsible list; both searchable |
 | `structure DOC [--part N]` | The tree: titles, summaries, unit ranges |
 | `page DOC --pages 12-18` | The text of those units |
 | `remove DOC` | Delete a document from the store |
