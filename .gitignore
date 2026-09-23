@@ -1,0 +1,18 @@
+# Built by install.sh / install.ps1, never edited by hand
+.venv/
+
+__pycache__/
+*.py[cod]
+
+# Pages written by `pi.py html`: generated from a store, and they carry the
+# indexed documents' text and summaries. Regenerate rather than commit.
+index-view.html
+*.view.html
+
+# A store placed inside the repository. The default lives in the platform's
+# per-user data directory; this catches an override pointed here by mistake,
+# which would commit whole documents.
+/pageindex-store/
+.pageindex/
+
+.DS_Store

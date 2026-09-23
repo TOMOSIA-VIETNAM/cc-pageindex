@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Document index</title>
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #fbfbfa; --panel: #ffffff; --line: #e3e1dc; --ink: #1c1b19;
+  --muted: #6d6a64; --accent: #7a5cff; --warn: #b4520f; --hit: #ffe9a8;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17161a; --panel: #1f1e23; --line: #322f38; --ink: #e9e7e4;
+    --muted: #9a958d; --accent: #a892ff; --warn: #e2883f; --hit: #4a3f14;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 14px/1.55 system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP",
+        sans-serif;
+}
+.shell { display: flex; min-height: 100vh; }
+aside {
+  width: 270px; flex: none; border-right: 1px solid var(--line);
+  background: var(--panel); padding: 16px 0; overflow-y: auto;
+  max-height: 100vh; position: sticky; top: 0;
+}
+aside h1 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--muted); margin: 0 16px 10px; }
+aside button {
+  display: block; width: 100%; text-align: left; border: 0; background: none;
+  color: inherit; font: inherit; padding: 7px 16px; cursor: pointer;
+  border-left: 3px solid transparent;
+}
+aside button:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+aside button[aria-current="true"] {
+  border-left-color: var(--accent); font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+aside .meta { display: block; color: var(--muted); font-size: 12px; }
+main { flex: 1; min-width: 0; padding: 20px 26px 60px; }
+header h2 { margin: 0 0 4px; font-size: 20px; }
+header p { margin: 0 0 16px; color: var(--muted); }
+.bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  margin-bottom: 18px; }
+input[type=search] {
+  flex: 1; min-width: 200px; padding: 8px 11px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--panel); color: inherit;
+  font: inherit;
+}
+.bar button, label.chk {
+  border: 1px solid var(--line); background: var(--panel); color: inherit;
+  padding: 7px 11px; border-radius: 7px; cursor: pointer; font: inherit;
+}
+label.chk { display: flex; align-items: center; gap: 6px; }
+.node { border-left: 1px solid var(--line); margin-left: 9px;
+  padding-left: 13px; }
+.row { display: flex; gap: 8px; align-items: baseline; padding: 3px 0; }
+.twist { width: 15px; flex: none; border: 0; background: none; color: var(--muted);
+  cursor: pointer; font: inherit; padding: 0; }
+.twist.leaf { visibility: hidden; }
+.nid { font-family: var(--mono); font-size: 12px; color: var(--muted);
+  flex: none; }
+.title { font-weight: 500; }
+.units { font-family: var(--mono); font-size: 12px; color: var(--muted);
+  flex: none; }
+.missing .title { color: var(--warn); }
+.missing .title::after { content: " ·未要約"; font-size: 11px; }
+.sum { color: var(--muted); margin: 0 0 4px 46px; max-width: 78ch; }
+mark { background: var(--hit); color: inherit; border-radius: 2px; }
+.hidden { display: none; }
+footer { color: var(--muted); font-size: 12px; margin-top: 26px;
+  border-top: 1px solid var(--line); padding-top: 10px; }
+@media (max-width: 720px) {
+  .shell { flex-direction: column; }
+  aside { width: 100%; position: static; max-height: 240px; }
+  main { padding: 16px; }
+  .sum { margin-left: 22px; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside><h1>Documents</h1><div id="docs"></div></aside>
+  <main>
+    <header><h2 id="docName"></h2><p id="docMeta"></p></header>
+    <div class="bar">
+      <input type="search" id="q" placeholder="Search titles and summaries">
+      <button id="expand">Expand all</button>
+      <button id="collapse">Collapse all</button>
+      <label class="chk"><input type="checkbox" id="onlyMissing">
+        Without summary</label>
+    </div>
+    <div id="tree"></div>
+    <footer id="foot"></footer>
+  </main>
+</div>
+<script id="payload" type="application/json">__DATA__</script>
+<script>
+const data = JSON.parse(document.getElementById("payload").textContent);
+const docsEl = document.getElementById("docs");
+const treeEl = document.getElementById("tree");
+const q = document.getElementById("q");
+const onlyMissing = document.getElementById("onlyMissing");
+let current = 0;
+
+function counts(nodes, acc = {total: 0, summarized: 0}) {
+  for (const node of nodes) {
+    acc.total++;
+    if (node.summary) acc.summarized++;
+    counts(node.nodes || [], acc);
+  }
+  return acc;
+}
+
+data.documents.forEach((doc, index) => {
+  const c = counts(doc.nodes);
+  const button = document.createElement("button");
+  button.innerHTML = "";
+  button.append(doc.name);
+  const meta = document.createElement("span");
+  meta.className = "meta";
+  meta.textContent = `${c.summarized}/${c.total} summarized · ${doc.units} units`;
+  button.append(meta);
+  button.onclick = () => select(index);
+  docsEl.append(button);
+});
+
+function element(tag, cls, text) {
+  const node = document.createElement(tag);
+  if (cls) node.className = cls;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function draw(nodes, depth) {
+  const box = element("div", depth ? "node" : "");
+  for (const node of nodes) {
+    const wrap = element("div");
+    const row = element("div", "row" + (node.summary ? "" : " missing"));
+    const children = node.nodes || [];
+    const twist = element("button", "twist" + (children.length ? "" : " leaf"),
+                          children.length ? "▾" : "·");
+    row.append(twist, element("span", "nid", node.id),
+               element("span", "title", node.title),
+               element("span", "units", `[${node.start}–${node.end}]`));
+    wrap.append(row);
+    if (node.summary) wrap.append(element("p", "sum", node.summary));
+    if (children.length) {
+      const kids = draw(children, depth + 1);
+      wrap.append(kids);
+      twist.onclick = () => {
+        const hide = !kids.classList.contains("hidden");
+        kids.classList.toggle("hidden", hide);
+        twist.textContent = hide ? "▸" : "▾";
+      };
+    }
+    wrap.dataset.text = (node.title + " " + (node.summary || "")).toLowerCase();
+    wrap.dataset.title = node.title;
+    if (node.summary) wrap.dataset.summary = node.summary;
+    wrap.dataset.missing = node.summary ? "0" : "1";
+    box.append(wrap);
+  }
+  return box;
+}
+
+function select(index) {
+  current = index;
+  const doc = data.documents[index];
+  [...docsEl.children].forEach((button, i) =>
+    button.setAttribute("aria-current", String(i === index)));
+  document.getElementById("docName").textContent = doc.name;
+  const c = counts(doc.nodes);
+  document.getElementById("docMeta").textContent =
+    [doc.description, `${c.summarized}/${c.total} nodes summarized`,
+     `${doc.units} read units`, doc.source].filter(Boolean).join(" · ");
+  treeEl.replaceChildren(draw(doc.nodes, 0));
+  filter();
+}
+
+function setAll(hidden) {
+  treeEl.querySelectorAll(".node").forEach(node =>
+    node.classList.toggle("hidden", hidden));
+  treeEl.querySelectorAll(".twist:not(.leaf)").forEach(twist =>
+    twist.textContent = hidden ? "▸" : "▾");
+}
+
+function paint(target, text, needle) {
+  if (!target) return;
+  if (!needle) { target.textContent = text; return; }
+  const parts = text.toLowerCase().split(needle);
+  const fragment = document.createDocumentFragment();
+  let at = 0;
+  parts.forEach((part, index) => {
+    fragment.append(text.slice(at, at + part.length));
+    at += part.length;
+    if (index < parts.length - 1) {
+      fragment.append(element("mark", "", text.slice(at, at + needle.length)));
+      at += needle.length;
+    }
+  });
+  target.replaceChildren(fragment);
+}
+
+function filter() {
+  const needle = q.value.trim().toLowerCase();
+  const missingOnly = onlyMissing.checked;
+  let shown = 0;
+  const walk = (box) => {
+    let anyVisible = false;
+    for (const wrap of box.children) {
+      if (!wrap.dataset.text) continue;
+      const kids = wrap.querySelector(":scope > .node");
+      const childVisible = kids ? walk(kids) : false;
+      const hit = (!needle || wrap.dataset.text.includes(needle)) &&
+                  (!missingOnly || wrap.dataset.missing === "1");
+      const visible = hit || childVisible;
+      wrap.classList.toggle("hidden", !visible);
+      if (visible) {
+        paint(wrap.querySelector(":scope > .row > .title"),
+              wrap.dataset.title, needle);
+        paint(wrap.querySelector(":scope > .sum"), wrap.dataset.summary,
+              needle);
+      }
+      if (hit) shown++;
+      if (kids && (needle || missingOnly) && childVisible) {
+        kids.classList.remove("hidden");
+        const twist = wrap.querySelector(":scope > .row > .twist");
+        if (twist) twist.textContent = "▾";
+      }
+      anyVisible = anyVisible || visible;
+    }
+    return anyVisible;
+  };
+  walk(treeEl.firstElementChild);
+  document.getElementById("foot").textContent =
+    (needle || missingOnly ? `${shown} matching nodes · ` : "") +
+    `generated ${data.generated} from ${data.store}`;
+}
+
+q.oninput = filter;
+onlyMissing.onchange = filter;
+document.getElementById("expand").onclick = () => { setAll(false); filter(); };
+document.getElementById("collapse").onclick = () => setAll(true);
+select(0);
+</script>
+</body>
+</html>
