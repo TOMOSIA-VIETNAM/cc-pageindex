@@ -23,6 +23,16 @@
   --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 6px 20px rgb(0 0 0 / .35);
 }
 * { box-sizing: border-box; }
+.embed nav.docs, .embed .head, .embed footer { display: none; }
+.embed .shell, .embed main { height: 100vh; min-height: 0; }
+/* one finger scrolls the host page vertically; horizontal drags and two fingers move the board */
+.embed .board { touch-action: pan-y; }
+.embed .hint-touch { display: none; }
+@media (max-width: 720px) { .embed #expand, .embed #collapse { display: none; } }
+@media (pointer: coarse) {
+  .embed .hint-mouse { display: none; }
+  .embed .hint-touch { display: inline; }
+}
 .head-tools { display: flex; gap: 8px; align-items: center; flex: none; }
 .theme { border: 1px solid var(--line); background: var(--panel); width: 36px;
   height: 36px; border-radius: 8px; display: grid; place-items: center; }
@@ -253,10 +263,16 @@ mark { background: var(--hit); color: inherit; border-radius: 2px; }
 }
 </style>
 <script>
-// Light unless this viewer chose dark before; set here so the page never flashes light.
+// `?embed` shows the page inside another one (an iframe on a web page): only the
+// board and its search bar, the host page keeps its own scrolling, and the host
+// sets the theme with `?theme=dark` or a message instead of a stored choice.
+const embedded = new URLSearchParams(location.search).has("embed");
+if (embedded) document.documentElement.classList.add("embed");
+// Light unless chosen otherwise; set here so the page never flashes light.
 try {
-  if (localStorage.getItem("pageindex-viewer-theme") === "dark")
-    document.documentElement.dataset.theme = "dark";
+  const theme = embedded ? new URLSearchParams(location.search).get("theme")
+                         : localStorage.getItem("pageindex-viewer-theme");
+  if (theme === "dark") document.documentElement.dataset.theme = "dark";
 } catch (error) {}
 </script>
 </head>
@@ -309,7 +325,7 @@ try {
             <button class="chip warn" id="chipMissing" aria-pressed="false" title="Show only sections without a summary"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-dasharray="2.4 2"/></svg><span></span></button>
             <button class="chip" id="chipFolded" title="Unfold every branch"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="currentColor" stroke="currentColor"/></svg><span></span></button>
           </div>
-          <p class="hint">drag to move · ⌘/Ctrl + scroll to zoom · click a circle to fold</p>
+          <p class="hint"><span class="hint-mouse">drag to move · ⌘/Ctrl + scroll to zoom · click a circle to fold</span><span class="hint-touch">drag sideways or with two fingers to move · pinch to zoom · tap a circle to fold</span></p>
         </div>
       </section>
       <div class="float zoom" role="group" aria-label="Zoom">
@@ -795,10 +811,13 @@ function updateStats() {
 function setStatsOpen(open) {
   $("statsToggle").setAttribute("aria-expanded", String(open));
   $("statsBody").hidden = !open;
-  try { localStorage.setItem("pageindex-viewer-stats", open ? "open" : "closed"); } catch (error) {}
 }
-$("statsToggle").onclick = () =>
-  setStatsOpen($("statsToggle").getAttribute("aria-expanded") !== "true");
+// only a choice the viewer made is remembered, so the default can still differ by screen size
+$("statsToggle").onclick = () => {
+  const open = $("statsToggle").getAttribute("aria-expanded") !== "true";
+  setStatsOpen(open);
+  try { localStorage.setItem("pageindex-viewer-stats", open ? "open" : "closed"); } catch (error) {}
+};
 $("chipMissing").onclick = () => { onlyMissing.checked = !onlyMissing.checked; filter(); };
 $("chipFolded").onclick = () => unfoldAll();
 {
@@ -1019,6 +1038,9 @@ board.addEventListener("pointermove", e => {
   if (touches.size >= 2) {
     const [a, b] = [...touches.values()], rect = board.getBoundingClientRect();
     const distance = spread();
+    // the midpoint moves by half of what this one finger moved: two fingers also pan
+    cam.x += (now.x - prev.x) / 2;
+    cam.y += (now.y - prev.y) / 2;
     if (drag.pinch)
       zoomAt((a.x + b.x) / 2 - rect.left, (a.y + b.y) / 2 - rect.top, distance / drag.pinch);
     drag.pinch = distance;
@@ -1045,10 +1067,13 @@ board.addEventListener("pointerup", release);
 board.addEventListener("pointercancel", release);
 
 board.addEventListener("wheel", e => {
+  const zoom = e.ctrlKey || e.metaKey;
+  // embedded, a plain scroll belongs to the host page, so the board is not a scroll trap
+  if (embedded && !zoom) return;
   e.preventDefault();
   cancelAnimationFrame(flight);
   const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? board.clientHeight : 1;
-  if (e.ctrlKey || e.metaKey) {
+  if (zoom) {
     const rect = board.getBoundingClientRect();
     const dy = Math.max(-40, Math.min(40, e.deltaY * unit));
     zoomAt(e.clientX - rect.left, e.clientY - rect.top, Math.exp(-dy * 0.01));
@@ -1259,12 +1284,20 @@ function setTheme(dark) {
   try { localStorage.setItem("pageindex-viewer-theme", dark ? "dark" : "light"); } catch (error) {}
 }
 $("theme").onclick = () => setTheme(document.documentElement.dataset.theme !== "dark");
+if (embedded) {
+  // the host page switches the theme without reloading the frame
+  addEventListener("message", e => {
+    if (e.source !== parent || !e.data || e.data.type !== "pageindex-theme") return;
+    if (e.data.theme === "dark") document.documentElement.dataset.theme = "dark";
+    else delete document.documentElement.dataset.theme;
+  });
+}
 $("theme").setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "dark"));
 
 $("foot").textContent = `generated ${data.generated} from ${data.store}`;
 let savedView = "graph";
 try { savedView = localStorage.getItem("pageindex-viewer-view") || "graph"; } catch (error) {}
-showView(savedView === "list" ? "list" : "graph");
+showView(savedView === "list" && !embedded ? "list" : "graph");
 select(0);
 </script>
 </body>

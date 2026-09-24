@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A Claude Code skill that answers questions about long documents without an LLM API key. The `pageindex` library does the mechanical work — parse a PDF's layout into a section tree, store it, serve reads. The session that runs the skill does every generative step: OCR page images, write section summaries, write the answer. Nothing in `tools/pi.py` calls a model.
 
-There is no application here beyond the skill. `notebooks/spec/` holds design documents, one directory per work item.
+Beyond the skill, `webapp/` is the public landing page (Next.js, deployed to Vercel); it embeds the viewer page `pi.py html` writes for `example/`, so a change to `tools/viewer.html` shows up there after the example is regenerated. `webapp/README.md` covers running and deploying it. `notebooks/spec/` holds design documents, one directory per work item.
 
 ## Commands
 
