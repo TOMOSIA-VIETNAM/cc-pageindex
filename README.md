@@ -4,118 +4,122 @@
 
 <h1 align="center">cc-pageindex</h1>
 
+<p align="center"><b>English</b> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.ja.md">日本語</a></p>
+
 <p align="center">
-  <b>Tài liệu 300 trang, Claude chỉ đọc đúng vài trang cần thiết.</b><br>
-  Skill cho Claude Code · không cần API key
+  <b>Read a 300-page document the way a person does.</b><br>
+  A Claude Code skill · no API key
 </p>
 
 <p align="center">
-  <a href="https://pagindex.vercel.app/vi"><b>Trang giới thiệu</b></a> ·
-  <a href="https://pagindex.vercel.app/demo/shokunin.html">Kéo thử đồ thị</a> ·
-  <a href="#cài-mất-chừng-một-phút">Cài đặt</a>
+  <a href="https://pagindex.vercel.app/en"><b>Website</b></a> ·
+  <a href="https://pagindex.vercel.app/demo/shokunin.html">Try the graph</a> ·
+  <a href="#installed-in-about-a-minute">Install</a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Claude%20Code-skill-d97757" alt="Claude Code skill">
-  <img src="https://img.shields.io/badge/API%20key-kh%C3%B4ng%20c%E1%BA%A7n-5b45e0" alt="Không cần API key">
+  <img src="https://img.shields.io/badge/API%20key-not%20needed-5b45e0" alt="No API key needed">
   <img src="https://img.shields.io/badge/python-3.10%2B-3776ab?logo=python&logoColor=white" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-lightgrey" alt="macOS, Linux, Windows">
-  <img src="https://img.shields.io/badge/pdf%20%C2%B7%20docx%20%C2%B7%20pptx%20%C2%B7%20adoc%20%C2%B7%20md%20%C2%B7%20txt-informational" alt="Định dạng hỗ trợ">
+  <img src="https://img.shields.io/badge/pdf%20%C2%B7%20docx%20%C2%B7%20pptx%20%C2%B7%20adoc%20%C2%B7%20md%20%C2%B7%20txt-informational" alt="Supported formats">
 </p>
 
 <p align="center">
-  <a href="https://pagindex.vercel.app/vi"><img src="assets/landing-hero.jpg" alt="Trang giới thiệu cc-pageindex: tài liệu thành mục lục, rồi thành câu trả lời kèm số trang" width="860"></a>
+  <a href="https://pagindex.vercel.app/en"><img src="assets/landing-hero.en.jpg" alt="The cc-pageindex website: a document becomes a table of contents, then an answer with its pages" width="860"></a>
 </p>
 
-Để trả lời một câu hỏi, chẳng ai đọc lại cả cuốn sách. Người ta mở mục lục, lật tới đúng chương, đọc vài trang là xong — và nhớ luôn mình lấy thông tin ở đâu.
+Nobody rereads a whole book to answer one question. You open the table of contents, flip to the right chapter, read a few pages — and you remember where you found it.
 
-Claude thì không có thói quen đó. Dán cả bộ spec 300 trang vào thì tốn token, tràn context, mà càng dài nó càng đọc lướt. Không dán thì nó vẫn trả lời, rất trôi chảy, và sai. **cc-pageindex** dạy Claude đọc như người thật: nhìn mục lục, mở đúng mục, đọc xong mới trả lời, kèm số trang để bạn kiểm lại.
+Claude doesn't have that habit. Paste in a 300-page spec and you burn tokens, overflow the context, and the longer it gets the more it skims. Leave the document out and it answers anyway: fluently, and wrong. **cc-pageindex** teaches Claude to read like a person: look at the contents, open the right section, read it, then answer — with the page, so you can check.
 
-Dùng được cho báo cáo, hợp đồng, spec màn hình tiếng Nhật, sách nội bộ — thứ gì đủ dài để bạn ngại đọc lại từ đầu.
+It works on reports, contracts, Japanese screen specs, internal handbooks — anything long enough that you'd rather not read it again from the top.
 
 ```
-Bạn:    Trong spec 会員管理, 退会処理 cập nhật cột email thế nào?
+You:    In the 会員管理 spec, how does 退会処理 update the email column?
 
-Claude: Ghi email thành "<địa chỉ cũ>_<thời điểm hiện tại>", đồng thời đặt
-        status = 退会, encrypted_password = chuỗi ngẫu nhiên 20 ký tự đã hash,
-        phone_number = NULL, quit_at = thời điểm hiện tại.
-        Nguồn: 2.1.会員詳細画面_機能詳細.adoc, dòng 110.
+Claude: It rewrites email as "<old address>_<current timestamp>" and sets
+        status = 退会, encrypted_password = a hashed random 20-character string,
+        phone_number = NULL, quit_at = the current time.
+        Source: 2.1.会員詳細画面_機能詳細.adoc, line 110.
 ```
 
-## Hỏi về tài liệu dài, cách quen thuộc nào cũng hụt
+## Every usual way of asking a long document falls short
 
-| | Cách làm | Vấn đề |
+| | Approach | What goes wrong |
 | --- | --- | --- |
-| ✗ | **Dán hết vào khung chat** | Tốn token, tràn context, tài liệu càng dài model càng đọc lướt và bỏ sót. |
-| ✗ | **Cắt nhỏ rồi tìm bằng vector** | Mỗi đoạn bị tách khỏi chương của nó, bảng biểu đứt làm đôi. Đoạn “nghe na ná” câu hỏi chưa chắc đã là đoạn có câu trả lời. Chưa kể phải nuôi thêm embedding model, vector database, và index lại mỗi lần tài liệu đổi. |
-| ✓ | **Lần theo mục lục** | Tài liệu tử tế nào cũng có sẵn mục lục. Giữ nguyên nó, việc tìm câu trả lời chỉ còn là chọn đúng mục — và đã biết mình đọc ở đâu thì trích nguồn là chuyện đương nhiên. |
+| ✗ | **Paste it all in** | Tokens burn, the context overflows, and the longer it gets the more the model skims. |
+| ✗ | **Chop it into vectors** | Chunks lose the chapter they belonged to and tables split in half. A passage that *sounds like* the question is often not the one that answers it. And you now run an embedding model and a vector database, and re-index whenever the document changes. |
+| ✓ | **Walk the table of contents** | Serious documents already carry their structure. Keep it, and finding the answer becomes choosing a section — and once you know where you read, citing it comes for free. |
 
-Cái khác không nằm ở chỗ model thông minh hơn, mà ở chỗ nó đang đọc đúng trang.
+The difference isn't a smarter model. It's reading the right page.
 
-## Việc tay chân để máy lo, việc suy nghĩ để Claude
+## The tool does the chores. Claude does the thinking.
 
-Công cụ chỉ làm phần cơ học và không bao giờ gọi model. Từng chữ trong câu trả lời đều do chính session Claude Code của bạn viết — nên không cần API key nào.
+The tool only does mechanical work and never calls a model. Every word of the answer comes from your own Claude Code session — which is why no API key is needed.
 
-1. **Index một lần là xong** · *công cụ*
-   Dựng mục lục từ bố cục của PDF, style Heading của Word, cấp tiêu đề AsciiDoc hay tiêu đề từng slide, rồi lưu ngay trên máy bạn. Gặp bản scan hay file text trơn thì Claude đọc qua một lượt và tự đặt tiêu đề.
-2. **Tìm mục ngay trên máy** · *công cụ*
-   Câu hỏi được đem so với tên và tóm tắt của từng mục, từ nào càng hiếm càng được tính nặng. Tiếng Nhật, tiếng Trung được tách thành từng cụm hai chữ. Hỏi lại đúng câu cũ, kết quả vẫn y như cũ.
-3. **Đọc xong mới trả lời** · *Claude*
-   Chỉ mở vài mục đứng đầu, xem chúng có thật sự trả lời được không, rồi đáp kèm số trang, số slide, hoặc tên file và số dòng.
+1. **Index once** · *tool*
+   Builds a table of contents from a PDF's layout, Word heading styles, AsciiDoc levels or slide titles, and stores it on your machine. Scanned pages and plain text get headings Claude writes, once.
+2. **Find the section locally** · *tool*
+   The question is matched against every section's title and summary, rarer words counting more. Japanese and Chinese are split into two-character pieces. Ask the same question again and you get the same ranking.
+3. **Read first, then answer** · *Claude*
+   Opens only the top few sections, checks they really answer, and replies with the page, slide, or file and line.
 
-Chi tiết cơ chế nằm ở [Cách nó làm việc](docs/how-it-works.md).
+The details are in [How it works](docs/how-it-works.md) (in Vietnamese).
 
-## Một câu hỏi, chỉ cần đọc 4 trang
+## One question, 4 pages read
 
-Lần chạy thật trên cuốn *SHOKUNIN IT – Cách người TOMOSIA làm việc* (131 trang, 78 mục). Công cụ chấm điểm toàn bộ các mục, không gọi model:
+A real run against *SHOKUNIN IT – Cách người TOMOSIA làm việc* (131 pages, 78 sections). The tool scores every section, no model involved:
 
 ```
-#0036  CHƯƠNG 3: CẢI TIẾN – KAIZEN VÀ SỨC MẠNH CỦA AI      13.91   tr. 49–50   ← đọc
-#0037  KAIZEN – ĐI LÊN TỪ NHỮNG BƯỚC CHÂN NHỎ               8.78   tr. 51–52   ← đọc
-#0042  AI LÀ NGƯỜI SỬ DỤNG AI HIỆU QUẢ NHẤT ?                7.93   tr. 61–62
+#0036  CHƯƠNG 3: CẢI TIẾN – KAIZEN VÀ SỨC MẠNH CỦA AI      13.91   p. 49–50   ← read
+#0037  KAIZEN – ĐI LÊN TỪ NHỮNG BƯỚC CHÂN NHỎ               8.78   p. 51–52   ← read
+#0042  AI LÀ NGƯỜI SỬ DỤNG AI HIỆU QUẢ NHẤT ?                7.93   p. 61–62
 ```
 
-Claude mở hai mục đầu — 4 trang trên 131 — rồi trả lời:
+Claude opens the top two — 4 pages out of 131 — and answers:
 
-> **Shokunin kết hợp Kaizen với AI như thế nào?**
+> **How does a shokunin combine Kaizen with AI?**
 >
-> Không phải chọn một trong hai. Người shokunin giữ tinh thần Kaizen — cải tiến từng chút nhưng không ngừng, như nguyên lý mỗi ngày tốt hơn 1%, tức (1.01)^365 — và dùng AI để khuếch đại chính nỗ lực đó. Có điều, cải tiến chỉ bền khi nó trở thành tiêu chuẩn chung của cả đội, giống miếng chèn giữ khẩu pháo khỏi tụt dốc trong lúc cả tiểu đội đang kéo pháo lên.
+> They don't pick one. A shokunin keeps Kaizen — improving in small, continuous steps, the 1% principle of (1.01)^365 — and treats AI as a tool that amplifies that effort. Improvement only lasts once it becomes a shared standard, like the wedge that stops a cannon sliding back while the team hauls it uphill.
 >
-> <sub>Nguồn: trang 49–52</sub>
+> <sub>Source: pages 49–52</sub>
 
-## Đồ thị này có sẵn trong skill
+The book is in Vietnamese; the question and answer are in English. Claude answers in the language you ask in.
 
-Bảo Claude *“preview tài liệu”*, hoặc tự chạy `pi.py html`, bạn sẽ có một file HTML duy nhất, mở offline được. Trong đó mục lục hiện thành đồ thị trên một mặt bảng kéo tự do như draw.io.
+## The graph ships with the skill
+
+Ask Claude to *"preview the document"*, or run `pi.py html` yourself, and you get a single HTML file that works offline. Inside, the table of contents is a graph on a board you drag around freely, like draw.io.
 
 <p align="center">
-  <a href="https://pagindex.vercel.app/demo/shokunin.html"><img src="assets/graph-view.jpg" alt="Đồ thị mục lục của cuốn sách mẫu, một nhánh đang được làm sáng" width="860"></a>
+  <a href="https://pagindex.vercel.app/demo/shokunin.html"><img src="assets/graph-view.jpg" alt="The sample book's section graph with one branch lit" width="860"></a>
 </p>
-<p align="center"><sub><a href="https://pagindex.vercel.app/demo/shokunin.html">Bấm vào ảnh để kéo thử bản thật</a></sub></p>
+<p align="center"><sub><a href="https://pagindex.vercel.app/demo/shokunin.html">Click the image to drag the real one</a></sub></p>
 
-- **Thấy ngay đường đi** — rê chuột vào một mục, đường từ gốc tới đó chạy sáng lên, kèm toàn bộ mục con.
-- **Gập bớt cho gọn** — bấm vòng tròn để gập một nhánh; mục vừa bấm vẫn đứng yên chỗ cũ.
-- **Dạng cây hay dạng tròn** — trái sang phải để dễ đọc tên mục, xoè tròn để thấy toàn cảnh.
-- **Tìm và rà soát** — mục khớp sáng lên và tự mở nhánh, Enter để nhảy qua từng kết quả, một cú bấm lọc ra mục chưa có tóm tắt.
-- **Số liệu ngay trước mắt** — mỗi cấp bao nhiêu mục, nhánh nào đang gập, mỗi mục chiếm bao nhiêu phần tài liệu.
-- **Một file, chạy offline** — không server, không CDN, dữ liệu không rời khỏi máy. Có giao diện sáng và tối, dùng được bằng chuột, bàn phím lẫn cảm ứng.
+- **Trace any path** — hover a section and the route from the root lights up, with everything under it.
+- **Fold what you don't need** — click a circle to collapse a branch; the section you clicked stays exactly where it was.
+- **Tree or radial** — left to right for reading titles, radial to take in the whole shape at once.
+- **Search and triage** — matches light up and unfold, Enter steps through them, and one click lists every section still missing a summary.
+- **Numbers at a glance** — sections per level, folded branches, and how much of the document each section covers.
+- **One file, offline** — no server, no CDN, nothing leaves your machine. Light and dark, mouse, keyboard and touch.
 
-## Tài liệu có sẵn cấu trúc gì, dùng luôn cấu trúc đó
+## Uses the structure your documents already have
 
-| Định dạng | Mục lục lấy từ đâu | Chi phí index |
+| Format | Where the contents come from | Indexing cost |
 | --- | --- | --- |
-| PDF có chữ | bố cục và bookmark | không tốn model |
-| PDF scan | Claude đọc ảnh từng trang | Claude đọc 1 lượt |
-| Word `.docx` | style Heading 1–9 | không tốn model |
-| PowerPoint `.pptx` | mỗi slide là một mục | không tốn model |
-| Markdown | các tiêu đề `#` | không tốn model |
-| File text trơn | Claude tự đặt tiêu đề | Claude đọc 1 lượt |
-| Thư mục AsciiDoc | cấp tiêu đề `=`, trích nguồn theo file và dòng | không tốn model |
+| PDF with text | layout and bookmarks | no model pass |
+| Scanned PDF | page images Claude reads | one model pass |
+| Word `.docx` | Heading 1–9 styles | no model pass |
+| PowerPoint `.pptx` | one section per slide | no model pass |
+| Markdown | `#` headings | no model pass |
+| Plain text | headings Claude writes | one model pass |
+| AsciiDoc folder | `=` levels, cited by file and line | no model pass |
 
-Vì sao lại chia như vậy: [Định dạng tài liệu](docs/formats.md).
+Why it splits that way: [Document formats](docs/formats.md) (in Vietnamese).
 
-## Cài mất chừng một phút
+## Installed in about a minute
 
-Chỉ cần có **[uv](https://github.com/astral-sh/uv)** hoặc **Python 3.10 trở lên**. Có uv thì khỏi lo Python, uv tự tải bản nó cần.
+All you need is **[uv](https://github.com/astral-sh/uv)** or **Python 3.10+**. With uv you don't even need Python — it fetches the version it wants.
 
 ```bash
 git clone https://github.com/tms-minhtang1/cc-pageindex.git
@@ -123,45 +127,43 @@ cd cc-pageindex
 ./install.sh
 ```
 
-Dùng Windows thì chạy `.\install.ps1`. Muốn gỡ: `./install.sh --uninstall`.
+On Windows, run `.\install.ps1`. To remove it: `./install.sh --uninstall`.
 
-Script sẽ tự dựng môi trường Python riêng và gắn skill vào `~/.claude/skills/`. Xong là mở session Claude Code ở thư mục nào cũng dùng được.
+The script sets up its own Python environment and links the skill into `~/.claude/skills/`. After that it works in a Claude Code session opened in any folder.
 
-## Rồi cứ thế hỏi
+## Then just ask
 
-**Index — mỗi tài liệu một lần:**
-
-```
-Dùng skill pageindex, index file ~/Documents/bao-cao-2025.pdf
-```
-
-**Hỏi — ở bất kỳ session nào sau đó:**
+**Index — once per document:**
 
 ```
-Dùng skill pageindex. Doanh thu quý 3 trong báo cáo 2025 là bao nhiêu?
+Use the pageindex skill to index ~/Documents/report-2025.pdf
 ```
 
-**Xem mục lục dạng đồ thị:**
+**Ask — from any session after that:**
 
 ```
-Dùng skill pageindex, preview báo cáo 2025
+Use the pageindex skill. What was Q3 revenue in the 2025 report?
 ```
 
-Câu trả lời luôn kèm nguồn: số trang với PDF, số slide với PowerPoint, tên file và số dòng với AsciiDoc. Lần theo đó là kiểm lại được.
+**See the contents as a graph:**
 
-## Tìm hiểu thêm
+```
+Use the pageindex skill to preview the 2025 report
+```
+
+Every answer comes with its source: the page for a PDF, the slide for PowerPoint, the file and line for AsciiDoc. Follow it to check.
+
+## Learn more
+
+These pages are in Vietnamese.
 
 | | |
 | --- | --- |
-| [Định dạng tài liệu](docs/formats.md) | Loại nào index miễn phí, loại nào tốn token, và vì sao |
-| [Cách nó làm việc](docs/how-it-works.md) | Công cụ làm gì, Claude làm gì, một câu hỏi được trả lời ra sao |
-| [Kho tài liệu](docs/store.md) | Nằm ở đâu, chứa gì, cách xem và xoá |
-| [Trang giới thiệu](webapp/README.md) | Mã nguồn của pagindex.vercel.app và cách deploy |
+| [Document formats](docs/formats.md) | Which formats index for free, which cost tokens, and why |
+| [How it works](docs/how-it-works.md) | What the tool does, what Claude does, how a question gets answered |
+| [The store](docs/store.md) | Where indexed documents live, what's in them, how to view and delete them |
+| [Website](webapp/README.md) | Source of pagindex.vercel.app and how to deploy it (in English) |
 
-## Giới hạn
+## Limits
 
-Hình ảnh bên trong tài liệu chưa được đọc, trừ khi cả tài liệu là PDF scan. Câu hỏi về bố cục màn hình hay nội dung chỉ nằm trong ảnh sẽ được trả lời thiếu.
-
----
-
-<sub>Xây trên nền [PageIndex](https://github.com/VectifyAI/PageIndex) của VectifyAI, chạy dưới dạng skill của [Claude Code](https://claude.com/claude-code). Đây không phải sản phẩm chính thức của bên nào; tên và logo thuộc về chủ sở hữu. Sách mẫu *SHOKUNIN IT – Cách người TOMOSIA làm việc* của tác giả Lưu Tuấn Anh (TOMOSIA), được sử dụng khi đã có sự cho phép.</sub>
+Images inside a document aren't read, unless the whole document is a scanned PDF. Questions about a screen layout, or anything that only appears in a picture, get an incomplete answer.
