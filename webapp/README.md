@@ -1,6 +1,6 @@
 # pageindex landing page
 
-The public site for the skill, deployed at <https://pageindex.vercel.app>. Next.js,
+The public site for the skill, deployed at <https://pagindex.vercel.app>. Next.js,
 in English, Vietnamese and Japanese (`/en`, `/vi`, `/ja`; `/` redirects by
 `Accept-Language`).
 
