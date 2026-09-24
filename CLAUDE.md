@@ -82,6 +82,12 @@ It is lexical, not semantic. A question phrased in different words than the docu
 
 Response ceilings come from the library (`TOOL_RESPONSE_CHAR_LIMIT`), not from numbers invented here. `structure` and `page` go through `agent_tools.call_tool`, so they are capped and paginated by the library already. `read` is this tool's own command and shares that same ceiling across the sections requested in one call.
 
+## Repository and deploying
+
+The repository is `TOMOSIA-VIETNAM/cc-pageindex`; push and open pull requests there only.
+
+The landing page deploys from this machine, not from Git, and Vercel accepts a deploy only when the commit at `HEAD` is authored by an email it knows. A merge made with GitHub's Merge button is authored by the GitHub noreply address and gets blocked without an error from the CLI. So merge pull requests locally (`git merge --no-ff` on `main`, then push), check `git log -1 --format='%ae'` before deploying, and after deploying confirm the deployment is `Ready` with `vercel inspect` rather than trusting the CLI's exit. `webapp/README.md` has the commands.
+
 ## Conventions
 
 Durable files — code, comments, `SKILL.md`, the documents under `notebooks/spec/` — must stand on their own. No references to things that move: no section numbers, no phase names, no design-document titles, no internal jargon left undefined where it is used. Name things for what they do.
