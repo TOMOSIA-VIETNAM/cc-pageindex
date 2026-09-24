@@ -13,6 +13,8 @@ export const REPO_URL = "https://github.com/TOMOSIA-VIETNAM/cc-pageindex";
 export const REPO_DIR = "cc-pageindex";
 export const SITE_URL = "https://pagindex.vercel.app";
 export const PAGEINDEX_URL = "https://github.com/VectifyAI/PageIndex";
+// The code's license, as the structured data names it; the sample book is not under it.
+export const LICENSE_URL = "https://opensource.org/license/mit";
 export const CLAUDE_CODE_URL = "https://claude.com/claude-code";
 // Key under which the visitor's light/dark choice is remembered.
 export const THEME_KEY = "pageindex-site-theme";

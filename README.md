@@ -164,6 +164,11 @@ These pages are in Vietnamese.
 | [The store](docs/store.md) | Where indexed documents live, what's in them, how to view and delete them |
 | [Website](webapp/README.md) | Source of pagindex.vercel.app and how to deploy it (in English) |
 
+## License
+
+The code is under the [MIT license](LICENSE). The sample book in `example/` is not: it belongs
+to its author and is included with permission — see [example/README.md](example/README.md).
+
 ## Limits
 
 Images inside a document aren't read, unless the whole document is a scanned PDF. Questions about a screen layout, or anything that only appears in a picture, get an incomplete answer.
