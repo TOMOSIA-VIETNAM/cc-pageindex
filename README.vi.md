@@ -120,7 +120,7 @@ Vì sao lại chia như vậy: [Định dạng tài liệu](docs/formats.md).
 Chỉ cần có **[uv](https://github.com/astral-sh/uv)** hoặc **Python 3.10 trở lên**. Có uv thì khỏi lo Python, uv tự tải bản nó cần.
 
 ```bash
-git clone https://github.com/tms-minhtang1/cc-pageindex.git
+git clone https://github.com/TOMOSIA-VIETNAM/cc-pageindex.git
 cd cc-pageindex
 ./install.sh
 ```

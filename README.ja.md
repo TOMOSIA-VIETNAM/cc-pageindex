@@ -122,7 +122,7 @@ Claude に「プレビューして」と頼むか、自分で `pi.py html` を�
 必要なのは **[uv](https://github.com/astral-sh/uv)** か **Python 3.10 以上** だけです。uv があれば Python も不要で、必要なバージョンを uv が取ってきます。
 
 ```bash
-git clone https://github.com/tms-minhtang1/cc-pageindex.git
+git clone https://github.com/TOMOSIA-VIETNAM/cc-pageindex.git
 cd cc-pageindex
 ./install.sh
 ```

@@ -122,7 +122,7 @@ Why it splits that way: [Document formats](docs/formats.md) (in Vietnamese).
 All you need is **[uv](https://github.com/astral-sh/uv)** or **Python 3.10+**. With uv you don't even need Python — it fetches the version it wants.
 
 ```bash
-git clone https://github.com/tms-minhtang1/cc-pageindex.git
+git clone https://github.com/TOMOSIA-VIETNAM/cc-pageindex.git
 cd cc-pageindex
 ./install.sh
 ```

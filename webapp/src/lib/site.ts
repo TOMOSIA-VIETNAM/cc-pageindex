@@ -2,7 +2,7 @@
 export const BRAND = "cc-pageindex";
 
 // Where the project lives; every link and install command on the site uses these.
-export const REPO_URL = "https://github.com/tms-minhtang1/cc-pageindex";
+export const REPO_URL = "https://github.com/TOMOSIA-VIETNAM/cc-pageindex";
 export const REPO_DIR = "cc-pageindex";
 export const SITE_URL = "https://pagindex.vercel.app";
 export const PAGEINDEX_URL = "https://github.com/VectifyAI/PageIndex";
