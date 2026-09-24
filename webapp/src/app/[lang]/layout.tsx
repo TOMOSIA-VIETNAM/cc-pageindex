@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_JP } from "next/font/google";
-import { dictionaries, isLocale, locales, type Locale } from "@/i18n";
+import { dictionaries, isLocale, locales, pathFor, type Locale } from "@/i18n";
 import { BRAND, REPO_URL, SITE_URL, THEME_KEY } from "@/lib/site";
 import "../globals.css";
 
@@ -27,11 +27,11 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
     applicationName: BRAND,
     keywords: ["Claude Code", "Claude Code skill", "PageIndex", "vectorless RAG", "document QA", "PDF", "table of contents", "no API key"],
     alternates: {
-      canonical: `/${lang}`,
-      languages: { ...Object.fromEntries(locales.map(locale => [locale, `/${locale}`])), "x-default": "/" },
+      canonical: pathFor(lang),
+      languages: { ...Object.fromEntries(locales.map(locale => [locale, pathFor(locale)])), "x-default": "/" },
     },
     openGraph: {
-      title: meta.title, description: meta.description, url: `/${lang}`, siteName: BRAND, type: "website",
+      title: meta.title, description: meta.description, url: pathFor(lang), siteName: BRAND, type: "website",
       locale: ogLocale[lang], alternateLocale: locales.filter(locale => locale !== lang).map(locale => ogLocale[locale]),
     },
     twitter: { card: "summary_large_image", title: meta.title, description: meta.description },
@@ -75,7 +75,7 @@ function structuredData(lang: Locale) {
     "@type": "SoftwareApplication",
     name: BRAND,
     description: meta.description,
-    url: `${SITE_URL}/${lang}`,
+    url: new URL(pathFor(lang), SITE_URL).href,
     inLanguage: lang,
     applicationCategory: "DeveloperApplication",
     operatingSystem: "macOS, Linux, Windows",

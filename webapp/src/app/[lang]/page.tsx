@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { dictionaries, fill, isLocale, localeNames, locales, type Locale } from "@/i18n";
+import { dictionaries, fill, isLocale, localeNames, locales, pathFor, type Locale } from "@/i18n";
 import { DEMO_PAGE, demoStats, exampleReads, exampleRun } from "@/lib/demo";
 import { BRAND, CLAUDE_CODE_URL, PAGEINDEX_URL, REPO_DIR, REPO_URL } from "@/lib/site";
 import { CopyCommand } from "@/components/CopyCommand";
@@ -37,7 +37,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
     <>
       <header className="nav">
         <div className="container nav-inner">
-          <Link href={`/${lang}`} className="wordmark" aria-label={BRAND}>
+          <Link href={pathFor(lang)} className="wordmark" aria-label={BRAND}>
             <span className="wordmark-dot" aria-hidden="true" />{BRAND}
           </Link>
           <nav className="nav-links" aria-label="Sections">
@@ -267,7 +267,7 @@ function LanguageSwitch({ current, label }: { current: Locale; label: string }) 
   return (
     <nav className="lang" aria-label={label}>
       {locales.map(locale => (
-        <a key={locale} href={`/${locale}`} hrefLang={locale} lang={locale} title={localeNames[locale]}
+        <a key={locale} href={pathFor(locale)} hrefLang={locale} lang={locale} title={localeNames[locale]}
            aria-current={locale === current ? "page" : undefined}>
           {locale.toUpperCase()}
         </a>
