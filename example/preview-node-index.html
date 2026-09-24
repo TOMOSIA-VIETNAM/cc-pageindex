@@ -6,62 +6,104 @@
 <title>Document index</title>
 <style>
 :root {
-  color-scheme: light dark;
-  --bg: #fbfbfa; --panel: #ffffff; --line: #e3e1dc; --ink: #1c1b19;
-  --muted: #6d6a64; --accent: #7a5cff; --warn: #b4520f; --hit: #ffe9a8;
-  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+  --bg: #f7f6f2; --panel: #ffffff; --line: #e3e1dc; --ink: #1c1b19;
+  --muted: #6d6a64; --accent: #5b45e0; --warn: #b4520f; --hit: #ffe9a8;
+  --edge: #a29e94; --dot: #d6d3cb;
+  --shadow: 0 1px 2px rgb(0 0 0 / .05), 0 6px 20px rgb(0 0 0 / .07);
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP",
+          sans-serif;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #17161a; --panel: #1f1e23; --line: #322f38; --ink: #e9e7e4;
-    --muted: #9a958d; --accent: #a892ff; --warn: #e2883f; --hit: #4a3f14;
-  }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #131317; --panel: #1c1c21; --line: #2e2d35; --ink: #e9e7e4;
+  --muted: #9a958d; --accent: #a892ff; --warn: #e2883f; --hit: #4a3f14;
+  --edge: #5f5c66; --dot: #2a2930;
+  --shadow: 0 1px 2px rgb(0 0 0 / .4), 0 6px 20px rgb(0 0 0 / .35);
 }
 * { box-sizing: border-box; }
+.head-tools { display: flex; gap: 8px; align-items: center; flex: none; }
+.theme { border: 1px solid var(--line); background: var(--panel); width: 36px;
+  height: 36px; border-radius: 8px; display: grid; place-items: center; }
+.theme:hover { border-color: var(--muted); }
+.theme svg { width: 17px; height: 17px; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.theme .moon, :root[data-theme="dark"] .theme .sun { display: none; }
+:root[data-theme="dark"] .theme .moon { display: block; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
-  font: 14px/1.55 system-ui, -apple-system, "Hiragino Sans", "Noto Sans JP",
-        sans-serif;
+  font: 14px/1.55 var(--sans);
 }
-.shell { display: flex; min-height: 100vh; }
-aside {
-  width: 270px; flex: none; border-right: 1px solid var(--line);
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+.board:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.shell { display: flex; height: 100vh; }
+
+/* document list */
+nav.docs {
+  width: 260px; flex: none; border-right: 1px solid var(--line);
   background: var(--panel); padding: 16px 0; overflow-y: auto;
-  max-height: 100vh; position: sticky; top: 0;
 }
-aside h1 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
-  color: var(--muted); margin: 0 16px 10px; }
-aside button {
+nav.docs h1 { font-size: 12px; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--muted); margin: 0 16px 10px; font-weight: 600; }
+nav.docs button {
   display: block; width: 100%; text-align: left; border: 0; background: none;
-  color: inherit; font: inherit; padding: 7px 16px; cursor: pointer;
-  border-left: 3px solid transparent;
+  padding: 8px 16px; border-left: 3px solid transparent; overflow-wrap: anywhere;
 }
-aside button:hover { background: color-mix(in srgb, var(--accent) 10%, transparent); }
-aside button[aria-current="true"] {
+nav.docs button:hover { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+nav.docs button[aria-current="true"] {
   border-left-color: var(--accent); font-weight: 600;
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  background: color-mix(in srgb, var(--accent) 13%, transparent);
 }
-aside .meta { display: block; color: var(--muted); font-size: 12px; }
-main { flex: 1; min-width: 0; padding: 20px 26px 60px; }
-header h2 { margin: 0 0 4px; font-size: 20px; }
-header p { margin: 0 0 16px; color: var(--muted); }
-.bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
-  margin-bottom: 18px; }
+nav.docs .meta { display: block; color: var(--muted); font-size: 12px;
+  font-weight: 400; }
+
+main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.head { display: flex; gap: 16px; align-items: flex-start;
+  justify-content: space-between; padding: 16px 24px 0; }
+.head h2 { margin: 0 0 2px; font-size: 19px; line-height: 1.3; }
+.head p { margin: 0; color: var(--muted); font-size: 13px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px;
+  background: var(--panel); padding: 2px; flex: none; }
+.seg button { border: 0; background: none; padding: 5px 12px; border-radius: 6px;
+  color: var(--muted); }
+.seg button[aria-selected="true"], .seg button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+  color: var(--ink); font-weight: 600;
+}
+.bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  padding: 12px 24px; border-bottom: 1px solid var(--line); }
 input[type=search] {
-  flex: 1; min-width: 200px; padding: 8px 11px; border-radius: 7px;
+  flex: 1; min-width: 200px; padding: 7px 11px; border-radius: 8px;
   border: 1px solid var(--line); background: var(--panel); color: inherit;
   font: inherit;
 }
-.bar button, label.chk {
-  border: 1px solid var(--line); background: var(--panel); color: inherit;
-  padding: 7px 11px; border-radius: 7px; cursor: pointer; font: inherit;
+.bar > button, label.chk {
+  border: 1px solid var(--line); background: var(--panel);
+  padding: 6px 11px; border-radius: 8px;
 }
-label.chk { display: flex; align-items: center; gap: 6px; }
+.bar > button:hover, label.chk:hover { border-color: var(--muted); }
+label.chk { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+.hits { color: var(--muted); font-size: 12px; font-family: var(--mono);
+  min-width: 0; }
+footer { color: var(--muted); font-size: 12px; padding: 6px 24px;
+  border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+.view { flex: 1; min-height: 0; }
+
+/* list view */
+.list { overflow: auto; padding: 16px 24px 40px; }
 .node { border-left: 1px solid var(--line); margin-left: 9px;
   padding-left: 13px; }
 .row { display: flex; gap: 8px; align-items: baseline; padding: 3px 0; }
 .twist { width: 15px; flex: none; border: 0; background: none; color: var(--muted);
-  cursor: pointer; font: inherit; padding: 0; }
+  padding: 0; }
 .twist.leaf { visibility: hidden; }
 .nid { font-family: var(--mono); font-size: 12px; color: var(--muted);
   flex: none; }
@@ -73,40 +115,245 @@ label.chk { display: flex; align-items: center; gap: 6px; }
 .sum { color: var(--muted); margin: 0 0 4px 46px; max-width: 78ch; }
 mark { background: var(--hit); color: inherit; border-radius: 2px; }
 .hidden { display: none; }
-footer { color: var(--muted); font-size: 12px; margin-top: 26px;
-  border-top: 1px solid var(--line); padding-top: 10px; }
+
+/* graph view: an unbounded board, moved by dragging */
+.graph { position: relative; overflow: hidden; }
+.board {
+  position: absolute; inset: 0; cursor: grab; touch-action: none;
+  user-select: none; -webkit-user-select: none;
+  background-color: var(--bg);
+  background-image: radial-gradient(circle, var(--dot) 1.1px, transparent 1.3px);
+}
+.board.panning { cursor: grabbing; }
+#stage { display: block; width: 100%; height: 100%; }
+.edge { fill: none; stroke: var(--edge); stroke-width: 1.3;
+  transition: opacity .16s, stroke .16s; }
+.edge-hit { fill: none; stroke: transparent; stroke-width: 12;
+  pointer-events: stroke; cursor: pointer; }
+.edge.lit { stroke: var(--accent); stroke-width: 1.9; stroke-dasharray: 6 5;
+  animation: flow .7s linear infinite; }
+@keyframes flow { to { stroke-dashoffset: -11; } }
+.gnode { cursor: pointer; transition: opacity .16s; outline: none; }
+.gnode .hitc { fill: transparent; }
+.gnode .ring { fill: none; stroke: transparent; stroke-width: 2; }
+.gnode .dot { fill: var(--bg); stroke: var(--ink); stroke-width: 1.4;
+  transition: stroke .16s, fill .16s; }
+.gnode.missing .dot { stroke: var(--warn); stroke-dasharray: 2.4 2; }
+.gnode.collapsed .dot { fill: var(--ink); }
+.gnode.missing.collapsed .dot { fill: var(--warn); }
+.gnode.lit .dot { stroke: var(--accent); stroke-dasharray: none; }
+.gnode.lit.collapsed .dot { fill: var(--accent); }
+.gnode:focus-visible .ring, .gnode.sel .ring { stroke: var(--accent); }
+.label {
+  fill: var(--ink); font-family: var(--mono); font-size: var(--label-size);
+  paint-order: stroke; stroke: var(--bg); stroke-width: 4px;
+  stroke-linejoin: round; dominant-baseline: central;
+}
+.label .more { fill: var(--muted); }
+.gnode.root .label { font-size: var(--root-size); font-weight: 600; }
+.gnode.hover .label, .gnode.sel .label, .gnode.match .label { fill: var(--accent); }
+.gnode.match .dot { stroke: var(--accent); stroke-width: 2.2; }
+.focusing .gnode:not(.lit) { opacity: .25; }
+.focusing .edge:not(.lit) { opacity: .15; }
+.searching.focusing .gnode.match:not(.lit) { opacity: .75; }
+.searching:not(.focusing) .gnode:not(.match) { opacity: .35; }
+.searching:not(.focusing) .edge { opacity: .35; }
+@media (prefers-reduced-motion: reduce) {
+  .edge.lit { animation: none; stroke-dasharray: none; }
+  .edge, .gnode, .gnode .dot { transition: none; }
+}
+
+.float { position: absolute; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 10px; box-shadow: var(--shadow); }
+.stats { top: 14px; left: 14px; width: 300px; font-size: 12px;
+  max-width: calc(100% - 28px); }
+.stats-head { display: flex; width: 100%; align-items: center; gap: 8px;
+  justify-content: space-between; border: 0; background: none; padding: 8px 12px;
+  font-size: 13px; font-weight: 600; text-align: left; border-radius: 10px; }
+.stats-head svg { width: 14px; height: 14px; flex: none; fill: none;
+  stroke: var(--muted); stroke-width: 2; stroke-linecap: round;
+  stroke-linejoin: round; transition: transform .16s; }
+.stats-head[aria-expanded="false"] svg { transform: rotate(-90deg); }
+.stats-body { padding: 0 12px 10px; }
+.levels { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 8px;
+  align-items: center; margin-bottom: 10px; max-height: 150px; overflow-y: auto; }
+.lv-name, .lv-n { font-family: var(--mono); color: var(--muted); }
+.lv-n { text-align: right; color: var(--ink); }
+.lv-track { height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
+.lv-bar { height: 100%; border-radius: 3px; background: var(--accent); min-width: 2px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line);
+  background: var(--bg); border-radius: 999px; padding: 3px 9px 3px 7px;
+  font-size: 12px; }
+.chip:not(:disabled):hover { border-color: var(--accent); }
+.chip:disabled { cursor: default; }
+.chip[aria-pressed="true"] { border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.chip svg { width: 12px; height: 12px; }
+.chip circle { stroke-width: 1.4; }
+.chip.warn:not(:disabled) { color: var(--warn); }
+.hint { margin: 8px 0 0; color: var(--muted); font-size: 11.5px; }
+@media (prefers-reduced-motion: reduce) { .stats-head svg { transition: none; } }
+.zoom { left: 14px; bottom: 14px; display: flex; align-items: center; padding: 3px; }
+.zoom button { border: 0; background: none; width: 36px; height: 36px;
+  border-radius: 7px; display: grid; place-items: center; }
+.zoom button:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.zoom #zoomLevel { width: 56px; font-family: var(--mono); font-size: 12px; }
+.zoom svg { width: 17px; height: 17px; fill: none; stroke: currentColor;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.zoom .sep { width: 1px; height: 20px; background: var(--line); margin: 0 3px; }
+.mini { right: 14px; bottom: 14px; width: 200px; height: 130px; cursor: crosshair;
+  touch-action: none; }
+.mini-edge { stroke: var(--edge); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.mini-dot { fill: var(--ink); }
+.mini-dot.missing { fill: var(--warn); }
+.mini-dot.match { fill: var(--accent); }
+#miniView { fill: color-mix(in srgb, var(--accent) 10%, transparent);
+  stroke: var(--accent); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.detail { top: 14px; right: 14px; width: 340px; padding: 14px 16px 16px;
+  max-height: calc(100% - 172px); overflow: auto; }
+.detail-head { display: flex; gap: 8px; align-items: flex-start; }
+.crumbs { flex: 1; min-width: 0; font-size: 12px; color: var(--muted); }
+.crumbs button { border: 0; background: none; padding: 0; color: var(--muted);
+  text-align: left; max-width: 100%; }
+.crumbs button:hover { color: var(--accent); text-decoration: underline; }
+.crumbs .sepr { margin: 0 4px; }
+.close { border: 0; background: none; width: 30px; height: 30px; flex: none;
+  border-radius: 6px; display: grid; place-items: center; margin: -5px -8px 0 0; }
+.close:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.close svg { width: 16px; height: 16px; stroke: currentColor; stroke-width: 2;
+  fill: none; stroke-linecap: round; }
+.detail h3 { margin: 6px 0 4px; font-size: 16px; line-height: 1.35;
+  overflow-wrap: anywhere; }
+.dmeta { margin: 0 0 10px; font-family: var(--mono); font-size: 12px;
+  color: var(--muted); }
+.dstats { display: grid; grid-template-columns: auto 1fr; gap: 3px 14px;
+  margin: 0 0 12px; font-size: 12.5px; }
+.dstats dt { color: var(--muted); }
+.dstats dd { margin: 0; font-family: var(--mono); }
+.dsum { margin: 0 0 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.dsum.empty { color: var(--warn); font-style: italic; }
+.dactions { display: flex; gap: 8px; flex-wrap: wrap; }
+.dactions button { border: 1px solid var(--line); background: var(--bg);
+  padding: 6px 11px; border-radius: 8px; }
+.dactions button:hover { border-color: var(--accent); }
+
 @media (max-width: 720px) {
-  .shell { flex-direction: column; }
-  aside { width: 100%; position: static; max-height: 240px; }
-  main { padding: 16px; }
+  .shell { flex-direction: column; height: auto; min-height: 100vh; }
+  nav.docs { width: 100%; max-height: 200px; border-right: 0;
+    border-bottom: 1px solid var(--line); }
+  main { min-height: 100vh; }
+  .head, .bar { padding-left: 16px; padding-right: 16px; }
+  .list { padding: 16px; }
+  .graph { min-height: 70vh; }
   .sum { margin-left: 22px; }
+  .mini { display: none; }
+  .detail { top: auto; left: 12px; right: 12px; bottom: 60px; width: auto;
+    max-height: 55%; }
 }
 </style>
+<script>
+// Light unless this viewer chose dark before; set here so the page never flashes light.
+try {
+  if (localStorage.getItem("pageindex-viewer-theme") === "dark")
+    document.documentElement.dataset.theme = "dark";
+} catch (error) {}
+</script>
 </head>
 <body>
 <div class="shell">
-  <aside><h1>Documents</h1><div id="docs"></div></aside>
+  <nav class="docs" aria-label="Documents"><h1>Documents</h1><div id="docs"></div></nav>
   <main>
-    <header><h2 id="docName"></h2><p id="docMeta"></p></header>
+    <header class="head">
+      <div><h2 id="docName"></h2><p id="docMeta"></p></div>
+      <div class="head-tools">
+        <div class="seg" role="tablist" aria-label="View">
+          <button role="tab" id="tabGraph" aria-controls="graphView">Graph</button>
+          <button role="tab" id="tabList" aria-controls="listView">List</button>
+        </div>
+        <button class="theme" id="theme" aria-pressed="false" aria-label="Dark theme" title="Dark theme">
+          <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <svg class="moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+      </div>
+    </header>
     <div class="bar">
-      <input type="search" id="q" placeholder="Search titles and summaries">
-      <button id="expand">Expand all</button>
-      <button id="collapse">Collapse all</button>
+      <input type="search" id="q" placeholder="Search titles and summaries"
+             aria-label="Search titles and summaries">
+      <span class="hits" id="hits" aria-live="polite"></span>
       <label class="chk"><input type="checkbox" id="onlyMissing">
         Without summary</label>
+      <div class="seg graph-only" role="group" aria-label="Layout">
+        <button id="layTree" aria-pressed="true">Tree</button>
+        <button id="layRadial" aria-pressed="false">Radial</button>
+      </div>
+      <button id="expand">Expand all</button>
+      <button id="collapse">Collapse all</button>
     </div>
-    <div id="tree"></div>
+
+    <section id="graphView" class="view graph" role="tabpanel" aria-labelledby="tabGraph">
+      <div id="board" class="board" tabindex="0"
+           aria-label="Section graph. Drag to move, Ctrl or Command with scroll to zoom, F to fit.">
+        <svg id="stage" aria-hidden="false">
+          <g id="world"><g id="edges"></g><g id="nodes"></g></g>
+        </svg>
+      </div>
+      <section id="stats" class="float stats" aria-label="Tree statistics">
+        <button id="statsToggle" class="stats-head" aria-expanded="true" aria-controls="statsBody">
+          <span id="statsLine"></span><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div id="statsBody" class="stats-body">
+          <div id="levels" class="levels" role="list" aria-label="Sections per level"></div>
+          <div class="chips">
+            <button class="chip" id="chipSummarized" disabled><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor"/></svg><span></span></button>
+            <button class="chip warn" id="chipMissing" aria-pressed="false" title="Show only sections without a summary"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="none" stroke="currentColor" stroke-dasharray="2.4 2"/></svg><span></span></button>
+            <button class="chip" id="chipFolded" title="Unfold every branch"><svg viewBox="0 0 12 12"><circle cx="6" cy="6" r="4.5" fill="currentColor" stroke="currentColor"/></svg><span></span></button>
+          </div>
+          <p class="hint">drag to move · ⌘/Ctrl + scroll to zoom · click a circle to fold</p>
+        </div>
+      </section>
+      <div class="float zoom" role="group" aria-label="Zoom">
+        <button id="zoomOut" aria-label="Zoom out" title="Zoom out (−)"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button>
+        <button id="zoomLevel" aria-label="Reset zoom to 100%" title="Reset to 100% (0)">100%</button>
+        <button id="zoomIn" aria-label="Zoom in" title="Zoom in (+)"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></svg></button>
+        <span class="sep"></span>
+        <button id="zoomFit" aria-label="Fit the whole tree" title="Fit (F)"><svg viewBox="0 0 24 24"><path d="M3 8V5a2 2 0 0 1 2-2h3M16 3h3a2 2 0 0 1 2 2v3M21 16v3a2 2 0 0 1-2 2h-3M8 21H5a2 2 0 0 1-2-2v-3"/></svg></button>
+      </div>
+      <svg id="mini" class="float mini" aria-label="Overview; click or drag to move the board" role="img">
+        <g id="miniNodes"></g><rect id="miniView" rx="2"></rect>
+      </svg>
+      <aside id="detail" class="float detail" aria-label="Section detail" hidden>
+        <div class="detail-head">
+          <div class="crumbs" id="crumbs"></div>
+          <button class="close" id="closeDetail" aria-label="Close detail"><svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+        </div>
+        <h3 id="dTitle"></h3>
+        <p class="dmeta" id="dMeta"></p>
+        <dl class="dstats" id="dStats"></dl>
+        <p class="dsum" id="dSum"></p>
+        <div class="dactions">
+          <button id="dToggle"></button>
+          <button id="dFocus">Zoom to section</button>
+        </div>
+      </aside>
+    </section>
+
+    <section id="listView" class="view list" role="tabpanel" aria-labelledby="tabList" hidden>
+      <div id="tree"></div>
+    </section>
     <footer id="foot"></footer>
   </main>
 </div>
-<script id="payload" type="application/json">{"generated": "2026-09-23T03:03:15.792000", "store": "/Users/minhtang/.local/share/pageindex", "documents": [{"name": "IT Shokunin - TOMOSIA.pdf", "description": "Sách \"SHOKUNIN IT – Cách người TOMOSIA làm việc\" của Lưu Tuấn Anh, Version 2025 Edition, phát hành tháng 7/2025, 131 trang tiếng Việt. Trình bày tinh thần shokunin (nghệ nhân Nhật Bản) và cách áp dụng vào nghề IT tại TOMOSIA qua 7 chương: Shokunin – tinh thần nghệ nhân Nhật Bản; Kĩ năng thượng thừa; Cải tiến – Kaizen và sức mạnh của AI; Trách nhiệm, kỷ luật và tư duy chủ động; Tận tâm, đam mê – No bugs, hướng tới sự hoàn hảo; Tôn trọng nghề nghiệp – tự hào dân tộc, công ty và cá nhân; Phát triển toàn diện – kiến tạo một Shokunin trọn vẹn.", "units": 131, "source": "detected", "nodes": [{"id": "0000", "title": "Preface", "summary": "Trang mục lục của cuốn \"Shokunin IT: Cách người TOMOSIA làm việc\" của tác giả Lưu Tuấn Anh (phiên bản năm 2025), bao gồm 7 chương với các tiêu đề: Shokunin - tinh thần nghệ nhân Nhật Bản, Kỹ năng thượng thừa, Cải tiến - Kaizen và sức mạnh của AI, Trách nhiệm, Tận tâm và hướng tới sự hoàn hảo, Tôn trọng nghề nghiệp, và Phát triển toàn diện.", "start": 1, "end": 4, "nodes": []}, {"id": "0001", "title": "LỜI NÓI ĐẦU", "summary": "Lịch sử cá nhân của tác giả bao gồm: học tập tại Chuyên Toán Tin Thái Bình, đạt giải nhì tin học quốc gia lớp 11, vào Đông Du ở TP. Hồ Chí Minh, sang Nhật năm 2007 học tại Nagaoka, lôi kéo bạn thành lập CLB lập trình tham gia ICPC tại Tokyo, thực tập tại Google Japan, DeNA, Greeen, Yahoo! Japan (thực tập 2 tuần với cuộc thi lập trình search engine), làm việc 2 năm tại OKWave với người bạn Trương Đình Hoàng, cùng Hoàng xây dựng AsianTech tại Đà Nẵng (2 năm làm các vị trí khác nhau như manager, PM, PMO), quay về Hà Nội thành lập TOMOSIA; nhắc tới các thầy cô và người ảnh hưởng như thầy dạy lớp 5, thầy dạy tin học, hiệu trưởng Nguyễn Đức Hòe, và mẹ.", "start": 5, "end": 8, "nodes": []}, {"id": "0002", "title": "CHƯƠNG 1: SHOKUNIN – TINH THẦN NGHỆ NHÂN NHẬT BẢN", "summary": "Giới thiệu Shokunin là khái niệm quan trọng trong văn hóa Nhật Bản thể hiện tận tâm và chuyên nghiệp trong công việc, không chỉ là danh xưng nghề mà là triết lý sống, với những người Shokunin không ngừng phát triển kỹ năng, tìm kiếm hoàn hảo trong chi tiết, truyền đạt kinh nghiệm cho thế hệ sau, đồng thời thể hiện giá trị về kiên trì, trách nhiệm và danh dự trong xã hội.", "start": 9, "end": 10, "nodes": []}, {"id": "0003", "title": "SHOKUNIN LÀ GÌ ?", "summary": "Mô tả trải nghiệm 8 năm sống và làm việc tại Nhật Bản của tác giả với ví dụ về những người bình thường thể hiện Shokunin: anh bạn hói ở tiệm phát báo Mizunokuchi tháo rác để lấy mẩu dây nhựa với tính chú tâm và mong muốn hoàn thành công việc trọn vẹn, ông bếp trưởng tại BERNARD cắt cá và dọn dẹp dao thớt như một nghi lễ; định nghĩa Shokunin không chỉ là \"nghệ nhân\" mà là triết lý làm việc thể hiện tận tâm tuyệt đối, tinh thông kỹ năng, khát khao vươn tới sự hoàn hảo, kèm hình ảnh người Shokunin đang rèn kiếm katana.", "start": 11, "end": 12, "nodes": []}, {"id": "0004", "title": "NHỮNG VÍ DỤ VỀ SHOKUNIN", "summary": "Ba ví dụ Shokunin trong nghề hiện đại: đội dọn tàu Shinkansen của TESSEI (\"Phép màu 7 phút\", video \"A Seven-Minute Miracle! The Shinkansen Cleaning Theater\"), Haruko Niitsu dọn vệ sinh Sân bay Haneda (9 năm liên tiếp sạch nhất thế giới, Omotenashi), và thợ đánh giày Nhật Bản (hiểu từng loại da, làm sạch, dưỡng ẩm, đánh xi, hoàn thiện).", "start": 13, "end": 14, "nodes": [{"id": "0005", "title": "Người Dọn Dẹp Tàu Shinkansen (\"Phép màu 7 phút\")", "summary": "Giới thiệu rằng ví dụ về Shokunin thường là thợ làm kiếm, gốm, sushi nhưng tinh thần Shokunin có trong các nghề hiện đại, ví dụ đội ngũ dọn dẹp tàu Shinkansen của công ty TESSEI nổi tiếng với hiệu quả chỉ mất khoảng 7 phút để làm sạch toàn bộ tàu, với sự phối hợp nhịp nhàng, tốc độ, tỉ mỉ từng chi tiết (xoay ngược ghế chào đón hành khách tiếp theo) và thái độ tận tâm, tham khảo video Youtube \"A Seven-Minute Miracle! The Shinkansen Cleaning Theater\", chỉ ra Shokunin có thể là nhóm hay công ty thấm nhuần triết lý.", "start": 13, "end": 13, "nodes": []}, {"id": "0006", "title": "Người Dọn Dẹp Sân Bay Haneda", "summary": "Nêu Haruko Niitsu, nhân viên vệ sinh tại Sân bay Haneda (Nhật Bản), là biểu tượng tinh thần Shokunin trong công việc dọn dẹp; bà và đội ngũ của mình góp phần giúp sân bay này 9 năm liên tiếp được đánh giá là sạch nhất thế giới; đối với bà, dọn dẹp không chỉ là làm sạch mà là Omotenashi (lòng hiếu khách), chú trọng chi tiết nhỏ nhất và làm việc với tỉ mỉ, kỹ thuật cao, niềm tự hào để mang lại không gian thoải mái nhất cho hành khách; chứng minh tinh thần Shokunin có thể nâng tầm bất kỳ công việc nào.", "start": 13, "end": 14, "nodes": []}, {"id": "0007", "title": "Thợ Đánh Giày", "summary": "Mô tả rằng tại Nhật Bản, những người đánh giày mang tinh thần Shokunin biến công việc tưởng chừng đơn giản thành ngh ệ thuật; họ không chỉ làm sạch và làm bóng giày mà hiểu rõ từng loại da, cách chăm sóc để phục hồi và kéo dài tuổi thọ giày; làm việc với tập trung cao độ, tỉ mỉ từng thao tác từ làm sạch bụi bẩn, dưỡng ẩm da, đánh bóng bằng xi phù hợp, đến hoàn thiện từng đường kim mũi chỉ; xem mỗi đôi giày là tác phẩm cần nâng niu, chăm sóc giày là hành động thể hiện tôn trọng; niềm tự hào về kỹ năng và tận tâm trong việc mang lại vẻ ngoài tốt nhất cho giày là tinh thần Shokunin rõ nét, biến công việc đánh giày thành dịch vụ đầy giá trị.", "start": 14, "end": 14, "nodes": []}]}, {"id": "0008", "title": "NHỮNG YẾU TỐ TẠO NÊN 1 SHOKUNIN", "summary": "Liệt kê sáu yếu tố chính tạo nên tinh thần Shokunin: (1) Kỹ năng xuất sắc - làm chủ công việc ở mức rất cao, được thừa nhận rộng rãi; (2) Kaizen - không ngừng cải thiện, luôn học hỏi và cải thiện mỗi ngày; (3) Tận tâm, đam mê - có đam mê với công việc, tìm thấy ý nghĩa và niềm vui, làm việc tỉ mỉ chu đáo; (4) Tinh thần trách nhiệm - cảm thấy có nghĩa vụ hoàn thành tốt nhất vì tập thể và người khác (khách hàng, xã hội); (5) Niềm tự hào - tự hào về tay nghề và công việc đóng góp; (6) Phát triển toàn diện - phát triển sức khỏe, tinh thần, kiến thức khai phóng ngoài chỉ công việc; sáu yếu tố này hòa quyện tạo nên con người Shokunin đầy bản lĩnh và giá trị, có thể được nuôi dưỡng trong tập thể và các công việc bình thường.", "start": 15, "end": 15, "nodes": []}, {"id": "0009", "title": "VÌ SAO SHOKUNIN VẪN TRƯỜNG TỒN VÀ NGÀY CÀNG CÓ GIÁ TRỊ?", "summary": "Bốn lý do Shokunin trường tồn trước AI và thế giới VUCA: nhu cầu về \"bậc thầy\" khi sản phẩm AI \"tạm ổn\" và na ná nhau; tri thức ẩn (tacit) không số hóa được so với tri thức hiện; trực giác và sáng tạo thật; và kết hợp cái bất biến (yêu nghề, chính trực, trách nhiệm) với cái ứng biến (học công nghệ mới, Kaizen, dùng AI làm công cụ).", "start": 16, "end": 18, "nodes": [{"id": "0010", "title": "Sự cần thiết của những “bậc thầy”", "summary": "Bàn luận về lý do vì sao những ngành thủ công truyền thống và tạo tác của Shokunin vẫn giữ vững giá trị trong thế giới VUCA và thời đại công nghệ phát triển như vũ bão; lưu ý rằng máy móc và AI xử lý dữ liệu nhanh chóng với độ chính xác cao nhưng sản phẩm AI có xu hướng \"tạm ổn\" và \"na ná giống nhau\"; trong thế giới đang bão hòa bởi sự đồng nhất, nhu cầu về sản phẩm vượt trội, mang tính cá nhân hóa cao, chứa đựng sự tinh tế và \"chất\" riêng của người tạo ra càng trở nên bức thiết; so sánh văn AI giống mì tôm (nhanh, tiện, tạm ổn) trong khi Shokunin là bậc thầy đáp ứng nhu cầu về sự vượt trội và độc đáo này; họ tạo ra sự khác biệt không chỉ bằng kỹ năng thuần thục mà còn bằng đam mê, sáng tạo và \"cái tâm\" của con người.", "start": 16, "end": 17, "nodes": []}, {"id": "0011", "title": "Tri thức ẩn", "summary": "Giải thích rằng sức mạnh cốt lõi của AI và công nghệ nằm ở khả năng xử lý và học hỏi từ tri thức hiện (văn bản, dữ liệu số, công thức, quy trình, hình ảnh, âm thanh); tuy nhiên tồn tại kho tàng tri thức sâu sắc ẩn sâu trong mỗi cá nhân: kinh nghiệm được \"thấm\" qua hàng ngàn giờ thực hành, trực giác bén nhạy được mài giũa, cảm xúc, sự đồng cảm, hiểu biết, những giá trị ngầm định hình cách nhìn nhận thế giới - đây là tri thức ẩn; tri thức ẩn rất khó diễn đạt thành lời hay chuyển đổi sang dữ liệu số, chỉ có thể lĩnh hội qua quan sát, thực hành chung, chia sẻ trực tiếp; vì không thể số hóa đầy đủ nên tri thức ẩn là rào cản AI khó lòng vượt qua; tri thức ẩn chính là điểm khác biệt lớn nhất và lợi thế cạnh tranh độc đáo của Shokunin so với AI, lồng ghép vào từng sản phẩm và dịch vụ tạo nên chiều sâu, sự tinh tế và \"cái hồn\" không thể sao chép bằng máy móc.", "start": 17, "end": 17, "nodes": []}, {"id": "0012", "title": "Trực giác và sự sáng tạo", "summary": "Phân biệt tri thức ẩn (từ hàng ngàn giờ thực hành, trực giác, cảm xúc) với tri thức hiện (dữ liệu số, công thức, quy trình) - AI học được; Shokunin lồng ghép tri thức ẩn vào sản phẩm tạo chiều sâu và linh hồn không sao chép được. Trực giác (cảm nhận nhanh dựa kinh nghiệm) và sáng tạo thực sự (nhìn vấn đề góc độ mới) là bản chất trí tuệ con người; Shokunin dùng chúng thấu hiểu nhu cầu tiềm ẩn khách hàng tạo giải pháp đột phá vượt logic thông thường.", "start": 17, "end": 18, "nodes": []}, {"id": "0013", "title": "Sự kết hợp hài hòa giữa cái bất biến và cái ứng biến", "summary": "Shokunin giữ vững \"bất biến\" trong tâm hồn: lòng yêu nghề, chính trực, trách nhiệm cao, khát vọng hoàn hảo - những giá trị cốt lõi tạo phẩm chất bậc thầy nuôi dưỡng tri thức ẩn và trực giác. Đồng thời linh hoạt \"ứng biến\" trong phương pháp: không ngại học công nghệ mới, áp dụng Kaizen liên tục cải tiến, xem AI như công cụ đắc lực để tự động hóa tác vụ lặp lại và có thời gian tập trung vào sáng tạo, tinh tế, thấu hiểu khách hàng.", "start": 18, "end": 18, "nodes": []}]}, {"id": "0014", "title": "TRIẾT LÝ IT SHOKUNIN CỦA TOMOSIA", "summary": "IT Shokunin thể hiện tinh thần qua sáu khía cạnh: Kỹ năng tinh thông (gõ bàn phím thành thạo, thuộc phím tắt editor, hiểu sâu design pattern, OOP, microservices, serverless cho developer; thiết kế test case tinh tế cho QC; quản lý dự án nhuần nhuyễn cho PM; phân tích nghiệp vụ sắc bén cho BA); Cải tiến liên tục/Kaizen (chủ động học hỏi, cập nhật kiến thức, tìm cách làm tốt hơn hiệu quả hơn - sống còn trong IT); Tận tâm và đam mê (làm bằng cả trái tim, developer không bug, QC không bug lọt tay khách, PM đảm bảo deadline và requirement); Trách nhiệm cao (ý thức với sản phẩm, đội, khách, nói là làm, sẵn sàng OT giải quyết sự cố); Niềm tự hào (tự hào tay nghề, sản phẩm, đóng góp công ty); Hiểu biết toàn diện (không chỉ kỹ thuật chuyên môn mà hiểu khách hàng, kinh doanh, phát triển toàn diện - coi khách hàng là partner). Phân tích job posting TOMOSIA thể hiện các phẩm chất này dù không dùng từ \"Shokunin\".", "start": 19, "end": 23, "nodes": []}, {"id": "0015", "title": "BẠN CÓ DÁM TRỞ THÀNH 1 SHOKUNIN KHÔNG ?", "summary": "Shokunin như một cách sống: kỹ năng đem lại kính trọng, cải tiến liên tục đem lại vị trí dẫn đầu, trách nhiệm đem lại tin tưởng; trạng thái \"dòng chảy\" (Flow) của Mihaly Csikszentmihalyi; ví dụ thầy Nguyễn Đức Hòe (Đông Du, ký túc xá Tokyo 1967, học bổng 1992, Huân chương Mặt trời mọc). Kèm các khó khăn bên trong (tự phụ, tự mãn khi thành key member) và bên ngoài (thế giới chuộng tốc độ và vật chất), trích Mark Twain và so sánh với Khắc kỷ.", "start": 24, "end": 27, "nodes": [{"id": "0016", "title": "Shokunin là một cách sống", "summary": "Kỹ năng xuất sắc mang lại sự kính trọng, cải tiến liên tục mang lại vị trí dẫn đầu, tận tâm đam mê mang lại sự yêu mến, trách nhiệm mang lại tin tưởng, niềm tự hào mang lại nhiệt huyết, phát triển toàn diện mang lại hài hòa cuộc sống. Hành trình Shokunin đưa đến trạng thái \"dòng chảy\" (Flow) theo Mihaly Csikszentmihalyi - tập trung cao độ quên thời gian, cảm thấy thích thú năng lượng dồi dào. Thầy Nguyễn Đức Hòe (hiệu trưởng Đông Du) từ 1967 thành lập ký túc xá sinh viên ở Tokyo, năm 1992 khởi xướng chương trình học bổng Đông Du hỗ trợ hàng ngàn sinh viên Việt, lồng ghép giáo dục yêu nước và đạo lý sống, được chính phủ Nhật trao Huân chương Mặt trời mọc.", "start": 24, "end": 25, "nodes": []}, {"id": "0017", "title": "Những khó khăn khi theo đuổi con đường Shokunin", "summary": "Khó khăn lớn nhất từ bên trong: khi thành \"key member\", sự dễ dãi và lời khen có thể thành bẫy ngọt ngào dẫn tự phụ, tự mãn, ngủ quên trên chiến thắng dù thế giới và công nghệ không ngừng vận động. Shokunin thực thụ hiểu sự nỗ lực 100% liên tục cần thiết, không để vượt người khác mà vượt chính mình hôm qua - cuộc chiến không ngừng với lười biếng, cái tôi muốn an phận, tiếng nói bảo \"đã đủ\". Khó khăn bên ngoài: thế giới chu ộng tốc độ và thoải mái tức thời nên Shokunin bị coi \"ngốc nghếch\" với đam mê \"công việc không cần công nhận\"; thế giới trọng vật chất luôn hỏi lương bổng vị trí doanh thu nên Shokunin tập trung chất lượng giá trị nội tại trông lạc lõng - nhưng Mark Twain nói \"khi đứng về phía số đông là lúc cần dừng lại suy ngẫm\", Shokunin chắc chắn số ít, tương tự Khắc kỷ theo giá trị nội tại bất chấp phản đối.", "start": 26, "end": 27, "nodes": []}]}, {"id": "0018", "title": "CON ĐƯỜNG ĐỂ TRỞ THÀNH SHOKUNIN", "summary": "Hai bước trên con đường Shokunin: xây niềm tin (nhận diện Shokunin quanh mình, khao khát trở thành họ, hiểu giá trị bền vững không bị công nghệ thay thế) và hành động bằng \"thói quen nhỏ có ý thức\" theo nguyên lý 1% Kaizen, dẫn sang phần 6 yếu tố Shokunin áp dụng vào thói quen hàng ngày.", "start": 28, "end": 30, "nodes": [{"id": "0019", "title": "Niềm tin: Tại sao con đường Shokunin xứng đáng?", "summary": "Để dấn thân con đường Shokunin cần niềm tin vững chắc - không lý thuyết mơ hồ mà minh chứng sống động. Nhận diện Shokunin xung quanh: nhìn người tôn trọng ngưỡng mộ thể hiện phẩm chất tinh thông, tận tâm, trách nhiệm, không ngừng cải tiến, tự hào, phát triển toàn diện; quan sát cách họ làm việc, đối mặt khó khăn, tạo giá trị; làm việc cùng họ học tri thức ẩn. Khao khát trở thành: hỏi \"bạn có muốn được như họ không\" - khao khát này là động lực mạnh mẽ nhất, không chỉ mong kỹ năng vị trí mà cách sống và trạng thái Flow. Hiểu về giá trị bền vững: con đường này tạo giá trị không thể thay thế, không bị công nghệ sao chép được tâm hồn và tận tâm - sẽ không mang giá trị ngắn hạn nhưng cuối cùng Shokunin chiến thắng. Bắt đầu từ thói quen nhỏ có ý thức: thay vì mục tiêu lớn, chia nhỏ thành thói quen đơn giản dễ thực hiện hàng ngày - như nguyên lý 1% Kaizen, mỗi bước nhỏ liên tục tạo tiến bộ đáng kể theo thời gian.", "start": 28, "end": 29, "nodes": []}, {"id": "0020", "title": "Hành động: Bắt đầu từ những “thói quen nhỏ có ý thức”", "summary": "Shokunin không phải danh hiệu đạt qua đêm hay sau đọc sách, mà kết quả rèn luyện liên tục tích lũy từ hành động nhỏ hàng ngày có ý thức. Thực hành có ý thức: quan trọng không chỉ thực hiện thói quen mà thực hiện có ý thức, hiểu ý nghĩa mục đích - nói \"cảm ơn\" không chỉ xã giao mà bày tỏ lòng biết ơn chân thành giúp cuộc sống tích cực hơn; mỗi hành động nhỏ công việc cần chú tâm tinh thần Shokunin. Áp dụng 6 yếu tố Shokunin vào thói quen hàng ngày: phần tiếp theo nói kĩ hơn về 6 yếu tố cùng \"thói quen nhỏ\" thực hành, đó là giá trị lớn nhất cuốn sách. Tóm lại: hành trình Shokunin là quá trình tự rèn luyện bền bỉ, bắt đầu từ củng cố niềm tin giá trị của nó, sau đó thực hành thói quen nhỏ có ý thức kiên trì, giống đi từng bước nhỏ lên cầu thang - mỗi bước nhỏ đều mang tiến bộ lớn lao.", "start": 29, "end": 30, "nodes": []}]}, {"id": "0021", "title": "CHƯƠNG 2: KĨ NĂNG THƯỢNG THỪA", "summary": "Xuất sắc không phải đích đến mà hành trình không ngừng; để tồn tại phải tìm chỗ đứng của mình tự thân vận động rèn luyện kỹ năng - công ty không chịu trách nhiệm cho cuộc đời bạn, sếp không chịu, chỉ bạn chịu. Đừng ỷ lại người khác dẫn dắt hay thành tích quá khứ - nâng cao năng lực là trách nhiệm cá nhân nền tảng tự tin khẳng định giá trị. Con đường kỹ năng xuất sắc đòi nỗ lực gấp đôi gấp ba người khác, không chỗ cho nỗ lực nửa vời hay tự mãn; cách nhanh nhất học từ người giỏi nhất xem cách họ cháy hết mình, sau đó sẵn sàng dấn thân bước ra khỏi vùng an toàn thử thách bản thân lĩnh vực mới. Nhớ: muốn đi nhanh thì đi một mình, muốn đi xa thì đi cùng nhau - chia sẻ kiến thức, học từ đồng nghiệp, xây dựng đội nhóm mạnh mẽ là bí quyết phát triển cùng nhau.", "start": 31, "end": 32, "nodes": []}, {"id": "0022", "title": "TỰ THÂN VẬN ĐỘNG !", "summary": "Câu chuyện làm thêm tại quán ăn 四六時中 thời đại học suýt bị đuổi việc, và ba hành động xoay chuyển: cải tiến quy trình rửa bát, nhận việc dọn cống, cải thiện quan hệ với các bà trong bếp. Kết luận: kỹ năng quyết định giá trị bản thân, chỉ có con đường rèn luyện liên tục, việc học là của bản thân; trích hai khả năng cốt lõi trong \"Deep Work\" của Cal Newport.", "start": 33, "end": 34, "nodes": [{"id": "0023", "title": "Bài học từ việc đi làm thêm tí nữa thì bị đuổi việc", "summary": "Câu chuyện làm thêm tại quán ăn 四六時中: lúc đại học, tiếng Nhật kém không hiểu nhân viên bếp nên bị ghét, chủ quán muốn đuổi vì \"không hiểu cái gì\"; sau sốc giận, nhận ra giỏi trường không giúp làm việc hiệu quả, chủ quán đúng khi đuổi vì không giúp được quán. Thay đổi với ba hành động: 1) Cải thiện kỹ năng rửa bát - khi quán đông bát không kịp rửa nên cải quy trình rửa nhanh sạch đáp ứng; 2) Chăm chỉ dọn cống - quán phải dọn cống định kỳ dọn dầu mỡ bể nước thải, người Nhật ngại mùi nên tôi làm; 3) Cải thiện mối quan hệ - mua bánh kẹo mang tới, lần la nói chuyện tâm sự các bà. Kết quả: một tháng sau chủ quán ưu tiên tôi thứ 7 chủ nhật rửa bát cộng thêm thứ 3 thứ 5 dọn cống - xây dựng chỗ đứng vững chắc nhờ thành thạo hai kỹ năng, mối quan hệ tốt hơn, các bà yêu quý. Bài học: muốn tồn tại phải có kỹ năng từ tự thân vận động, không ỷ lại công ty sếp; thành tích quá khứ thâm niên mối quan hệ không đảm bảo vị trí vững - phải tự xây dựng kỹ năng phù hợp công việc đạt trình độ cao. Cal Newport \"Deep Work\" tóm kết: trong nền kinh tế mới giá trị thúc đẩy bởi hai khả năng cốt lõi: 1) Nhanh chóng làm chủ những điều khó khăn. 2) Tạo sản phẩm ở trình độ xuất sắc chất lượng và tốc độ. Ba kết luận: 1) Kỹ năng quyết định giá trị bản thân. 2) Chỉ một con đường nỗ lực rèn luyện liên tục, không đường tắt. 3) Cải thiện kỹ năng là của bản thân, học là của bản thân, trở thành ai là của bản thân.", "start": 33, "end": 34, "nodes": []}]}, {"id": "0024", "title": "NỖ LỰC HƠN 200%!", "summary": "Luận điểm nỗ lực hơn 200%: làm gấp đôi người khác để hiểu giới hạn bản thân và tối ưu công việc; vượt người khác cần 70-80% nhưng vượt chính mình cần >100%; ví von con hổ không săn mồi thành mèo; \"việc chúng ta làm ngoài giờ làm việc sẽ quyết định chúng ta là ai\", nêu Hoàng Đoàn và Minh Tăng tối về vẫn mày mò công nghệ.", "start": 35, "end": 36, "nodes": [{"id": "0025", "title": "Việc chúng ta làm ngoài giờ làm việc sẽ quyết định chúng ta là ai.", "summary": "Lời khuyên: đừng sợ khó khăn, đừng sợ làm việc 16 tiếng một ngày, dấn đầu vào nó; phải chăm chỉ gấp đôi người khác làm gấp đôi - mục tiêu không phải output gấp đôi hay tăng lương mà hiểu giới hạn bản thân, tối ưu công việc bỏ thứ thừa thãi làm nhanh hơn, những trải nghiệm khó khăn giúp tiến bộ mài giũa năng lực khả năng phán đoán kiên trì bản lĩnh. Để phát triển phải nỗ lực >100%, để vượt người khác chỉ cần 70-80%, để vượt chính mình phải >100% - chiến thắng chính mình là khó khăn nhất. Con hổ là chúa sơn lâm nhưng không nỗ lực săn mồi cũng trở thành mèo. Việc chúng ta làm ngoài giờ làm việc sẽ quyết định chúng ta là ai: hết giờ công ty không phải xong, khác biệt nằm ở việc về nhà làm gì. Hoàng Đoàn và Minh Tăng (shokunin) - thói quen là khi về nhà ăn uống xong bật máy tiếp tục tìm hiểu mày mò công nghệ.", "start": 36, "end": 36, "nodes": []}]}, {"id": "0026", "title": "HỌC TỪ CAO THỦ : CÁCH NHANH NHẤT ĐỂ THÀNH CÔNG !", "summary": "\"Bộ ba đồng hành\" của IT Shokunin — người thầy, người bạn, người đệ tử. Phân biệt explicit knowledge và tacit knowledge, ví dụ code review nghiêm khắc của quản lý Đặng Văn Luân; vai trò người bạn (nhóm học tập, chia sẻ sau giờ làm, \"muốn đi nhanh thì đi một mình, muốn đi xa thì đi cùng nhau\"); vai trò người đệ tử (truyền nghề, làm gương, ví dụ Kim Luân Pháp Vương truyền Long Tương Bát Nhã Công cho Quách Tương).", "start": 37, "end": 38, "nodes": [{"id": "0027", "title": "Người Thầy", "summary": "Trình bày \"bộ ba đồng hành\" (người thầy, người bạn, người đệ tử) cho IT Shokunin. Phân biệt hai loại tri thức: explicit knowledge (văn bản, hình ảnh, âm thanh, khái niệm cụ thể) và tacit knowledge (kinh nghiệm, tình cảm, thái độ, cách tư duy). Ví dụ: quản lý Đặng Văn Luân với code review nghiêm khắc.", "start": 37, "end": 37, "nodes": []}, {"id": "0028", "title": "Người Bạn", "summary": "Trình bày vai trò người bạn: sẻ chia buồn vui và khó khăn công việc, thúc đẩy tiến lên; các buổi uống bia chia sẻ sau giờ làm. Học từ bạn bè qua nhóm học tập, chia sẻ kiến thức, kinh nghiệm; câu nói \"Muốn đi nhanh thì đi một mình, muốn đi xa thì đi cùng nhau\". Bắt đầu phần \"Người Đệ Tử\": truyền nghề rèn luyện tinh thần trách nhiệm, làm gương; tham chiếu \"Kim Luân Pháp Vương\" truyền \"Long Tương Bát Nhã Công\" cho \"Quách Tương\"; Shokunin cống hiến xã hội.", "start": 38, "end": 38, "nodes": []}, {"id": "0029", "title": "Người Đệ Tử", "summary": "Giống nội dung node 0028 nhưng bao gồm cả phần \"Người Bạn\" đầy đủ (uống bia, chia sẻ sau giờ làm) và phần \"Người Đệ Tử\" (truyền nghề, rèn luyện tinh thần, \"đệ tử chân truyền\", tham chiếu \"Kim Luân Pháp Vương\", \"Long Tương Bát Nhã Công\", \"Quách Tương\"); vòng lặp học hỏi-sẻ chia-phát triển.", "start": 38, "end": 38, "nodes": []}]}, {"id": "0030", "title": "LUÔN LUÔN PHẢI CÓ OUTPUT !", "summary": "Định nghĩa output cho các tình huống: dự án (sản phẩm chạy được, tính năng hoạt động, không bugs); task điều tra (report đầy đủ với dự đoán, cách thử, kết quả); cuộc họp (email tổng hợp); nghiên cứu (blog hoặc sản phẩm demo); học tập (chứng chỉ, bằng cấp). Giới thiệu Hourensou (Báo cáo - Liên lạc - Thảo luận) từ văn hóa Nhật. Shokunin phải tạo giá trị qua sản phẩm chất lượng cao và tốc độ nhanh.", "start": 39, "end": 40, "nodes": []}, {"id": "0031", "title": "NHÌN CÁI CÂY VÀ NHÌN CẢ KHU RỪNG", "summary": "Trình bày kỹ thuật sắp xếp màn hình làm việc 2x2 theo mô hình MVC + services (views, controllers, models, services). Nhấn mạnh đánh giá task theo tổng thể hệ thống (\"khu rừng\"), phát hiện vấn đề ảnh hưởng tới tasks khác, tránh code degradation. Liệt kê vai trò team: dev, leader, PM, comtor, tester; ví dụ QC Trang Nguyễn. Đề cập Kaizen (cải tiến liên tục) và tối ưu hóa giải pháp cho toàn hệ thống.", "start": 41, "end": 42, "nodes": []}, {"id": "0032", "title": "CÁCH HỌC CỦA 1 SHOKUNIN", "summary": "Cách học của Shokunin: học cái mới để đi nhanh, học căn bản (algorithms, databases, hướng đối tượng) để đi xa, cùng kiến thức sâu (DDD, design patterns, microservices, serverless, clean code). Mô hình T-shaped (nét dọc chiều sâu, nét ngang chiều rộng) mở rộng thành Pi-shaped và Comb-shaped, gắn với Kaizen không ngừng nghỉ.", "start": 43, "end": 44, "nodes": [{"id": "0033", "title": "Để đi nhanh thì học những cái mới, để đi xa thì học những cái căn bản", "summary": "Mô tả công nghệ IT thay đổi nhanh chóng. Liệt kê kiến thức căn bản (algorithms, databases, hướng đối tượng) và kiến thức sâu (DDD, design patterns, microservices, serverless, clean code). Giới thiệu mô hình T-shaped: nét dọc (chiều sâu, chuyên gia lĩnh vực), nét ngang (chiều rộng, hiểu biết cơ bản nhiều lĩnh vực). Phát triển thành Pi-shaped (π) và Comb-shaped (hình chiếc lược). Kaizen không ngừng nghỉ, nâng cao giá trị bản thân.", "start": 43, "end": 44, "nodes": []}, {"id": "0034", "title": "Học sâu hay học rộng ?", "summary": "Trình bày mô hình T-shaped: nét dọc (đào giếng sâu ở một chỗ - chuyên gia) và nét ngang (đi lại trên mặt đất - hiểu biết cơ bản nhiều lĩnh vực). Tiến tới Pi-shaped (hai chuyên môn sâu + nét ngang) hay Comb-shaped (lược - nhiều chuyên môn sâu + nét ngang) - cá nhân linh hoạt, giá trị cao. Tinh thần Shokunin: theo đuổi không ngừng sự hoàn hảo, Kaizen, nâng cao giá trị bản thân.", "start": 44, "end": 44, "nodes": []}]}, {"id": "0035", "title": "CÙNG NHAU PHÁT TRIỂN – NÂNG TẦM TRÍ TUỆ VIỆT", "summary": "Câu nói \"Muốn đi nhanh thì đi một mình. Muốn đi xa thì đi cùng nhau\". Tham chiếu La Văn Đăng (freelancer), mục tiêu TOMOSIA giúp 10.000-20.000 người. Mô hình SECI của giáo sư Nonaka & Takeuchi: Socialization (nhóm Ruby, React, Testing; pair programming; code review, test case review; brainstorming), Externalization (ghi chép, template báo cáo, template test case, best practices, blog), Combination (chia sẻ nội bộ, workshop, tài liệu hướng dẫn, tham gia cộng đồng IT), Internalization (đọc sách chuyên ngành, tạo thói quen tự học, áp dụng công việc hàng ngày). AI hỗ trợ từng giai đoạn.", "start": 45, "end": 48, "nodes": []}, {"id": "0036", "title": "CHƯƠNG 3: CẢI TIẾN – KAIZEN VÀ SỨC MẠNH CỦA AI", "summary": "Giới thiệu Chương 3 về Kaizen và sức mạnh AI. Nhận diện Kaizen (cải tiến từng bước nhỏ) và AI (công nghệ đổi thay nhanh) tưởng chừng đối lập. Shokunin IT thực thụ kết hợp hai lực này nhưng nhuyễn, giữ Kaizen trong tim, nắm bắt AI như công cụ khuếch đại nỗ lực.", "start": 49, "end": 50, "nodes": []}, {"id": "0037", "title": "KAIZEN – ĐI LÊN TỪ NHỮNG BƯỚC CHÂN NHỎ", "summary": "Trình bày Kaizen là cải tiến liên tục từ những bước nhỏ, dùng ví dụ cầu thang (người nhảy cao 2.5m nhưng ai cũng leo tầng 100 từng bậc). Nguyên lý 1%: (1.01)^365 sau một năm. Cơ hội cải tiến: code review, test case review, retro (retrospective), KPT (Keep Problem Try). Thách thức: duy trì cải tiến khi dự án gặp vấn đề. Metaphor kéo pháo lên Điện Biên Phủ - cần \"miếng chèn\" giữ tiến bộ (tiêu chuẩn tổ chức). Shokunin với tiêu chuẩn cao kéo cả team-tổ chức đi lên.", "start": 51, "end": 52, "nodes": []}, {"id": "0038", "title": "PHƯƠNG PHÁP LUẬN CỦA KAIZEN, CHU TRÌNH PDCA", "summary": "Chu trình PDCA (Plan-Do-Check-Act) với các bước chi tiết: Plan (xác định mục tiêu, phân tích vấn đề, lập kế hoạch), Do (thực hiện quy mô nhỏ, ghi chép, kiểm soát rủi ro), Check (đánh giá kết quả so với mục tiêu, phân tích dữ liệu, thu thập phản hồi), Act (chuẩn hóa hoặc điều chỉnh kế hoạch). Các nguyên lý nền tảng: tập trung vào quy trình, sự tham gia của tất cả mọi người, tiêu chuẩn hóa, tư duy giải quyết vấn đề; liên hệ với Scrum (sprint, daily scrum, sprint review, retrospective).", "start": 53, "end": 54, "nodes": []}, {"id": "0039", "title": "TIÊU CHUẨN CAO VÀ SỰ KHIÊM TỐN", "summary": "Tiêu chuẩn cao và sự khiêm tốn của Shokunin: không chấp nhận lỗi (cảm thấy nhục nhã khi có bug, không nói \"code nào chẳng có bug\"), không chấp nhận đội ngũ kém (thà tự làm còn hơn giao cho người không đủ năng lực), khiêm tốn (không nói linh tinh, thừa nhận \"không biết là không biết\", không giả vờ, trái với kiểu sếp/sư phụ ra lệnh mà không hiểu), sự khiêm tốn giúp tiếp thu cái mới - câu nói Socrates \"Tôi chỉ biết một điều là tôi không biết gì cả\".", "start": 55, "end": 56, "nodes": []}, {"id": "0040", "title": "QUYẾT LIỆT VÀ NHẢY VỌT", "summary": "Kaizen (cải tiến từng bước nhỏ) versus nhảy vọt (thay đổi đột phá) - nhận diện thời điểm cần thay đổi quy Resolver: từ bên ngoài: công nghệ đột phá (Internet, mobile, Cloud, Big Data, AI tạo sinh như ChatGPT), thị trường thay đổi nhanh, khủng hoảng hoặc cơ hội; từ bên trong: hiệu suất trì trệ dù Kaizen liên tục, những điểm tắc nẽ cố hữu, kiến thức tích lũy đủ lớn. Phẩm chất cần: quyết liệt, dũng cảm, khiêm tốn, tò mò, dám đặt câu hỏi \"Tại sao chúng ta không thử làm khác đi?\".", "start": 57, "end": 58, "nodes": []}, {"id": "0041", "title": "TỪ CHUYỂN ĐỔI SỐ ĐẾN AI FIRST", "summary": "Làn sóng chuyển đổi số (digital transformation) ở ngân hàng, bán lẻ, chính phủ (ứng dụng chuyển tiền miễn phí nhanh, cổng thông tin điện tử, định danh điện tử) được tiếp nối bởi cơn sóng AI với khả năng tư duy, học hỏi, phân tích dữ liệu khổng lồ, tạo sinh. Tư duy AI-First: đặt AI làm công cụ trọng tâm ưu tiên từ đầu thay vì \"làm gì đó rồi thêm AI vào sau\". Giá trị cốt lõi AI không thể thay thế: tận tâm, trách nhiệm, tính thẩm mỹ, sáng tạo, tư duy phản biện.", "start": 59, "end": 60, "nodes": []}, {"id": "0042", "title": "AI LÀ NGƯỜI SỬ DỤNG AI HIỆU QUẢ NHẤT ?", "summary": "Chân dung người dùng AI hiệu quả nhất: có tư duy giải quyết vấn đề (hỏi \"vấn đề của tôi là gì, AI có thể giúp như thế nào?\", biết đặt câu hỏi đúng - prompt engineering). Có tư duy \"AI-First\" và \"tối ưu hóa quy trình\" (tích hợp AI vào từng bước từ lập kế hoạch đến kiểm tra). Sở hữu khả năng tư duy phản biện (hiểu AI có thể ảo tưởng/thiên kiến, không tin tưởng mù quáng, luôn kiểm tra lại, biết khi nào nên sử dụng AI). Mang tinh thần khiêm tốn và tò mò vô tận (sẵn sàng thử công cụ AI mới, chấp nhận cần cập nhật kiến thức, phân tích và điều chỉnh khi không hiệu quả).", "start": 61, "end": 62, "nodes": []}, {"id": "0043", "title": "DÙNG AI NHIỀU CÓ KÉM ĐI KHÔNG ? – HỌC CÁCH KHÔNG BỊ PHỤ THUỘC", "summary": "Nỗi lo dùng AI nhiều sẽ làm kém năng lực là xác thực - tác giả ví dụ dịch tiếng Nhật sau dùng AI lâu rồi chậm lại. Quy tắc tác giả áp dụng: đọc và kiểm tra lại tất cả output AI, yêu cầu AI phân tích lý do sửa lỗi và học hỏi từ đó, yêu cầu AI trả lời ngắn gọn không nịnh bợ. Sử dụng AI như công cụ học tiếng Nhật: tổng hợp từ mới, cải thiện ngữ pháp, luyện phát âm. Bài học: biến AI thành công cụ để hoàn thành việc VÀ để củng cố/phát triển năng lực gốc của bản thân.", "start": 63, "end": 66, "nodes": []}, {"id": "0044", "title": "TRÁCH NHIỆM CỦA SHOKUNIN", "summary": "Trách nhiệm là một trong sáu yếu tố cốt lõi của Shokunin - sinh ra từ những vai trò và nghĩa vụ (thầy dạy dỗ, con hiếu thảo, người tham gia giao thông tuân thủ luật lệ). Trong IT: trách nhiệm với khách hàng, sản phẩm, đội ngũ, công ty, bản thân - sinh ra từ cam kết, không chỉ là danh sách công việc phải làm. Trách nhiệm là nền tảng xây dựng lòng tin, chất keo vô hình tạo sự gắn kết trong đội (ví dụ đội dọn Shinkansen trong \"phép màu 7 phút\"), nâng cao uy tín nghề nghiệp, đưa trí tuệ Việt Nam ra thế giới. Gốc rễ từ sự tự giác: người tự giác tuân thủ kỷ luật tự nhiên, nỗ lực không phải vì sợ hãi mà vì tôn trọng cam kết.", "start": 67, "end": 68, "nodes": []}, {"id": "0045", "title": "NÓI LÀ LÀM", "summary": "\"Nói là làm\" - ba từ thể hiện tinh thần trách nhiệm: lời hứa như \"Em sẽ xong task vào ngày mai\", \"Team sẽ release đúng deadline\", \"Em sẽ sửa ngay\" với sức nặng đằng sau - khi có lỗi phát sinh, công việc cá nhân, hay estimate lạc quan, Shokunin không thay đổi lời hứa vì là cam kết danh dự. Để \"nói là làm\" phải suy nghĩ cẩn thận trước khi nói, rèn luyện khả năng tư duy/lập kế hoạch/lường trước rủi ro. Ví dụ anh Trung Nguyễn ở lại thức gần như cả đêm để hoàn thành task quan trọng - hành động đó xây dựng lòng tin trong team, mỗi lời hứa giữ vững là viên gạch xây nên uy tín bản thân và sự tin cậy của tập thể.", "start": 69, "end": 70, "nodes": []}, {"id": "0046", "title": "TÍN DỤNG : TÀI SẢN VÔ GIÁ CỦA SHOKUNIN", "summary": "Tín dụng (niềm tin mà người khác dành cho mình) là tài sản vô hình của Shokunin: có người chỉ cần nói là vay được cả trăm triệu đồng, có người dù có đủ giấy tờ thế chấp chỉ vay được vài triệu. Giá trị thực của tín dụng không thể hiện khi \"trời yên biển lặng\" (dự án suôn sẻ) mà chỉ được tạo ra trong \"giông bão\" (khó khăn bất ngờ, vấn đề phức tạp). Ví dụ tác giả deploy server ngày Tết chiều 30 Tết khi mọi người chuẩn bị mâm cơm đoàn viên - hành động đó bảo vệ tín dụng của bản thân và TOMOSIA, tạo niềm tin gần như tuyệt đối của khách hàng, biến sự hy sinh/tận tâm thành tài sản quý giá mà bất kỳ ai làm việc với người có tín dụng cao đều cảm nhận được sự yên tâm lạ thường.", "start": 71, "end": 72, "nodes": []}, {"id": "0047", "title": "DŨNG CẢM NHẬN LỖI – \"ĐƯỢC PHÉP SAI MỘT LẦN”", "summary": "Dũng cảm nhận lỗi - \"Được phép sai một lần\" chứa triết lý: sai sót không thể tránh khỏi trong IT, tinh thần trách nhiệm không thể hiện ở việc hoàn hảo mà ở thái độ/hành động sau sai lầm. Thay vì đổ lỗi (tại khách hàng đổi yêu cầu, tại đồng nghiệp chậm, tại tài liệu không rõ), Shokunin chọn con đường khó khăn hơn: dũng cảm nhận lỗi (\"em estimate sai\", \"em xử lý chưa tốt\") - đó không phải biểu hiện yếu kém mà là dấu hiệu dũng cảm/bản lĩnh. Ông chủ quán ăn Nhật dạy: \"Bạn được sai một lần, nhưng không được sai hai lần cùng một lỗi\" - vế đầu thể hiện bao dung/tạo môi trường an toàn, vế sau đặt tiêu chuẩn cao về học hỏi (phân tích xem sai ở đâu, tại sao, làm thế nào để lần sau không lặp lại). Tác giả áp dụng tại TOMOSIA: chấp nhận nhân viên sai nhưng phải học được điều gì từ sai đó.", "start": 73, "end": 74, "nodes": []}, {"id": "0048", "title": "KỶ LUẬT - NỀN TẢNG CỦA MỌI THÀNH CÔNG", "summary": "Nhà văn Haruki Murakami tuân thủ lịch trình sinh hoạt và viết lách nghiêm ngặt; Steve Jobs nổi tiếng với lòng theo đuổi sự tối giản và tiêu chuẩn khắt khe; Luân Đặng dậy lúc 4h sáng chạy 42km hàng ngày. Kỷ luật giải phóng tâm trí khỏi quyết định vụn vặt để tập trung vào mục tiêu, rèn luyện kỹ năng mang lại sự tự do trong tay nghề, và tạo môi trường ổn định cho đội nhóm hoạt động hiệu quả.", "start": 75, "end": 76, "nodes": []}, {"id": "0049", "title": "TƯ DUY CHỦ ĐỘNG", "summary": "Năm lăng kính trách nhiệm: với công việc (cam kết hoàn thành tốt nhất, đảm bảo chất lượng và tiến độ), với đội ngũ (hỗ trợ và chia sẻ để cùng thành công chung), với công ty (đóng góp vào giá trị và mục tiêu chung), với khách hàng (đồng hành để giúp họ thành công), với bản thân (phát triển năng lực chuyên môn và rèn giũa nhân cách). Sự khác biệt giữa người làm thuê và người Shokunin là khả năng tự tìm ra những việc cần phải làm, không chỉ làm theo mệnh lệnh.", "start": 77, "end": 78, "nodes": []}, {"id": "0050", "title": "TRÁCH NHIỆM – CON ĐƯỜNG XÂY DỰNG NIỀM TỰ HÀO", "summary": "Trách nhiệm bao gồm cam kết từ bên trong, lòng dũng cảm đối mặt sai lầm, sức mạnh kỷ luật, và tư duy làm chủ qua năm lăng kính. Niềm tự hào được xây dựng từ bên trong, không phải sự tự phụ hay kiêu ngạo, là phần thưởng sâu sắc nhất của con đường trách nhiệm. Trách nhiệm với bản thân là con đường trực tiếp để xây dựng niềm tự hào, biến công việc từ chỉ kiếm tiền thành phương tiện tôi luyện và khẳng định giá trị bản thân.", "start": 79, "end": 80, "nodes": []}, {"id": "0051", "title": "CHƯƠNG 5: TẬN TÂM, ĐAM MÊ – NO BUGS, HƯỚNG TỚI SỰ HOÀN HẢO", "summary": "Chương 5 trình bày Kỹ năng là đôi tay sắc bén, Trách nhiệm là la bàn chỉ hướng, Tận tâm và Đam mê là ngọn lửa cháy trong tim người Shokunin. Người có đam mê trăn trở về từng dòng code, tỉ mỉ với từng test case, không chấp nhận sự tầm thường, giống như thợ mộc dùng gỗ tốt cho mặt sau tủ dù không ai nhìn thấy.", "start": 81, "end": 82, "nodes": []}, {"id": "0052", "title": "ĐỪNG THEO ĐUỔI ĐAM MÊ, HÃY XÂY DỰNG NÓ", "summary": "Cuốn sách 'So Good They Can't Ignore You' của Cal Newport chỉ ra đam mê là sản phẩm phụ của việc làm chủ kỹ năng. Vòng lặp tích cực gồm 5 bước: (1) rèn luyện kỹ năng tận tâm, (2) trở nên xuất sắc được công nhận, (3) có được sự tự chủ và niềm tự hào, (4) đam mê nảy nở, (5) đam mê thúc đẩy rèn luyện tiếp. Thay vì hỏi 'Tôi đam mê cái gì?', hãy bắt đầu với 'Làm thế nào để tôi làm công việc này tốt hơn ngày hôm qua?'.", "start": 83, "end": 84, "nodes": []}, {"id": "0053", "title": "TẬN TÂM – NGAY CẢ KHI KHÔNG CÓ AI NHÌN THẤY", "summary": "Tận tâm là làm hơn cả thế so với trách nhiệm, và là sự chăm chỉ có ý thức khác với cần cù (lặp lại vô thức). Tiêu chuẩn như của Steve Jobs: dùng gỗ chất lượng cao cho mặt sau tủ mặc dù không ai thấy; lập trình viên không để code cẩu thả; đầu bếp không 'nêm nếm cho qua'; người tử tế vẫn làm điều đúng đắn ngay cả khi không ai khen ngợi. Chất lượng thật nằm ở tiêu chuẩn bạn tự đặt cho chính mình, không phải ở ánh đèn chiếu sáng bên ngoài.", "start": 85, "end": 86, "nodes": []}, {"id": "0054", "title": "NHỮNG THÓI QUEN TẠO NÊN SỰ TẬN TÂM CỦA SHOKUNIN", "summary": "Bốn thói quen tạo nên sự tận tâm: rèn Deep Work và họp daily sớm để vào trạng thái flow; chú ý chi tiết và tự kiểm tra (\"100 test case, 99 pass, 1 NG vẫn là NG\", self-test trước bàn giao); quy tắc \"5 phút cuối\" rà soát email, file đính kèm, con số, commit; và \"thêm một chút\" vào mỗi nhiệm vụ để đưa kết quả từ tốt lên xuất sắc.", "start": 87, "end": 88, "nodes": [{"id": "0055", "title": "1. Rèn luyện Sự Tập Trung Sâu (Deep Work)", "summary": "Tập trung sâu (Deep Work) là siêu năng lực trong thế giới số đầy xao nhãng; người Shokunin có kế hoạch rõ ràng ngay khi thức dậy về những nhiệm vụ quan trọng nhất cần hoàn thành. Buổi họp daily sáng nên diễn ra sớm, chỉ thông báo nhanh tiến độ và khó khăn, để quay trở lại dòng chảy công việc và vào trạng thái 'flow' nhanh chóng.", "start": 87, "end": 87, "nodes": []}, {"id": "0056", "title": "2. Chú Ý Đến Chi Tiết và Tự Kiểm Tra Kỹ Lưỡng", "summary": "Chất lượng công việc là danh dự của Shokunin; tiêu chuẩn: '100 test case, 99 pass, 1 NG vẫn là NG', không có khái niệm 'gần xong' hay 'ổn rồi'. Lập trình viên phải viết code sạch sẽ dễ đọc dễ bảo trì, luôn tự kiểm tra (self-test) kỹ lưỡng trước khi bàn giao cho người khác, thể hiện sự tôn trọng thời gian và công sức của đồng nghiệp trong công đoạn tiếp theo.", "start": 87, "end": 88, "nodes": []}, {"id": "0057", "title": "3. Quy tắc \"5 phút cuối\"", "summary": "Quy tắc '5 phút cuối': dành đúng 5 phút trước khi kết thúc nhiệm vụ hoặc ngày làm việc để xem lại tất cả. Đọc lại email trước khi gửi, kiểm tra file đính kèm, rà soát con số trong báo cáo, xem lại commit code cuối cùng. Thói quen này giống lớp bảo vệ cuối cùng phát hiện lỗi nhỏ và xây dựng hình ảnh người cẩn trọng đáng tin cậy.", "start": 88, "end": 88, "nodes": []}, {"id": "0058", "title": "4. Thêm \"một chút\" vào mỗi nhiệm vụ", "summary": "Hoàn thành công việc được giao là trách nhiệm; tạo sản phẩm vượt trên mong đợi là tận tâm. Sau khi hoàn thành, hỏi 'Mình có thể làm thêm điều gì nhỏ để kết quả tốt hơn không?': trình bày slide đẹp mắt chuyên nghiệp, thêm dòng ghi chú giải thích logic phức tạp, sắp xếp tài liệu khoa học. Những nỗ lực 'thêm một chút' này biến sản phẩm từ 'tốt' thành 'xuất sắc' mang lại trải nghiệm 'wow' cho khách hàng và đồng nghiệp.", "start": 88, "end": 88, "nodes": []}]}, {"id": "0059", "title": "PHƯƠNG PHÁP MÀI DŨA KỸ NĂNG", "summary": "Phương pháp mài dũa kỹ năng gồm 4 bước: (1) chia nhỏ vấn đề thành nhiệm vụ cụ thể có output rõ ràng; (2) thử thách bản thân bằng \"task vượt ngưỡng\" hoặc time box để hoàn thành task quen thuộc nhanh hơn bình thường; (3) lắng nghe phản hồi qua unit test, profiling tools, và code review từ đồng đội; (4) ghi chú lại bài học thành note cá nhân, blog, template, hay checklist, rồi chia sẻ cho cả đội.", "start": 89, "end": 90, "nodes": []}, {"id": "0060", "title": "KHI SỰ TẬN TÂM CHUYỂN HÓA THÀNH ĐAM MÊ", "summary": "Ba nguồn phần thưởng tâm lý chuyển đổi tận tâm thành đam mê: (1) Niềm Vui Của Năng Lực – khi kỹ năng tăng lên, vào trạng thái \"dòng chảy\" (flow) theo Mihaly Csikszentmihalyi, cảm giác quên đi thời gian và mọi thứ; (2) Sự Công Nhận và Tôn Trọng – từ đồng nghiệp, quản lý, khách hàng; (3) Tầm Ảnh Hưởng Hữu Hình – thấy code viết làm trang web chạy nhanh hơn, kế hoạch giúp đội hoàn thành đúng hạn, báo cáo giúp công ty quyết định kinh doanh đúng đắn.", "start": 91, "end": 92, "nodes": []}, {"id": "0061", "title": "VƯỢT QUA “VỰC THẲM CỦA SỰ CHÁN NẢN”", "summary": "Giai đoạn \"Vực thẳm của sự chán nản\" xảy ra sau khi hào hứng ban đầu qua nhưng kết quả chưa thấy, khi vấn đề phức tạp nảy sinh và áp lực lớn. Ba nguồn sức mạnh vượt qua: (1) trách nhiệm và tín dụng với khách hàng và đồng đội; (2) tầm nhìn dài hạn xem khó khăn là cơ hội học hỏi quý giá; (3) tin tưởng vào quy trình làm việc đã được chứng minh. Chiến lược xây dựng bền bỉ: tập trung vào \"chiến thắng nhỏ\" từng ngày, chia nhỏ vấn đề lớn, đừng ngại yêu cầu giúp đỡ từ đội.", "start": 93, "end": 94, "nodes": []}, {"id": "0062", "title": "HƯỚNG TỚI SỰ HOÀN HẢO", "summary": "Cam kết \"Zero Bug\" – lời hứa danh dự rằng sản phẩm bàn giao không có lỗi, nếu có lỗi phát sinh sau này TOMOSIA chịu toàn bộ trách nhiệm và xử lý miễn phí. Tư duy người giải quyết vấn đề: thay vì hỏi khách hàng \"làm thế nào?\" hay yêu cầu giải thích, team chủ động suy nghĩ, nghiên cứu, và đưa ra tối thiểu 2-3 phương án cho khách hàng chọn. Khi theo đuổi sự hoàn hảo bằng tận tâm, lợi nhuận và niềm vui trong công việc sẽ tự tìm đến như phần thưởng xứng đáng.", "start": 95, "end": 96, "nodes": []}, {"id": "0063", "title": "CHƯƠNG 6: TÔN TRỌNG NGHỀ NGHIỆP – TỰ HÀO DÂN TỘC, CÔNG TY, VÀ CÁ NHÂN", "summary": "Phần mở đầu chương 6 nhắc nhở rằng chúng ta dành hơn 8 tiếng mỗi ngày ở công ty – một phần ba cuộc đời – nên không nên lãng phí là \"thời gian chết\" mà hãy biến nó thành hành trình hoàn thiện bản thân. Khuyến khích bạn chọn môi trường công ty như nơi cống hiến giá trị win-win, chứ không chỉ kiếm tiền, với tinh thần shokunin, tử tế, và sứ mệnh nâng tầm CNTT Việt Nam.", "start": 97, "end": 98, "nodes": []}, {"id": "0064", "title": "CÔNG VIỆC CÒN HƠN CẢ MƯU SINH", "summary": "Kể chuyện giáo viên cũ bán cà phê và trà sữa ở TP HCM với lòng tự hào và tâm huyết vì dùng nguyên liệu \"thật\", không hóa chất. Minh họa rằng không có công việc nào thấp kém – giá trị công việc phụ thuộc cách làm: đánh giày để chiếc giày hồi sinh như mới, dọn dẹp với nụ cười và tử tế, hay làm IT để hệ thống hoạt động ổn định không bug là những công việc cao quý. Giới thiệu \"Công thức Cuộc đời\" của Kazuo Inamori: Thành quả = Thái độ × Nhiệt tình × Năng lực, trong đó Thái độ là yếu tố quyết định nhất.", "start": 99, "end": 100, "nodes": []}, {"id": "0065", "title": "THÁI ĐỘ QUAN TRỌNG HƠN TRÌNH ĐỘ", "summary": "Công thức cuộc đời của Kazuo Inamori: Thành quả = Thái độ × Nhiệt tình × Năng lực, với ba yếu tố (Năng lực: 0-100, Nhiệt tình: 0-100, Thái độ: -100 đến +100). Thái độ là cách nhìn nhận sự việc, triết lý sống, động lực bên trong, và là yếu tố nhân là phép nhân nên quyết định kết quả. Ví dụ intern có lợi thế thấp nhưng thái độ tốt – chủ động xin review, ghi chép cẩn thận, tham gia chia sẻ, tự tìm hiểu – đã trở thành key member sau 6 tháng và quản lý ở công ty startup nước ngoài hiện tại.", "start": 101, "end": 102, "nodes": []}, {"id": "0066", "title": "NHỮNG THÓI QUEN NHỎ TẠO NÊN THÁI ĐỘ", "summary": "Thái độ chuẩn mực được rèn luyện qua 5 loại thói quen nhỏ hàng ngày: (1) Thái độ với Thời gian – đến sớm 10-15 phút, dự phòng 20% thời gian để kiểm tra chất lượng; (2) Thái độ với Quy trình – tuân thủ test procedure, report rule, HR process; (3) Thái độ trong Giao tiếp – lắng nghe thực sự, phản hồi nhanh, nói chuyện lịch sự; (4) Thái độ với Sản phẩm công việc – chú trọng chất lượng code, test cẩn thận, không lặp lại lỗi; (5) Thái độ với Không gian làm việc – giữ sạch sẽ, dọn dẹp bàn, vệ sinh cá nhân, thấy rác tiện tay dọn. Những hành động này nuôi dưỡng LÒNG TỰ TRỌNG và TỰ HÀO nghề nghiệp.", "start": 103, "end": 105, "nodes": []}, {"id": "0067", "title": "MỐI QUAN HỆ GIỮA KHÁCH HÀNG - NHÂN VIÊN - CÔNG TY", "summary": "Mối quan hệ ba bên trong lĩnh vực dịch vụ IT: Khách hàng cho đi (tin tưởng, tài chính, yêu cầu rõ ràng) và nhận lại (sản phẩm chất lượng, know-how); Công ty cho đi (nhân sự chất lượng, giá trị cốt lõi, môi trường lành mạnh) và nhận lại (lực lượng con người, tài chính, know-how, trải nghiệm); Nhân sự cho đi (chất lượng công việc, học hỏi liên tục, xây dựng văn hóa) và nhận lại (môi trường phát triển, thu nhập xứng đáng, đam mê và flow). Triết lý WIN-WIN: mỗi vai trò phải cho đi trước khi nhận lại, vòng tròn giá trị cần vận hành trơn tru cân bằng.", "start": 106, "end": 107, "nodes": []}, {"id": "0068", "title": "TRIẾT LÝ TỪ CÁI TÊN TOMOSIA", "summary": "Tên TOMOSIA xuất phát từ cụm tiếng Nhật 共に幸せを灯す (tomo ni shiawase o tomosu) nghĩa là \"cùng nhau thắp sáng hạnh phúc\", gói gọn hai yếu tố: \"hạnh phúc\" và \"cùng nhau\". Triết lý kinh doanh WIN-WIN từ ngày đầu thành lập – công ty tạo môi trường cho lập trình viên sống với đam mê, muốn đi xa phải đi cùng nhau, có nhau để động viên khi mỏi gối. Nguyên tắc sống: bản thân mình có thể làm được những điều gì, thì mình hãy CỨ LÀM đi, đừng chờ đợi người khác, đối xử chân thành và hết lòng trước, nếu không được đáp lại thì thôi. Sự tôn trọng công ty giống chọn người yêu – chọn rồi hãy gắn bó hết mình, nếu không hợp thì chia tay sạch sẽ.", "start": 108, "end": 110, "nodes": []}, {"id": "0069", "title": "KHÁT VỌNG NÂNG TẦM NGÀNH CNTT VIỆT NAM", "summary": "Việc ngành CNTT là đòn bẩy chiến lược cho Việt Nam thoát bẫy thu nhập trung bình, khái niệm Shokunin từ Nhật Bản, nhận xét về năng lực lao động thấp và kỹ năng thiếu của người Việt, vai trò giáo dục và doanh nghiệp trong chuẩn bị nguồn lực, triết lý đào tạo IT Shokunin toàn diện của TOMOSIA (chuyên môn, trách nhiệm, tận tâm, tinh thần học hỏi), sứ mệnh nâng tầm ngành CNTT Việt Nam.", "start": 111, "end": 112, "nodes": []}, {"id": "0070", "title": "CHƯƠNG 7: PHÁT TRIỂN TOÀN DIỆN – KIẾN TẠO MỘT SHOKUNIN TRỌN VẸN", "summary": "Chương 7 giới thiệu hành trình phát triển toàn diện từ Thân - Tâm - Trí để kiến tạo một Shokunin trọn vẹn, từ những phẩm chất kỹ thuật, tận tâm và trách nhiệm đã nêu ở các chương trước đến sự viên mãn trong cuộc sống.", "start": 113, "end": 114, "nodes": []}, {"id": "0071", "title": "NUÔI DƯỠNG SỨC KHỎE", "summary": "Niềm tự hào khi thức trắng fix bug, các dấu hiệu burnout, câu nói về nghìn ước mơ khi khỏe mạnh vs. một ước mơ duy nhất là khỏe lại, liên kết giữa sức khỏe thể chất và hiệu suất công việc, năm thói quen cụ thể: phá vỡ trạng thái tĩnh (dùng cầu thang thay thang máy), bảo dưỡng tay và mắt (quy tắc 20-20-20), uống nước, chú ý dinh dưỡng (không đường trắng, hạn chế tinh bột trắng), ưu tiên giấc ngủ đều đặn.", "start": 115, "end": 116, "nodes": []}, {"id": "0072", "title": "NUÔI DƯỠNG TƯ DUY", "summary": "Phép ẩn dụ máy tính (CPU là năng lực bẩm sinh, OS là giáo dục, phần mềm là phương pháp tư duy), năm kiểu tư duy với câu hỏi kích hoạt: tư duy phản biện (Critical Thinking), tư duy sáng tạo (Creative Thinking), tư duy thiết kế (Design Thinking), tư duy hệ thống (Systems Thinking) với khái niệm leverage points, tư duy ngược (Reverse Thinking/Inversion), và siêu nhận thức (Metacognition) như công cụ tối thượng.", "start": 117, "end": 120, "nodes": []}, {"id": "0073", "title": "NUÔI DƯỠNG SỰ TÒ MÒ", "summary": "Câu chuyện về nhân viên đọc vui tên TOMOSIA thành \"tò mò sí\", phân biệt tò mò vs. tọc mạch, tò mò là sự ham hiểu biết và niềm vui tìm câu trả lời, khác biệt với tò mò ở người lớn bị bào mòn, ba phương pháp kích hoạt tò mò: thay đổi tư duy coi thách thức là học hỏi, luôn đặt câu hỏi \"Tại sao?\", chủ động tìm kiến thức từ sách/blog/kỹ năng mới, bước ra khỏi vùng an toàn.", "start": 121, "end": 122, "nodes": []}, {"id": "0074", "title": "NUÔI DƯỠNG TRÁI TIM", "summary": "Ẩn dụ khu vườn tâm hồn, hạt mầm tốt của lòng biết ơn và sự tử tế (thank cards, reactions trên teams), tưới tắm bằng trắc ẩn và tha thứ, phân bón quý giá là kết nối chân thành, nhổ bỏ cỏ dại (oán giận, ghen tị), mở lòng ra với ánh sáng (passion, niềm vui, tình yêu), thử thách và bão giông (criticism, wave cảm xúc), rễ của lòng tự trọng và kiên cường, hoa của yêu thương và khả năng rung cảm, trái của sự sẻ chia.", "start": 123, "end": 124, "nodes": []}, {"id": "0075", "title": "TỈNH THỨC TRONG THẾ GIỚI PHÂN TÂM", "summary": "Sự chú ý trở thành mặt hàng trong thời đại hiện tại, định nghĩa tỉnh thức là khả năng hiện diện trọn vẹn với công việc, khóa \"Search Inside Yourself\" của Google, trạng thái dòng chảy (flow), năm công cụ xây dựng tỉnh thức: dọn sạch mặt bàn, đặt điện thoại xa tầm tay, tập ngồi yên không nhạc/video nền, kỹ thuật Pomodoro (25 phút làm/5 phút nghỉ), viết 3 việc cần làm, thực hành thiền 5 phút tập trung vào hơi thở.", "start": 125, "end": 126, "nodes": []}, {"id": "0076", "title": "SỨC MẠNH CỦA NHỮNG THÓI QUEN NHỎ: XÂY DỰNG KỶ LUẬT TRONG 1 PHÚT", "summary": "Đánh giá quá cao một hành động lớn vs. coi thường cải tiến nhỏ nhất quán, kỷ luật là bền bỉ không phải chịu đựng, mười thói quen \"1 phút\": nói lời khen (trái tim), nghĩ 2 điều tích cực (hạt mầm tốt), thiền 1 phút (tỉnh thức), kể 3 điều biết ơn (lòng biết ơn), chống đẩy 1 cái (thể chất), viết 50 từ (tư duy), đọc 2 trang sách (kiến thức), nhảy dây 10 cái (năng lượng), đi bộ 100 bước (phá vỡ tĩnh), uống nước (chăm sóc cơ bản).", "start": 127, "end": 128, "nodes": []}, {"id": "0077", "title": "TRỞ THÀNH MỘT SHOKUNIN TRỌN VẸN: KHI CÔNG VIỆC VÀ CUỘC SỐNG HÒA LÀM MỘT", "summary": "Tổng kết hành trình từ mài giũa kỹ năng chuyên môn đến rèn luyện Thân - Tâm - Trí, vai trò sức khỏe thể chất trong năng lượng sáng tạo, mối liên hệ giữa tư duy sắc bén và cách nhìn cuộc sống, lợi ích tu dưỡng tâm hồn và tỉnh thức trong công việc, ranh giới giữa công việc và cuộc sống tan biến, công việc trở thành sân chơi/phòng thí nghiệm/phương tiện biểu đạt giá trị, quá trình tu dưỡng cả đời với thói quen nhỏ hàng ngày, tên tác giả Lưu Tuấn Anh, ấn phẩm nội bộ TOMOSIA tháng 7/2025.", "start": 129, "end": 131, "nodes": []}]}]}</script>
+<script id="payload" type="application/json">{"generated": "2026-09-23T08:24:30.818000", "store": "/Users/minhtang/Documents/Projects/MyProject/any4ai/tms/pageindex/example/pageindex", "documents": [{"name": "IT Shokunin - TOMOSIA.pdf", "description": "Sách \"SHOKUNIN IT – Cách người TOMOSIA làm việc\" của Lưu Tuấn Anh, Version 2025 Edition, phát hành tháng 7/2025, 131 trang tiếng Việt. Trình bày tinh thần shokunin (nghệ nhân Nhật Bản) và cách áp dụng vào nghề IT tại TOMOSIA qua 7 chương: Shokunin – tinh thần nghệ nhân Nhật Bản; Kĩ năng thượng thừa; Cải tiến – Kaizen và sức mạnh của AI; Trách nhiệm, kỷ luật và tư duy chủ động; Tận tâm, đam mê – No bugs, hướng tới sự hoàn hảo; Tôn trọng nghề nghiệp – tự hào dân tộc, công ty và cá nhân; Phát triển toàn diện – kiến tạo một Shokunin trọn vẹn.", "units": 131, "source": "detected", "nodes": [{"id": "0000", "title": "Preface", "summary": "Trang mục lục của cuốn \"Shokunin IT: Cách người TOMOSIA làm việc\" của tác giả Lưu Tuấn Anh (phiên bản năm 2025), bao gồm 7 chương với các tiêu đề: Shokunin - tinh thần nghệ nhân Nhật Bản, Kỹ năng thượng thừa, Cải tiến - Kaizen và sức mạnh của AI, Trách nhiệm, Tận tâm và hướng tới sự hoàn hảo, Tôn trọng nghề nghiệp, và Phát triển toàn diện.", "start": 1, "end": 4, "nodes": []}, {"id": "0001", "title": "LỜI NÓI ĐẦU", "summary": "Lịch sử cá nhân của tác giả bao gồm: học tập tại Chuyên Toán Tin Thái Bình, đạt giải nhì tin học quốc gia lớp 11, vào Đông Du ở TP. Hồ Chí Minh, sang Nhật năm 2007 học tại Nagaoka, lôi kéo bạn thành lập CLB lập trình tham gia ICPC tại Tokyo, thực tập tại Google Japan, DeNA, Greeen, Yahoo! Japan (thực tập 2 tuần với cuộc thi lập trình search engine), làm việc 2 năm tại OKWave với người bạn Trương Đình Hoàng, cùng Hoàng xây dựng AsianTech tại Đà Nẵng (2 năm làm các vị trí khác nhau như manager, PM, PMO), quay về Hà Nội thành lập TOMOSIA; nhắc tới các thầy cô và người ảnh hưởng như thầy dạy lớp 5, thầy dạy tin học, hiệu trưởng Nguyễn Đức Hòe, và mẹ.", "start": 5, "end": 8, "nodes": []}, {"id": "0002", "title": "CHƯƠNG 1: SHOKUNIN – TINH THẦN NGHỆ NHÂN NHẬT BẢN", "summary": "Giới thiệu Shokunin là khái niệm quan trọng trong văn hóa Nhật Bản thể hiện tận tâm và chuyên nghiệp trong công việc, không chỉ là danh xưng nghề mà là triết lý sống, với những người Shokunin không ngừng phát triển kỹ năng, tìm kiếm hoàn hảo trong chi tiết, truyền đạt kinh nghiệm cho thế hệ sau, đồng thời thể hiện giá trị về kiên trì, trách nhiệm và danh dự trong xã hội.", "start": 9, "end": 10, "nodes": []}, {"id": "0003", "title": "SHOKUNIN LÀ GÌ ?", "summary": "Mô tả trải nghiệm 8 năm sống và làm việc tại Nhật Bản của tác giả với ví dụ về những người bình thường thể hiện Shokunin: anh bạn hói ở tiệm phát báo Mizunokuchi tháo rác để lấy mẩu dây nhựa với tính chú tâm và mong muốn hoàn thành công việc trọn vẹn, ông bếp trưởng tại BERNARD cắt cá và dọn dẹp dao thớt như một nghi lễ; định nghĩa Shokunin không chỉ là \"nghệ nhân\" mà là triết lý làm việc thể hiện tận tâm tuyệt đối, tinh thông kỹ năng, khát khao vươn tới sự hoàn hảo, kèm hình ảnh người Shokunin đang rèn kiếm katana.", "start": 11, "end": 12, "nodes": []}, {"id": "0004", "title": "NHỮNG VÍ DỤ VỀ SHOKUNIN", "summary": "Ba ví dụ Shokunin trong nghề hiện đại: đội dọn tàu Shinkansen của TESSEI (\"Phép màu 7 phút\", video \"A Seven-Minute Miracle! The Shinkansen Cleaning Theater\"), Haruko Niitsu dọn vệ sinh Sân bay Haneda (9 năm liên tiếp sạch nhất thế giới, Omotenashi), và thợ đánh giày Nhật Bản (hiểu từng loại da, làm sạch, dưỡng ẩm, đánh xi, hoàn thiện).", "start": 13, "end": 14, "nodes": [{"id": "0005", "title": "Người Dọn Dẹp Tàu Shinkansen (\"Phép màu 7 phút\")", "summary": "Giới thiệu rằng ví dụ về Shokunin thường là thợ làm kiếm, gốm, sushi nhưng tinh thần Shokunin có trong các nghề hiện đại, ví dụ đội ngũ dọn dẹp tàu Shinkansen của công ty TESSEI nổi tiếng với hiệu quả chỉ mất khoảng 7 phút để làm sạch toàn bộ tàu, với sự phối hợp nhịp nhàng, tốc độ, tỉ mỉ từng chi tiết (xoay ngược ghế chào đón hành khách tiếp theo) và thái độ tận tâm, tham khảo video Youtube \"A Seven-Minute Miracle! The Shinkansen Cleaning Theater\", chỉ ra Shokunin có thể là nhóm hay công ty thấm nhuần triết lý.", "start": 13, "end": 13, "nodes": []}, {"id": "0006", "title": "Người Dọn Dẹp Sân Bay Haneda", "summary": "Nêu Haruko Niitsu, nhân viên vệ sinh tại Sân bay Haneda (Nhật Bản), là biểu tượng tinh thần Shokunin trong công việc dọn dẹp; bà và đội ngũ của mình góp phần giúp sân bay này 9 năm liên tiếp được đánh giá là sạch nhất thế giới; đối với bà, dọn dẹp không chỉ là làm sạch mà là Omotenashi (lòng hiếu khách), chú trọng chi tiết nhỏ nhất và làm việc với tỉ mỉ, kỹ thuật cao, niềm tự hào để mang lại không gian thoải mái nhất cho hành khách; chứng minh tinh thần Shokunin có thể nâng tầm bất kỳ công việc nào.", "start": 13, "end": 14, "nodes": []}, {"id": "0007", "title": "Thợ Đánh Giày", "summary": "Mô tả rằng tại Nhật Bản, những người đánh giày mang tinh thần Shokunin biến công việc tưởng chừng đơn giản thành ngh ệ thuật; họ không chỉ làm sạch và làm bóng giày mà hiểu rõ từng loại da, cách chăm sóc để phục hồi và kéo dài tuổi thọ giày; làm việc với tập trung cao độ, tỉ mỉ từng thao tác từ làm sạch bụi bẩn, dưỡng ẩm da, đánh bóng bằng xi phù hợp, đến hoàn thiện từng đường kim mũi chỉ; xem mỗi đôi giày là tác phẩm cần nâng niu, chăm sóc giày là hành động thể hiện tôn trọng; niềm tự hào về kỹ năng và tận tâm trong việc mang lại vẻ ngoài tốt nhất cho giày là tinh thần Shokunin rõ nét, biến công việc đánh giày thành dịch vụ đầy giá trị.", "start": 14, "end": 14, "nodes": []}]}, {"id": "0008", "title": "NHỮNG YẾU TỐ TẠO NÊN 1 SHOKUNIN", "summary": "Liệt kê sáu yếu tố chính tạo nên tinh thần Shokunin: (1) Kỹ năng xuất sắc - làm chủ công việc ở mức rất cao, được thừa nhận rộng rãi; (2) Kaizen - không ngừng cải thiện, luôn học hỏi và cải thiện mỗi ngày; (3) Tận tâm, đam mê - có đam mê với công việc, tìm thấy ý nghĩa và niềm vui, làm việc tỉ mỉ chu đáo; (4) Tinh thần trách nhiệm - cảm thấy có nghĩa vụ hoàn thành tốt nhất vì tập thể và người khác (khách hàng, xã hội); (5) Niềm tự hào - tự hào về tay nghề và công việc đóng góp; (6) Phát triển toàn diện - phát triển sức khỏe, tinh thần, kiến thức khai phóng ngoài chỉ công việc; sáu yếu tố này hòa quyện tạo nên con người Shokunin đầy bản lĩnh và giá trị, có thể được nuôi dưỡng trong tập thể và các công việc bình thường.", "start": 15, "end": 15, "nodes": []}, {"id": "0009", "title": "VÌ SAO SHOKUNIN VẪN TRƯỜNG TỒN VÀ NGÀY CÀNG CÓ GIÁ TRỊ?", "summary": "Bốn lý do Shokunin trường tồn trước AI và thế giới VUCA: nhu cầu về \"bậc thầy\" khi sản phẩm AI \"tạm ổn\" và na ná nhau; tri thức ẩn (tacit) không số hóa được so với tri thức hiện; trực giác và sáng tạo thật; và kết hợp cái bất biến (yêu nghề, chính trực, trách nhiệm) với cái ứng biến (học công nghệ mới, Kaizen, dùng AI làm công cụ).", "start": 16, "end": 18, "nodes": [{"id": "0010", "title": "Sự cần thiết của những “bậc thầy”", "summary": "Bàn luận về lý do vì sao những ngành thủ công truyền thống và tạo tác của Shokunin vẫn giữ vững giá trị trong thế giới VUCA và thời đại công nghệ phát triển như vũ bão; lưu ý rằng máy móc và AI xử lý dữ liệu nhanh chóng với độ chính xác cao nhưng sản phẩm AI có xu hướng \"tạm ổn\" và \"na ná giống nhau\"; trong thế giới đang bão hòa bởi sự đồng nhất, nhu cầu về sản phẩm vượt trội, mang tính cá nhân hóa cao, chứa đựng sự tinh tế và \"chất\" riêng của người tạo ra càng trở nên bức thiết; so sánh văn AI giống mì tôm (nhanh, tiện, tạm ổn) trong khi Shokunin là bậc thầy đáp ứng nhu cầu về sự vượt trội và độc đáo này; họ tạo ra sự khác biệt không chỉ bằng kỹ năng thuần thục mà còn bằng đam mê, sáng tạo và \"cái tâm\" của con người.", "start": 16, "end": 17, "nodes": []}, {"id": "0011", "title": "Tri thức ẩn", "summary": "Giải thích rằng sức mạnh cốt lõi của AI và công nghệ nằm ở khả năng xử lý và học hỏi từ tri thức hiện (văn bản, dữ liệu số, công thức, quy trình, hình ảnh, âm thanh); tuy nhiên tồn tại kho tàng tri thức sâu sắc ẩn sâu trong mỗi cá nhân: kinh nghiệm được \"thấm\" qua hàng ngàn giờ thực hành, trực giác bén nhạy được mài giũa, cảm xúc, sự đồng cảm, hiểu biết, những giá trị ngầm định hình cách nhìn nhận thế giới - đây là tri thức ẩn; tri thức ẩn rất khó diễn đạt thành lời hay chuyển đổi sang dữ liệu số, chỉ có thể lĩnh hội qua quan sát, thực hành chung, chia sẻ trực tiếp; vì không thể số hóa đầy đủ nên tri thức ẩn là rào cản AI khó lòng vượt qua; tri thức ẩn chính là điểm khác biệt lớn nhất và lợi thế cạnh tranh độc đáo của Shokunin so với AI, lồng ghép vào từng sản phẩm và dịch vụ tạo nên chiều sâu, sự tinh tế và \"cái hồn\" không thể sao chép bằng máy móc.", "start": 17, "end": 17, "nodes": []}, {"id": "0012", "title": "Trực giác và sự sáng tạo", "summary": "Phân biệt tri thức ẩn (từ hàng ngàn giờ thực hành, trực giác, cảm xúc) với tri thức hiện (dữ liệu số, công thức, quy trình) - AI học được; Shokunin lồng ghép tri thức ẩn vào sản phẩm tạo chiều sâu và linh hồn không sao chép được. Trực giác (cảm nhận nhanh dựa kinh nghiệm) và sáng tạo thực sự (nhìn vấn đề góc độ mới) là bản chất trí tuệ con người; Shokunin dùng chúng thấu hiểu nhu cầu tiềm ẩn khách hàng tạo giải pháp đột phá vượt logic thông thường.", "start": 17, "end": 18, "nodes": []}, {"id": "0013", "title": "Sự kết hợp hài hòa giữa cái bất biến và cái ứng biến", "summary": "Shokunin giữ vững \"bất biến\" trong tâm hồn: lòng yêu nghề, chính trực, trách nhiệm cao, khát vọng hoàn hảo - những giá trị cốt lõi tạo phẩm chất bậc thầy nuôi dưỡng tri thức ẩn và trực giác. Đồng thời linh hoạt \"ứng biến\" trong phương pháp: không ngại học công nghệ mới, áp dụng Kaizen liên tục cải tiến, xem AI như công cụ đắc lực để tự động hóa tác vụ lặp lại và có thời gian tập trung vào sáng tạo, tinh tế, thấu hiểu khách hàng.", "start": 18, "end": 18, "nodes": []}]}, {"id": "0014", "title": "TRIẾT LÝ IT SHOKUNIN CỦA TOMOSIA", "summary": "IT Shokunin thể hiện tinh thần qua sáu khía cạnh: Kỹ năng tinh thông (gõ bàn phím thành thạo, thuộc phím tắt editor, hiểu sâu design pattern, OOP, microservices, serverless cho developer; thiết kế test case tinh tế cho QC; quản lý dự án nhuần nhuyễn cho PM; phân tích nghiệp vụ sắc bén cho BA); Cải tiến liên tục/Kaizen (chủ động học hỏi, cập nhật kiến thức, tìm cách làm tốt hơn hiệu quả hơn - sống còn trong IT); Tận tâm và đam mê (làm bằng cả trái tim, developer không bug, QC không bug lọt tay khách, PM đảm bảo deadline và requirement); Trách nhiệm cao (ý thức với sản phẩm, đội, khách, nói là làm, sẵn sàng OT giải quyết sự cố); Niềm tự hào (tự hào tay nghề, sản phẩm, đóng góp công ty); Hiểu biết toàn diện (không chỉ kỹ thuật chuyên môn mà hiểu khách hàng, kinh doanh, phát triển toàn diện - coi khách hàng là partner). Phân tích job posting TOMOSIA thể hiện các phẩm chất này dù không dùng từ \"Shokunin\".", "start": 19, "end": 23, "nodes": []}, {"id": "0015", "title": "BẠN CÓ DÁM TRỞ THÀNH 1 SHOKUNIN KHÔNG ?", "summary": "Shokunin như một cách sống: kỹ năng đem lại kính trọng, cải tiến liên tục đem lại vị trí dẫn đầu, trách nhiệm đem lại tin tưởng; trạng thái \"dòng chảy\" (Flow) của Mihaly Csikszentmihalyi; ví dụ thầy Nguyễn Đức Hòe (Đông Du, ký túc xá Tokyo 1967, học bổng 1992, Huân chương Mặt trời mọc). Kèm các khó khăn bên trong (tự phụ, tự mãn khi thành key member) và bên ngoài (thế giới chuộng tốc độ và vật chất), trích Mark Twain và so sánh với Khắc kỷ.", "start": 24, "end": 27, "nodes": [{"id": "0016", "title": "Shokunin là một cách sống", "summary": "Kỹ năng xuất sắc mang lại sự kính trọng, cải tiến liên tục mang lại vị trí dẫn đầu, tận tâm đam mê mang lại sự yêu mến, trách nhiệm mang lại tin tưởng, niềm tự hào mang lại nhiệt huyết, phát triển toàn diện mang lại hài hòa cuộc sống. Hành trình Shokunin đưa đến trạng thái \"dòng chảy\" (Flow) theo Mihaly Csikszentmihalyi - tập trung cao độ quên thời gian, cảm thấy thích thú năng lượng dồi dào. Thầy Nguyễn Đức Hòe (hiệu trưởng Đông Du) từ 1967 thành lập ký túc xá sinh viên ở Tokyo, năm 1992 khởi xướng chương trình học bổng Đông Du hỗ trợ hàng ngàn sinh viên Việt, lồng ghép giáo dục yêu nước và đạo lý sống, được chính phủ Nhật trao Huân chương Mặt trời mọc.", "start": 24, "end": 25, "nodes": []}, {"id": "0017", "title": "Những khó khăn khi theo đuổi con đường Shokunin", "summary": "Khó khăn lớn nhất từ bên trong: khi thành \"key member\", sự dễ dãi và lời khen có thể thành bẫy ngọt ngào dẫn tự phụ, tự mãn, ngủ quên trên chiến thắng dù thế giới và công nghệ không ngừng vận động. Shokunin thực thụ hiểu sự nỗ lực 100% liên tục cần thiết, không để vượt người khác mà vượt chính mình hôm qua - cuộc chiến không ngừng với lười biếng, cái tôi muốn an phận, tiếng nói bảo \"đã đủ\". Khó khăn bên ngoài: thế giới chu ộng tốc độ và thoải mái tức thời nên Shokunin bị coi \"ngốc nghếch\" với đam mê \"công việc không cần công nhận\"; thế giới trọng vật chất luôn hỏi lương bổng vị trí doanh thu nên Shokunin tập trung chất lượng giá trị nội tại trông lạc lõng - nhưng Mark Twain nói \"khi đứng về phía số đông là lúc cần dừng lại suy ngẫm\", Shokunin chắc chắn số ít, tương tự Khắc kỷ theo giá trị nội tại bất chấp phản đối.", "start": 26, "end": 27, "nodes": []}]}, {"id": "0018", "title": "CON ĐƯỜNG ĐỂ TRỞ THÀNH SHOKUNIN", "summary": "Hai bước trên con đường Shokunin: xây niềm tin (nhận diện Shokunin quanh mình, khao khát trở thành họ, hiểu giá trị bền vững không bị công nghệ thay thế) và hành động bằng \"thói quen nhỏ có ý thức\" theo nguyên lý 1% Kaizen, dẫn sang phần 6 yếu tố Shokunin áp dụng vào thói quen hàng ngày.", "start": 28, "end": 30, "nodes": [{"id": "0019", "title": "Niềm tin: Tại sao con đường Shokunin xứng đáng?", "summary": "Để dấn thân con đường Shokunin cần niềm tin vững chắc - không lý thuyết mơ hồ mà minh chứng sống động. Nhận diện Shokunin xung quanh: nhìn người tôn trọng ngưỡng mộ thể hiện phẩm chất tinh thông, tận tâm, trách nhiệm, không ngừng cải tiến, tự hào, phát triển toàn diện; quan sát cách họ làm việc, đối mặt khó khăn, tạo giá trị; làm việc cùng họ học tri thức ẩn. Khao khát trở thành: hỏi \"bạn có muốn được như họ không\" - khao khát này là động lực mạnh mẽ nhất, không chỉ mong kỹ năng vị trí mà cách sống và trạng thái Flow. Hiểu về giá trị bền vững: con đường này tạo giá trị không thể thay thế, không bị công nghệ sao chép được tâm hồn và tận tâm - sẽ không mang giá trị ngắn hạn nhưng cuối cùng Shokunin chiến thắng. Bắt đầu từ thói quen nhỏ có ý thức: thay vì mục tiêu lớn, chia nhỏ thành thói quen đơn giản dễ thực hiện hàng ngày - như nguyên lý 1% Kaizen, mỗi bước nhỏ liên tục tạo tiến bộ đáng kể theo thời gian.", "start": 28, "end": 29, "nodes": []}, {"id": "0020", "title": "Hành động: Bắt đầu từ những “thói quen nhỏ có ý thức”", "summary": "Shokunin không phải danh hiệu đạt qua đêm hay sau đọc sách, mà kết quả rèn luyện liên tục tích lũy từ hành động nhỏ hàng ngày có ý thức. Thực hành có ý thức: quan trọng không chỉ thực hiện thói quen mà thực hiện có ý thức, hiểu ý nghĩa mục đích - nói \"cảm ơn\" không chỉ xã giao mà bày tỏ lòng biết ơn chân thành giúp cuộc sống tích cực hơn; mỗi hành động nhỏ công việc cần chú tâm tinh thần Shokunin. Áp dụng 6 yếu tố Shokunin vào thói quen hàng ngày: phần tiếp theo nói kĩ hơn về 6 yếu tố cùng \"thói quen nhỏ\" thực hành, đó là giá trị lớn nhất cuốn sách. Tóm lại: hành trình Shokunin là quá trình tự rèn luyện bền bỉ, bắt đầu từ củng cố niềm tin giá trị của nó, sau đó thực hành thói quen nhỏ có ý thức kiên trì, giống đi từng bước nhỏ lên cầu thang - mỗi bước nhỏ đều mang tiến bộ lớn lao.", "start": 29, "end": 30, "nodes": []}]}, {"id": "0021", "title": "CHƯƠNG 2: KĨ NĂNG THƯỢNG THỪA", "summary": "Xuất sắc không phải đích đến mà hành trình không ngừng; để tồn tại phải tìm chỗ đứng của mình tự thân vận động rèn luyện kỹ năng - công ty không chịu trách nhiệm cho cuộc đời bạn, sếp không chịu, chỉ bạn chịu. Đừng ỷ lại người khác dẫn dắt hay thành tích quá khứ - nâng cao năng lực là trách nhiệm cá nhân nền tảng tự tin khẳng định giá trị. Con đường kỹ năng xuất sắc đòi nỗ lực gấp đôi gấp ba người khác, không chỗ cho nỗ lực nửa vời hay tự mãn; cách nhanh nhất học từ người giỏi nhất xem cách họ cháy hết mình, sau đó sẵn sàng dấn thân bước ra khỏi vùng an toàn thử thách bản thân lĩnh vực mới. Nhớ: muốn đi nhanh thì đi một mình, muốn đi xa thì đi cùng nhau - chia sẻ kiến thức, học từ đồng nghiệp, xây dựng đội nhóm mạnh mẽ là bí quyết phát triển cùng nhau.", "start": 31, "end": 32, "nodes": []}, {"id": "0022", "title": "TỰ THÂN VẬN ĐỘNG !", "summary": "Câu chuyện làm thêm tại quán ăn 四六時中 thời đại học suýt bị đuổi việc, và ba hành động xoay chuyển: cải tiến quy trình rửa bát, nhận việc dọn cống, cải thiện quan hệ với các bà trong bếp. Kết luận: kỹ năng quyết định giá trị bản thân, chỉ có con đường rèn luyện liên tục, việc học là của bản thân; trích hai khả năng cốt lõi trong \"Deep Work\" của Cal Newport.", "start": 33, "end": 34, "nodes": [{"id": "0023", "title": "Bài học từ việc đi làm thêm tí nữa thì bị đuổi việc", "summary": "Câu chuyện làm thêm tại quán ăn 四六時中: lúc đại học, tiếng Nhật kém không hiểu nhân viên bếp nên bị ghét, chủ quán muốn đuổi vì \"không hiểu cái gì\"; sau sốc giận, nhận ra giỏi trường không giúp làm việc hiệu quả, chủ quán đúng khi đuổi vì không giúp được quán. Thay đổi với ba hành động: 1) Cải thiện kỹ năng rửa bát - khi quán đông bát không kịp rửa nên cải quy trình rửa nhanh sạch đáp ứng; 2) Chăm chỉ dọn cống - quán phải dọn cống định kỳ dọn dầu mỡ bể nước thải, người Nhật ngại mùi nên tôi làm; 3) Cải thiện mối quan hệ - mua bánh kẹo mang tới, lần la nói chuyện tâm sự các bà. Kết quả: một tháng sau chủ quán ưu tiên tôi thứ 7 chủ nhật rửa bát cộng thêm thứ 3 thứ 5 dọn cống - xây dựng chỗ đứng vững chắc nhờ thành thạo hai kỹ năng, mối quan hệ tốt hơn, các bà yêu quý. Bài học: muốn tồn tại phải có kỹ năng từ tự thân vận động, không ỷ lại công ty sếp; thành tích quá khứ thâm niên mối quan hệ không đảm bảo vị trí vững - phải tự xây dựng kỹ năng phù hợp công việc đạt trình độ cao. Cal Newport \"Deep Work\" tóm kết: trong nền kinh tế mới giá trị thúc đẩy bởi hai khả năng cốt lõi: 1) Nhanh chóng làm chủ những điều khó khăn. 2) Tạo sản phẩm ở trình độ xuất sắc chất lượng và tốc độ. Ba kết luận: 1) Kỹ năng quyết định giá trị bản thân. 2) Chỉ một con đường nỗ lực rèn luyện liên tục, không đường tắt. 3) Cải thiện kỹ năng là của bản thân, học là của bản thân, trở thành ai là của bản thân.", "start": 33, "end": 34, "nodes": []}]}, {"id": "0024", "title": "NỖ LỰC HƠN 200%!", "summary": "Luận điểm nỗ lực hơn 200%: làm gấp đôi người khác để hiểu giới hạn bản thân và tối ưu công việc; vượt người khác cần 70-80% nhưng vượt chính mình cần >100%; ví von con hổ không săn mồi thành mèo; \"việc chúng ta làm ngoài giờ làm việc sẽ quyết định chúng ta là ai\", nêu Hoàng Đoàn và Minh Tăng tối về vẫn mày mò công nghệ.", "start": 35, "end": 36, "nodes": [{"id": "0025", "title": "Việc chúng ta làm ngoài giờ làm việc sẽ quyết định chúng ta là ai.", "summary": "Lời khuyên: đừng sợ khó khăn, đừng sợ làm việc 16 tiếng một ngày, dấn đầu vào nó; phải chăm chỉ gấp đôi người khác làm gấp đôi - mục tiêu không phải output gấp đôi hay tăng lương mà hiểu giới hạn bản thân, tối ưu công việc bỏ thứ thừa thãi làm nhanh hơn, những trải nghiệm khó khăn giúp tiến bộ mài giũa năng lực khả năng phán đoán kiên trì bản lĩnh. Để phát triển phải nỗ lực >100%, để vượt người khác chỉ cần 70-80%, để vượt chính mình phải >100% - chiến thắng chính mình là khó khăn nhất. Con hổ là chúa sơn lâm nhưng không nỗ lực săn mồi cũng trở thành mèo. Việc chúng ta làm ngoài giờ làm việc sẽ quyết định chúng ta là ai: hết giờ công ty không phải xong, khác biệt nằm ở việc về nhà làm gì. Hoàng Đoàn và Minh Tăng (shokunin) - thói quen là khi về nhà ăn uống xong bật máy tiếp tục tìm hiểu mày mò công nghệ.", "start": 36, "end": 36, "nodes": []}]}, {"id": "0026", "title": "HỌC TỪ CAO THỦ : CÁCH NHANH NHẤT ĐỂ THÀNH CÔNG !", "summary": "\"Bộ ba đồng hành\" của IT Shokunin — người thầy, người bạn, người đệ tử. Phân biệt explicit knowledge và tacit knowledge, ví dụ code review nghiêm khắc của quản lý Đặng Văn Luân; vai trò người bạn (nhóm học tập, chia sẻ sau giờ làm, \"muốn đi nhanh thì đi một mình, muốn đi xa thì đi cùng nhau\"); vai trò người đệ tử (truyền nghề, làm gương, ví dụ Kim Luân Pháp Vương truyền Long Tương Bát Nhã Công cho Quách Tương).", "start": 37, "end": 38, "nodes": [{"id": "0027", "title": "Người Thầy", "summary": "Trình bày \"bộ ba đồng hành\" (người thầy, người bạn, người đệ tử) cho IT Shokunin. Phân biệt hai loại tri thức: explicit knowledge (văn bản, hình ảnh, âm thanh, khái niệm cụ thể) và tacit knowledge (kinh nghiệm, tình cảm, thái độ, cách tư duy). Ví dụ: quản lý Đặng Văn Luân với code review nghiêm khắc.", "start": 37, "end": 37, "nodes": []}, {"id": "0028", "title": "Người Bạn", "summary": "Trình bày vai trò người bạn: sẻ chia buồn vui và khó khăn công việc, thúc đẩy tiến lên; các buổi uống bia chia sẻ sau giờ làm. Học từ bạn bè qua nhóm học tập, chia sẻ kiến thức, kinh nghiệm; câu nói \"Muốn đi nhanh thì đi một mình, muốn đi xa thì đi cùng nhau\". Bắt đầu phần \"Người Đệ Tử\": truyền nghề rèn luyện tinh thần trách nhiệm, làm gương; tham chiếu \"Kim Luân Pháp Vương\" truyền \"Long Tương Bát Nhã Công\" cho \"Quách Tương\"; Shokunin cống hiến xã hội.", "start": 38, "end": 38, "nodes": []}, {"id": "0029", "title": "Người Đệ Tử", "summary": "Giống nội dung node 0028 nhưng bao gồm cả phần \"Người Bạn\" đầy đủ (uống bia, chia sẻ sau giờ làm) và phần \"Người Đệ Tử\" (truyền nghề, rèn luyện tinh thần, \"đệ tử chân truyền\", tham chiếu \"Kim Luân Pháp Vương\", \"Long Tương Bát Nhã Công\", \"Quách Tương\"); vòng lặp học hỏi-sẻ chia-phát triển.", "start": 38, "end": 38, "nodes": []}]}, {"id": "0030", "title": "LUÔN LUÔN PHẢI CÓ OUTPUT !", "summary": "Định nghĩa output cho các tình huống: dự án (sản phẩm chạy được, tính năng hoạt động, không bugs); task điều tra (report đầy đủ với dự đoán, cách thử, kết quả); cuộc họp (email tổng hợp); nghiên cứu (blog hoặc sản phẩm demo); học tập (chứng chỉ, bằng cấp). Giới thiệu Hourensou (Báo cáo - Liên lạc - Thảo luận) từ văn hóa Nhật. Shokunin phải tạo giá trị qua sản phẩm chất lượng cao và tốc độ nhanh.", "start": 39, "end": 40, "nodes": []}, {"id": "0031", "title": "NHÌN CÁI CÂY VÀ NHÌN CẢ KHU RỪNG", "summary": "Trình bày kỹ thuật sắp xếp màn hình làm việc 2x2 theo mô hình MVC + services (views, controllers, models, services). Nhấn mạnh đánh giá task theo tổng thể hệ thống (\"khu rừng\"), phát hiện vấn đề ảnh hưởng tới tasks khác, tránh code degradation. Liệt kê vai trò team: dev, leader, PM, comtor, tester; ví dụ QC Trang Nguyễn. Đề cập Kaizen (cải tiến liên tục) và tối ưu hóa giải pháp cho toàn hệ thống.", "start": 41, "end": 42, "nodes": []}, {"id": "0032", "title": "CÁCH HỌC CỦA 1 SHOKUNIN", "summary": "Cách học của Shokunin: học cái mới để đi nhanh, học căn bản (algorithms, databases, hướng đối tượng) để đi xa, cùng kiến thức sâu (DDD, design patterns, microservices, serverless, clean code). Mô hình T-shaped (nét dọc chiều sâu, nét ngang chiều rộng) mở rộng thành Pi-shaped và Comb-shaped, gắn với Kaizen không ngừng nghỉ.", "start": 43, "end": 44, "nodes": [{"id": "0033", "title": "Để đi nhanh thì học những cái mới, để đi xa thì học những cái căn bản", "summary": "Mô tả công nghệ IT thay đổi nhanh chóng. Liệt kê kiến thức căn bản (algorithms, databases, hướng đối tượng) và kiến thức sâu (DDD, design patterns, microservices, serverless, clean code). Giới thiệu mô hình T-shaped: nét dọc (chiều sâu, chuyên gia lĩnh vực), nét ngang (chiều rộng, hiểu biết cơ bản nhiều lĩnh vực). Phát triển thành Pi-shaped (π) và Comb-shaped (hình chiếc lược). Kaizen không ngừng nghỉ, nâng cao giá trị bản thân.", "start": 43, "end": 44, "nodes": []}, {"id": "0034", "title": "Học sâu hay học rộng ?", "summary": "Trình bày mô hình T-shaped: nét dọc (đào giếng sâu ở một chỗ - chuyên gia) và nét ngang (đi lại trên mặt đất - hiểu biết cơ bản nhiều lĩnh vực). Tiến tới Pi-shaped (hai chuyên môn sâu + nét ngang) hay Comb-shaped (lược - nhiều chuyên môn sâu + nét ngang) - cá nhân linh hoạt, giá trị cao. Tinh thần Shokunin: theo đuổi không ngừng sự hoàn hảo, Kaizen, nâng cao giá trị bản thân.", "start": 44, "end": 44, "nodes": []}]}, {"id": "0035", "title": "CÙNG NHAU PHÁT TRIỂN – NÂNG TẦM TRÍ TUỆ VIỆT", "summary": "Câu nói \"Muốn đi nhanh thì đi một mình. Muốn đi xa thì đi cùng nhau\". Tham chiếu La Văn Đăng (freelancer), mục tiêu TOMOSIA giúp 10.000-20.000 người. Mô hình SECI của giáo sư Nonaka & Takeuchi: Socialization (nhóm Ruby, React, Testing; pair programming; code review, test case review; brainstorming), Externalization (ghi chép, template báo cáo, template test case, best practices, blog), Combination (chia sẻ nội bộ, workshop, tài liệu hướng dẫn, tham gia cộng đồng IT), Internalization (đọc sách chuyên ngành, tạo thói quen tự học, áp dụng công việc hàng ngày). AI hỗ trợ từng giai đoạn.", "start": 45, "end": 48, "nodes": []}, {"id": "0036", "title": "CHƯƠNG 3: CẢI TIẾN – KAIZEN VÀ SỨC MẠNH CỦA AI", "summary": "Giới thiệu Chương 3 về Kaizen và sức mạnh AI. Nhận diện Kaizen (cải tiến từng bước nhỏ) và AI (công nghệ đổi thay nhanh) tưởng chừng đối lập. Shokunin IT thực thụ kết hợp hai lực này nhưng nhuyễn, giữ Kaizen trong tim, nắm bắt AI như công cụ khuếch đại nỗ lực.", "start": 49, "end": 50, "nodes": []}, {"id": "0037", "title": "KAIZEN – ĐI LÊN TỪ NHỮNG BƯỚC CHÂN NHỎ", "summary": "Trình bày Kaizen là cải tiến liên tục từ những bước nhỏ, dùng ví dụ cầu thang (người nhảy cao 2.5m nhưng ai cũng leo tầng 100 từng bậc). Nguyên lý 1%: (1.01)^365 sau một năm. Cơ hội cải tiến: code review, test case review, retro (retrospective), KPT (Keep Problem Try). Thách thức: duy trì cải tiến khi dự án gặp vấn đề. Metaphor kéo pháo lên Điện Biên Phủ - cần \"miếng chèn\" giữ tiến bộ (tiêu chuẩn tổ chức). Shokunin với tiêu chuẩn cao kéo cả team-tổ chức đi lên.", "start": 51, "end": 52, "nodes": []}, {"id": "0038", "title": "PHƯƠNG PHÁP LUẬN CỦA KAIZEN, CHU TRÌNH PDCA", "summary": "Chu trình PDCA (Plan-Do-Check-Act) với các bước chi tiết: Plan (xác định mục tiêu, phân tích vấn đề, lập kế hoạch), Do (thực hiện quy mô nhỏ, ghi chép, kiểm soát rủi ro), Check (đánh giá kết quả so với mục tiêu, phân tích dữ liệu, thu thập phản hồi), Act (chuẩn hóa hoặc điều chỉnh kế hoạch). Các nguyên lý nền tảng: tập trung vào quy trình, sự tham gia của tất cả mọi người, tiêu chuẩn hóa, tư duy giải quyết vấn đề; liên hệ với Scrum (sprint, daily scrum, sprint review, retrospective).", "start": 53, "end": 54, "nodes": []}, {"id": "0039", "title": "TIÊU CHUẨN CAO VÀ SỰ KHIÊM TỐN", "summary": "Tiêu chuẩn cao và sự khiêm tốn của Shokunin: không chấp nhận lỗi (cảm thấy nhục nhã khi có bug, không nói \"code nào chẳng có bug\"), không chấp nhận đội ngũ kém (thà tự làm còn hơn giao cho người không đủ năng lực), khiêm tốn (không nói linh tinh, thừa nhận \"không biết là không biết\", không giả vờ, trái với kiểu sếp/sư phụ ra lệnh mà không hiểu), sự khiêm tốn giúp tiếp thu cái mới - câu nói Socrates \"Tôi chỉ biết một điều là tôi không biết gì cả\".", "start": 55, "end": 56, "nodes": []}, {"id": "0040", "title": "QUYẾT LIỆT VÀ NHẢY VỌT", "summary": "Kaizen (cải tiến từng bước nhỏ) versus nhảy vọt (thay đổi đột phá) - nhận diện thời điểm cần thay đổi quy Resolver: từ bên ngoài: công nghệ đột phá (Internet, mobile, Cloud, Big Data, AI tạo sinh như ChatGPT), thị trường thay đổi nhanh, khủng hoảng hoặc cơ hội; từ bên trong: hiệu suất trì trệ dù Kaizen liên tục, những điểm tắc nẽ cố hữu, kiến thức tích lũy đủ lớn. Phẩm chất cần: quyết liệt, dũng cảm, khiêm tốn, tò mò, dám đặt câu hỏi \"Tại sao chúng ta không thử làm khác đi?\".", "start": 57, "end": 58, "nodes": []}, {"id": "0041", "title": "TỪ CHUYỂN ĐỔI SỐ ĐẾN AI FIRST", "summary": "Làn sóng chuyển đổi số (digital transformation) ở ngân hàng, bán lẻ, chính phủ (ứng dụng chuyển tiền miễn phí nhanh, cổng thông tin điện tử, định danh điện tử) được tiếp nối bởi cơn sóng AI với khả năng tư duy, học hỏi, phân tích dữ liệu khổng lồ, tạo sinh. Tư duy AI-First: đặt AI làm công cụ trọng tâm ưu tiên từ đầu thay vì \"làm gì đó rồi thêm AI vào sau\". Giá trị cốt lõi AI không thể thay thế: tận tâm, trách nhiệm, tính thẩm mỹ, sáng tạo, tư duy phản biện.", "start": 59, "end": 60, "nodes": []}, {"id": "0042", "title": "AI LÀ NGƯỜI SỬ DỤNG AI HIỆU QUẢ NHẤT ?", "summary": "Chân dung người dùng AI hiệu quả nhất: có tư duy giải quyết vấn đề (hỏi \"vấn đề của tôi là gì, AI có thể giúp như thế nào?\", biết đặt câu hỏi đúng - prompt engineering). Có tư duy \"AI-First\" và \"tối ưu hóa quy trình\" (tích hợp AI vào từng bước từ lập kế hoạch đến kiểm tra). Sở hữu khả năng tư duy phản biện (hiểu AI có thể ảo tưởng/thiên kiến, không tin tưởng mù quáng, luôn kiểm tra lại, biết khi nào nên sử dụng AI). Mang tinh thần khiêm tốn và tò mò vô tận (sẵn sàng thử công cụ AI mới, chấp nhận cần cập nhật kiến thức, phân tích và điều chỉnh khi không hiệu quả).", "start": 61, "end": 62, "nodes": []}, {"id": "0043", "title": "DÙNG AI NHIỀU CÓ KÉM ĐI KHÔNG ? – HỌC CÁCH KHÔNG BỊ PHỤ THUỘC", "summary": "Nỗi lo dùng AI nhiều sẽ làm kém năng lực là xác thực - tác giả ví dụ dịch tiếng Nhật sau dùng AI lâu rồi chậm lại. Quy tắc tác giả áp dụng: đọc và kiểm tra lại tất cả output AI, yêu cầu AI phân tích lý do sửa lỗi và học hỏi từ đó, yêu cầu AI trả lời ngắn gọn không nịnh bợ. Sử dụng AI như công cụ học tiếng Nhật: tổng hợp từ mới, cải thiện ngữ pháp, luyện phát âm. Bài học: biến AI thành công cụ để hoàn thành việc VÀ để củng cố/phát triển năng lực gốc của bản thân.", "start": 63, "end": 66, "nodes": []}, {"id": "0044", "title": "TRÁCH NHIỆM CỦA SHOKUNIN", "summary": "Trách nhiệm là một trong sáu yếu tố cốt lõi của Shokunin - sinh ra từ những vai trò và nghĩa vụ (thầy dạy dỗ, con hiếu thảo, người tham gia giao thông tuân thủ luật lệ). Trong IT: trách nhiệm với khách hàng, sản phẩm, đội ngũ, công ty, bản thân - sinh ra từ cam kết, không chỉ là danh sách công việc phải làm. Trách nhiệm là nền tảng xây dựng lòng tin, chất keo vô hình tạo sự gắn kết trong đội (ví dụ đội dọn Shinkansen trong \"phép màu 7 phút\"), nâng cao uy tín nghề nghiệp, đưa trí tuệ Việt Nam ra thế giới. Gốc rễ từ sự tự giác: người tự giác tuân thủ kỷ luật tự nhiên, nỗ lực không phải vì sợ hãi mà vì tôn trọng cam kết.", "start": 67, "end": 68, "nodes": []}, {"id": "0045", "title": "NÓI LÀ LÀM", "summary": "\"Nói là làm\" - ba từ thể hiện tinh thần trách nhiệm: lời hứa như \"Em sẽ xong task vào ngày mai\", \"Team sẽ release đúng deadline\", \"Em sẽ sửa ngay\" với sức nặng đằng sau - khi có lỗi phát sinh, công việc cá nhân, hay estimate lạc quan, Shokunin không thay đổi lời hứa vì là cam kết danh dự. Để \"nói là làm\" phải suy nghĩ cẩn thận trước khi nói, rèn luyện khả năng tư duy/lập kế hoạch/lường trước rủi ro. Ví dụ anh Trung Nguyễn ở lại thức gần như cả đêm để hoàn thành task quan trọng - hành động đó xây dựng lòng tin trong team, mỗi lời hứa giữ vững là viên gạch xây nên uy tín bản thân và sự tin cậy của tập thể.", "start": 69, "end": 70, "nodes": []}, {"id": "0046", "title": "TÍN DỤNG : TÀI SẢN VÔ GIÁ CỦA SHOKUNIN", "summary": "Tín dụng (niềm tin mà người khác dành cho mình) là tài sản vô hình của Shokunin: có người chỉ cần nói là vay được cả trăm triệu đồng, có người dù có đủ giấy tờ thế chấp chỉ vay được vài triệu. Giá trị thực của tín dụng không thể hiện khi \"trời yên biển lặng\" (dự án suôn sẻ) mà chỉ được tạo ra trong \"giông bão\" (khó khăn bất ngờ, vấn đề phức tạp). Ví dụ tác giả deploy server ngày Tết chiều 30 Tết khi mọi người chuẩn bị mâm cơm đoàn viên - hành động đó bảo vệ tín dụng của bản thân và TOMOSIA, tạo niềm tin gần như tuyệt đối của khách hàng, biến sự hy sinh/tận tâm thành tài sản quý giá mà bất kỳ ai làm việc với người có tín dụng cao đều cảm nhận được sự yên tâm lạ thường.", "start": 71, "end": 72, "nodes": []}, {"id": "0047", "title": "DŨNG CẢM NHẬN LỖI – \"ĐƯỢC PHÉP SAI MỘT LẦN”", "summary": "Dũng cảm nhận lỗi - \"Được phép sai một lần\" chứa triết lý: sai sót không thể tránh khỏi trong IT, tinh thần trách nhiệm không thể hiện ở việc hoàn hảo mà ở thái độ/hành động sau sai lầm. Thay vì đổ lỗi (tại khách hàng đổi yêu cầu, tại đồng nghiệp chậm, tại tài liệu không rõ), Shokunin chọn con đường khó khăn hơn: dũng cảm nhận lỗi (\"em estimate sai\", \"em xử lý chưa tốt\") - đó không phải biểu hiện yếu kém mà là dấu hiệu dũng cảm/bản lĩnh. Ông chủ quán ăn Nhật dạy: \"Bạn được sai một lần, nhưng không được sai hai lần cùng một lỗi\" - vế đầu thể hiện bao dung/tạo môi trường an toàn, vế sau đặt tiêu chuẩn cao về học hỏi (phân tích xem sai ở đâu, tại sao, làm thế nào để lần sau không lặp lại). Tác giả áp dụng tại TOMOSIA: chấp nhận nhân viên sai nhưng phải học được điều gì từ sai đó.", "start": 73, "end": 74, "nodes": []}, {"id": "0048", "title": "KỶ LUẬT - NỀN TẢNG CỦA MỌI THÀNH CÔNG", "summary": "Nhà văn Haruki Murakami tuân thủ lịch trình sinh hoạt và viết lách nghiêm ngặt; Steve Jobs nổi tiếng với lòng theo đuổi sự tối giản và tiêu chuẩn khắt khe; Luân Đặng dậy lúc 4h sáng chạy 42km hàng ngày. Kỷ luật giải phóng tâm trí khỏi quyết định vụn vặt để tập trung vào mục tiêu, rèn luyện kỹ năng mang lại sự tự do trong tay nghề, và tạo môi trường ổn định cho đội nhóm hoạt động hiệu quả.", "start": 75, "end": 76, "nodes": []}, {"id": "0049", "title": "TƯ DUY CHỦ ĐỘNG", "summary": "Năm lăng kính trách nhiệm: với công việc (cam kết hoàn thành tốt nhất, đảm bảo chất lượng và tiến độ), với đội ngũ (hỗ trợ và chia sẻ để cùng thành công chung), với công ty (đóng góp vào giá trị và mục tiêu chung), với khách hàng (đồng hành để giúp họ thành công), với bản thân (phát triển năng lực chuyên môn và rèn giũa nhân cách). Sự khác biệt giữa người làm thuê và người Shokunin là khả năng tự tìm ra những việc cần phải làm, không chỉ làm theo mệnh lệnh.", "start": 77, "end": 78, "nodes": []}, {"id": "0050", "title": "TRÁCH NHIỆM – CON ĐƯỜNG XÂY DỰNG NIỀM TỰ HÀO", "summary": "Trách nhiệm bao gồm cam kết từ bên trong, lòng dũng cảm đối mặt sai lầm, sức mạnh kỷ luật, và tư duy làm chủ qua năm lăng kính. Niềm tự hào được xây dựng từ bên trong, không phải sự tự phụ hay kiêu ngạo, là phần thưởng sâu sắc nhất của con đường trách nhiệm. Trách nhiệm với bản thân là con đường trực tiếp để xây dựng niềm tự hào, biến công việc từ chỉ kiếm tiền thành phương tiện tôi luyện và khẳng định giá trị bản thân.", "start": 79, "end": 80, "nodes": []}, {"id": "0051", "title": "CHƯƠNG 5: TẬN TÂM, ĐAM MÊ – NO BUGS, HƯỚNG TỚI SỰ HOÀN HẢO", "summary": "Chương 5 trình bày Kỹ năng là đôi tay sắc bén, Trách nhiệm là la bàn chỉ hướng, Tận tâm và Đam mê là ngọn lửa cháy trong tim người Shokunin. Người có đam mê trăn trở về từng dòng code, tỉ mỉ với từng test case, không chấp nhận sự tầm thường, giống như thợ mộc dùng gỗ tốt cho mặt sau tủ dù không ai nhìn thấy.", "start": 81, "end": 82, "nodes": []}, {"id": "0052", "title": "ĐỪNG THEO ĐUỔI ĐAM MÊ, HÃY XÂY DỰNG NÓ", "summary": "Cuốn sách 'So Good They Can't Ignore You' của Cal Newport chỉ ra đam mê là sản phẩm phụ của việc làm chủ kỹ năng. Vòng lặp tích cực gồm 5 bước: (1) rèn luyện kỹ năng tận tâm, (2) trở nên xuất sắc được công nhận, (3) có được sự tự chủ và niềm tự hào, (4) đam mê nảy nở, (5) đam mê thúc đẩy rèn luyện tiếp. Thay vì hỏi 'Tôi đam mê cái gì?', hãy bắt đầu với 'Làm thế nào để tôi làm công việc này tốt hơn ngày hôm qua?'.", "start": 83, "end": 84, "nodes": []}, {"id": "0053", "title": "TẬN TÂM – NGAY CẢ KHI KHÔNG CÓ AI NHÌN THẤY", "summary": "Tận tâm là làm hơn cả thế so với trách nhiệm, và là sự chăm chỉ có ý thức khác với cần cù (lặp lại vô thức). Tiêu chuẩn như của Steve Jobs: dùng gỗ chất lượng cao cho mặt sau tủ mặc dù không ai thấy; lập trình viên không để code cẩu thả; đầu bếp không 'nêm nếm cho qua'; người tử tế vẫn làm điều đúng đắn ngay cả khi không ai khen ngợi. Chất lượng thật nằm ở tiêu chuẩn bạn tự đặt cho chính mình, không phải ở ánh đèn chiếu sáng bên ngoài.", "start": 85, "end": 86, "nodes": []}, {"id": "0054", "title": "NHỮNG THÓI QUEN TẠO NÊN SỰ TẬN TÂM CỦA SHOKUNIN", "summary": "Bốn thói quen tạo nên sự tận tâm: rèn Deep Work và họp daily sớm để vào trạng thái flow; chú ý chi tiết và tự kiểm tra (\"100 test case, 99 pass, 1 NG vẫn là NG\", self-test trước bàn giao); quy tắc \"5 phút cuối\" rà soát email, file đính kèm, con số, commit; và \"thêm một chút\" vào mỗi nhiệm vụ để đưa kết quả từ tốt lên xuất sắc.", "start": 87, "end": 88, "nodes": [{"id": "0055", "title": "1. Rèn luyện Sự Tập Trung Sâu (Deep Work)", "summary": "Tập trung sâu (Deep Work) là siêu năng lực trong thế giới số đầy xao nhãng; người Shokunin có kế hoạch rõ ràng ngay khi thức dậy về những nhiệm vụ quan trọng nhất cần hoàn thành. Buổi họp daily sáng nên diễn ra sớm, chỉ thông báo nhanh tiến độ và khó khăn, để quay trở lại dòng chảy công việc và vào trạng thái 'flow' nhanh chóng.", "start": 87, "end": 87, "nodes": []}, {"id": "0056", "title": "2. Chú Ý Đến Chi Tiết và Tự Kiểm Tra Kỹ Lưỡng", "summary": "Chất lượng công việc là danh dự của Shokunin; tiêu chuẩn: '100 test case, 99 pass, 1 NG vẫn là NG', không có khái niệm 'gần xong' hay 'ổn rồi'. Lập trình viên phải viết code sạch sẽ dễ đọc dễ bảo trì, luôn tự kiểm tra (self-test) kỹ lưỡng trước khi bàn giao cho người khác, thể hiện sự tôn trọng thời gian và công sức của đồng nghiệp trong công đoạn tiếp theo.", "start": 87, "end": 88, "nodes": []}, {"id": "0057", "title": "3. Quy tắc \"5 phút cuối\"", "summary": "Quy tắc '5 phút cuối': dành đúng 5 phút trước khi kết thúc nhiệm vụ hoặc ngày làm việc để xem lại tất cả. Đọc lại email trước khi gửi, kiểm tra file đính kèm, rà soát con số trong báo cáo, xem lại commit code cuối cùng. Thói quen này giống lớp bảo vệ cuối cùng phát hiện lỗi nhỏ và xây dựng hình ảnh người cẩn trọng đáng tin cậy.", "start": 88, "end": 88, "nodes": []}, {"id": "0058", "title": "4. Thêm \"một chút\" vào mỗi nhiệm vụ", "summary": "Hoàn thành công việc được giao là trách nhiệm; tạo sản phẩm vượt trên mong đợi là tận tâm. Sau khi hoàn thành, hỏi 'Mình có thể làm thêm điều gì nhỏ để kết quả tốt hơn không?': trình bày slide đẹp mắt chuyên nghiệp, thêm dòng ghi chú giải thích logic phức tạp, sắp xếp tài liệu khoa học. Những nỗ lực 'thêm một chút' này biến sản phẩm từ 'tốt' thành 'xuất sắc' mang lại trải nghiệm 'wow' cho khách hàng và đồng nghiệp.", "start": 88, "end": 88, "nodes": []}]}, {"id": "0059", "title": "PHƯƠNG PHÁP MÀI DŨA KỸ NĂNG", "summary": "Phương pháp mài dũa kỹ năng gồm 4 bước: (1) chia nhỏ vấn đề thành nhiệm vụ cụ thể có output rõ ràng; (2) thử thách bản thân bằng \"task vượt ngưỡng\" hoặc time box để hoàn thành task quen thuộc nhanh hơn bình thường; (3) lắng nghe phản hồi qua unit test, profiling tools, và code review từ đồng đội; (4) ghi chú lại bài học thành note cá nhân, blog, template, hay checklist, rồi chia sẻ cho cả đội.", "start": 89, "end": 90, "nodes": []}, {"id": "0060", "title": "KHI SỰ TẬN TÂM CHUYỂN HÓA THÀNH ĐAM MÊ", "summary": "Ba nguồn phần thưởng tâm lý chuyển đổi tận tâm thành đam mê: (1) Niềm Vui Của Năng Lực – khi kỹ năng tăng lên, vào trạng thái \"dòng chảy\" (flow) theo Mihaly Csikszentmihalyi, cảm giác quên đi thời gian và mọi thứ; (2) Sự Công Nhận và Tôn Trọng – từ đồng nghiệp, quản lý, khách hàng; (3) Tầm Ảnh Hưởng Hữu Hình – thấy code viết làm trang web chạy nhanh hơn, kế hoạch giúp đội hoàn thành đúng hạn, báo cáo giúp công ty quyết định kinh doanh đúng đắn.", "start": 91, "end": 92, "nodes": []}, {"id": "0061", "title": "VƯỢT QUA “VỰC THẲM CỦA SỰ CHÁN NẢN”", "summary": "Giai đoạn \"Vực thẳm của sự chán nản\" xảy ra sau khi hào hứng ban đầu qua nhưng kết quả chưa thấy, khi vấn đề phức tạp nảy sinh và áp lực lớn. Ba nguồn sức mạnh vượt qua: (1) trách nhiệm và tín dụng với khách hàng và đồng đội; (2) tầm nhìn dài hạn xem khó khăn là cơ hội học hỏi quý giá; (3) tin tưởng vào quy trình làm việc đã được chứng minh. Chiến lược xây dựng bền bỉ: tập trung vào \"chiến thắng nhỏ\" từng ngày, chia nhỏ vấn đề lớn, đừng ngại yêu cầu giúp đỡ từ đội.", "start": 93, "end": 94, "nodes": []}, {"id": "0062", "title": "HƯỚNG TỚI SỰ HOÀN HẢO", "summary": "Cam kết \"Zero Bug\" – lời hứa danh dự rằng sản phẩm bàn giao không có lỗi, nếu có lỗi phát sinh sau này TOMOSIA chịu toàn bộ trách nhiệm và xử lý miễn phí. Tư duy người giải quyết vấn đề: thay vì hỏi khách hàng \"làm thế nào?\" hay yêu cầu giải thích, team chủ động suy nghĩ, nghiên cứu, và đưa ra tối thiểu 2-3 phương án cho khách hàng chọn. Khi theo đuổi sự hoàn hảo bằng tận tâm, lợi nhuận và niềm vui trong công việc sẽ tự tìm đến như phần thưởng xứng đáng.", "start": 95, "end": 96, "nodes": []}, {"id": "0063", "title": "CHƯƠNG 6: TÔN TRỌNG NGHỀ NGHIỆP – TỰ HÀO DÂN TỘC, CÔNG TY, VÀ CÁ NHÂN", "summary": "Phần mở đầu chương 6 nhắc nhở rằng chúng ta dành hơn 8 tiếng mỗi ngày ở công ty – một phần ba cuộc đời – nên không nên lãng phí là \"thời gian chết\" mà hãy biến nó thành hành trình hoàn thiện bản thân. Khuyến khích bạn chọn môi trường công ty như nơi cống hiến giá trị win-win, chứ không chỉ kiếm tiền, với tinh thần shokunin, tử tế, và sứ mệnh nâng tầm CNTT Việt Nam.", "start": 97, "end": 98, "nodes": []}, {"id": "0064", "title": "CÔNG VIỆC CÒN HƠN CẢ MƯU SINH", "summary": "Kể chuyện giáo viên cũ bán cà phê và trà sữa ở TP HCM với lòng tự hào và tâm huyết vì dùng nguyên liệu \"thật\", không hóa chất. Minh họa rằng không có công việc nào thấp kém – giá trị công việc phụ thuộc cách làm: đánh giày để chiếc giày hồi sinh như mới, dọn dẹp với nụ cười và tử tế, hay làm IT để hệ thống hoạt động ổn định không bug là những công việc cao quý. Giới thiệu \"Công thức Cuộc đời\" của Kazuo Inamori: Thành quả = Thái độ × Nhiệt tình × Năng lực, trong đó Thái độ là yếu tố quyết định nhất.", "start": 99, "end": 100, "nodes": []}, {"id": "0065", "title": "THÁI ĐỘ QUAN TRỌNG HƠN TRÌNH ĐỘ", "summary": "Công thức cuộc đời của Kazuo Inamori: Thành quả = Thái độ × Nhiệt tình × Năng lực, với ba yếu tố (Năng lực: 0-100, Nhiệt tình: 0-100, Thái độ: -100 đến +100). Thái độ là cách nhìn nhận sự việc, triết lý sống, động lực bên trong, và là yếu tố nhân là phép nhân nên quyết định kết quả. Ví dụ intern có lợi thế thấp nhưng thái độ tốt – chủ động xin review, ghi chép cẩn thận, tham gia chia sẻ, tự tìm hiểu – đã trở thành key member sau 6 tháng và quản lý ở công ty startup nước ngoài hiện tại.", "start": 101, "end": 102, "nodes": []}, {"id": "0066", "title": "NHỮNG THÓI QUEN NHỎ TẠO NÊN THÁI ĐỘ", "summary": "Thái độ chuẩn mực được rèn luyện qua 5 loại thói quen nhỏ hàng ngày: (1) Thái độ với Thời gian – đến sớm 10-15 phút, dự phòng 20% thời gian để kiểm tra chất lượng; (2) Thái độ với Quy trình – tuân thủ test procedure, report rule, HR process; (3) Thái độ trong Giao tiếp – lắng nghe thực sự, phản hồi nhanh, nói chuyện lịch sự; (4) Thái độ với Sản phẩm công việc – chú trọng chất lượng code, test cẩn thận, không lặp lại lỗi; (5) Thái độ với Không gian làm việc – giữ sạch sẽ, dọn dẹp bàn, vệ sinh cá nhân, thấy rác tiện tay dọn. Những hành động này nuôi dưỡng LÒNG TỰ TRỌNG và TỰ HÀO nghề nghiệp.", "start": 103, "end": 105, "nodes": []}, {"id": "0067", "title": "MỐI QUAN HỆ GIỮA KHÁCH HÀNG - NHÂN VIÊN - CÔNG TY", "summary": "Mối quan hệ ba bên trong lĩnh vực dịch vụ IT: Khách hàng cho đi (tin tưởng, tài chính, yêu cầu rõ ràng) và nhận lại (sản phẩm chất lượng, know-how); Công ty cho đi (nhân sự chất lượng, giá trị cốt lõi, môi trường lành mạnh) và nhận lại (lực lượng con người, tài chính, know-how, trải nghiệm); Nhân sự cho đi (chất lượng công việc, học hỏi liên tục, xây dựng văn hóa) và nhận lại (môi trường phát triển, thu nhập xứng đáng, đam mê và flow). Triết lý WIN-WIN: mỗi vai trò phải cho đi trước khi nhận lại, vòng tròn giá trị cần vận hành trơn tru cân bằng.", "start": 106, "end": 107, "nodes": []}, {"id": "0068", "title": "TRIẾT LÝ TỪ CÁI TÊN TOMOSIA", "summary": "Tên TOMOSIA xuất phát từ cụm tiếng Nhật 共に幸せを灯す (tomo ni shiawase o tomosu) nghĩa là \"cùng nhau thắp sáng hạnh phúc\", gói gọn hai yếu tố: \"hạnh phúc\" và \"cùng nhau\". Triết lý kinh doanh WIN-WIN từ ngày đầu thành lập – công ty tạo môi trường cho lập trình viên sống với đam mê, muốn đi xa phải đi cùng nhau, có nhau để động viên khi mỏi gối. Nguyên tắc sống: bản thân mình có thể làm được những điều gì, thì mình hãy CỨ LÀM đi, đừng chờ đợi người khác, đối xử chân thành và hết lòng trước, nếu không được đáp lại thì thôi. Sự tôn trọng công ty giống chọn người yêu – chọn rồi hãy gắn bó hết mình, nếu không hợp thì chia tay sạch sẽ.", "start": 108, "end": 110, "nodes": []}, {"id": "0069", "title": "KHÁT VỌNG NÂNG TẦM NGÀNH CNTT VIỆT NAM", "summary": "Việc ngành CNTT là đòn bẩy chiến lược cho Việt Nam thoát bẫy thu nhập trung bình, khái niệm Shokunin từ Nhật Bản, nhận xét về năng lực lao động thấp và kỹ năng thiếu của người Việt, vai trò giáo dục và doanh nghiệp trong chuẩn bị nguồn lực, triết lý đào tạo IT Shokunin toàn diện của TOMOSIA (chuyên môn, trách nhiệm, tận tâm, tinh thần học hỏi), sứ mệnh nâng tầm ngành CNTT Việt Nam.", "start": 111, "end": 112, "nodes": []}, {"id": "0070", "title": "CHƯƠNG 7: PHÁT TRIỂN TOÀN DIỆN – KIẾN TẠO MỘT SHOKUNIN TRỌN VẸN", "summary": "Chương 7 giới thiệu hành trình phát triển toàn diện từ Thân - Tâm - Trí để kiến tạo một Shokunin trọn vẹn, từ những phẩm chất kỹ thuật, tận tâm và trách nhiệm đã nêu ở các chương trước đến sự viên mãn trong cuộc sống.", "start": 113, "end": 114, "nodes": []}, {"id": "0071", "title": "NUÔI DƯỠNG SỨC KHỎE", "summary": "Niềm tự hào khi thức trắng fix bug, các dấu hiệu burnout, câu nói về nghìn ước mơ khi khỏe mạnh vs. một ước mơ duy nhất là khỏe lại, liên kết giữa sức khỏe thể chất và hiệu suất công việc, năm thói quen cụ thể: phá vỡ trạng thái tĩnh (dùng cầu thang thay thang máy), bảo dưỡng tay và mắt (quy tắc 20-20-20), uống nước, chú ý dinh dưỡng (không đường trắng, hạn chế tinh bột trắng), ưu tiên giấc ngủ đều đặn.", "start": 115, "end": 116, "nodes": []}, {"id": "0072", "title": "NUÔI DƯỠNG TƯ DUY", "summary": "Phép ẩn dụ máy tính (CPU là năng lực bẩm sinh, OS là giáo dục, phần mềm là phương pháp tư duy), năm kiểu tư duy với câu hỏi kích hoạt: tư duy phản biện (Critical Thinking), tư duy sáng tạo (Creative Thinking), tư duy thiết kế (Design Thinking), tư duy hệ thống (Systems Thinking) với khái niệm leverage points, tư duy ngược (Reverse Thinking/Inversion), và siêu nhận thức (Metacognition) như công cụ tối thượng.", "start": 117, "end": 120, "nodes": []}, {"id": "0073", "title": "NUÔI DƯỠNG SỰ TÒ MÒ", "summary": "Câu chuyện về nhân viên đọc vui tên TOMOSIA thành \"tò mò sí\", phân biệt tò mò vs. tọc mạch, tò mò là sự ham hiểu biết và niềm vui tìm câu trả lời, khác biệt với tò mò ở người lớn bị bào mòn, ba phương pháp kích hoạt tò mò: thay đổi tư duy coi thách thức là học hỏi, luôn đặt câu hỏi \"Tại sao?\", chủ động tìm kiến thức từ sách/blog/kỹ năng mới, bước ra khỏi vùng an toàn.", "start": 121, "end": 122, "nodes": []}, {"id": "0074", "title": "NUÔI DƯỠNG TRÁI TIM", "summary": "Ẩn dụ khu vườn tâm hồn, hạt mầm tốt của lòng biết ơn và sự tử tế (thank cards, reactions trên teams), tưới tắm bằng trắc ẩn và tha thứ, phân bón quý giá là kết nối chân thành, nhổ bỏ cỏ dại (oán giận, ghen tị), mở lòng ra với ánh sáng (passion, niềm vui, tình yêu), thử thách và bão giông (criticism, wave cảm xúc), rễ của lòng tự trọng và kiên cường, hoa của yêu thương và khả năng rung cảm, trái của sự sẻ chia.", "start": 123, "end": 124, "nodes": []}, {"id": "0075", "title": "TỈNH THỨC TRONG THẾ GIỚI PHÂN TÂM", "summary": "Sự chú ý trở thành mặt hàng trong thời đại hiện tại, định nghĩa tỉnh thức là khả năng hiện diện trọn vẹn với công việc, khóa \"Search Inside Yourself\" của Google, trạng thái dòng chảy (flow), năm công cụ xây dựng tỉnh thức: dọn sạch mặt bàn, đặt điện thoại xa tầm tay, tập ngồi yên không nhạc/video nền, kỹ thuật Pomodoro (25 phút làm/5 phút nghỉ), viết 3 việc cần làm, thực hành thiền 5 phút tập trung vào hơi thở.", "start": 125, "end": 126, "nodes": []}, {"id": "0076", "title": "SỨC MẠNH CỦA NHỮNG THÓI QUEN NHỎ: XÂY DỰNG KỶ LUẬT TRONG 1 PHÚT", "summary": "Đánh giá quá cao một hành động lớn vs. coi thường cải tiến nhỏ nhất quán, kỷ luật là bền bỉ không phải chịu đựng, mười thói quen \"1 phút\": nói lời khen (trái tim), nghĩ 2 điều tích cực (hạt mầm tốt), thiền 1 phút (tỉnh thức), kể 3 điều biết ơn (lòng biết ơn), chống đẩy 1 cái (thể chất), viết 50 từ (tư duy), đọc 2 trang sách (kiến thức), nhảy dây 10 cái (năng lượng), đi bộ 100 bước (phá vỡ tĩnh), uống nước (chăm sóc cơ bản).", "start": 127, "end": 128, "nodes": []}, {"id": "0077", "title": "TRỞ THÀNH MỘT SHOKUNIN TRỌN VẸN: KHI CÔNG VIỆC VÀ CUỘC SỐNG HÒA LÀM MỘT", "summary": "Tổng kết hành trình từ mài giũa kỹ năng chuyên môn đến rèn luyện Thân - Tâm - Trí, vai trò sức khỏe thể chất trong năng lượng sáng tạo, mối liên hệ giữa tư duy sắc bén và cách nhìn cuộc sống, lợi ích tu dưỡng tâm hồn và tỉnh thức trong công việc, ranh giới giữa công việc và cuộc sống tan biến, công việc trở thành sân chơi/phòng thí nghiệm/phương tiện biểu đạt giá trị, quá trình tu dưỡng cả đời với thói quen nhỏ hàng ngày, tên tác giả Lưu Tuấn Anh, ấn phẩm nội bộ TOMOSIA tháng 7/2025.", "start": 129, "end": 131, "nodes": []}]}]}</script>
 <script>
 const data = JSON.parse(document.getElementById("payload").textContent);
-const docsEl = document.getElementById("docs");
-const treeEl = document.getElementById("tree");
-const q = document.getElementById("q");
-const onlyMissing = document.getElementById("onlyMissing");
+const $ = id => document.getElementById(id);
+const docsEl = $("docs");
+const treeEl = $("tree");
+const q = $("q");
+const onlyMissing = $("onlyMissing");
 let current = 0;
+let activeView = "graph";
 
 function counts(nodes, acc = {total: 0, summarized: 0}) {
   for (const node of nodes) {
@@ -117,25 +364,32 @@ function counts(nodes, acc = {total: 0, summarized: 0}) {
   return acc;
 }
 
-data.documents.forEach((doc, index) => {
-  const c = counts(doc.nodes);
-  const button = document.createElement("button");
-  button.innerHTML = "";
-  button.append(doc.name);
-  const meta = document.createElement("span");
-  meta.className = "meta";
-  meta.textContent = `${c.summarized}/${c.total} summarized · ${doc.units} units`;
-  button.append(meta);
-  button.onclick = () => select(index);
-  docsEl.append(button);
-});
-
 function element(tag, cls, text) {
   const node = document.createElement(tag);
   if (cls) node.className = cls;
   if (text !== undefined) node.textContent = text;
   return node;
 }
+
+// The one test both views use to decide whether a section matches the bar.
+function needle() { return q.value.trim().toLowerCase(); }
+function matches(title, summary, text, missingOnly) {
+  return (!text || (title + " " + (summary || "")).toLowerCase().includes(text)) &&
+         (!missingOnly || !summary);
+}
+
+data.documents.forEach((doc, index) => {
+  const c = counts(doc.nodes);
+  const button = document.createElement("button");
+  button.append(doc.name);
+  const meta = element("span", "meta",
+                       `${c.summarized}/${c.total} summarized · ${doc.units} units`);
+  button.append(meta);
+  button.onclick = () => select(index);
+  docsEl.append(button);
+});
+
+/* ---------------------------------------------------------------- list view */
 
 function draw(nodes, depth) {
   const box = element("div", depth ? "node" : "");
@@ -159,27 +413,11 @@ function draw(nodes, depth) {
         twist.textContent = hide ? "▸" : "▾";
       };
     }
-    wrap.dataset.text = (node.title + " " + (node.summary || "")).toLowerCase();
     wrap.dataset.title = node.title;
     if (node.summary) wrap.dataset.summary = node.summary;
-    wrap.dataset.missing = node.summary ? "0" : "1";
     box.append(wrap);
   }
   return box;
-}
-
-function select(index) {
-  current = index;
-  const doc = data.documents[index];
-  [...docsEl.children].forEach((button, i) =>
-    button.setAttribute("aria-current", String(i === index)));
-  document.getElementById("docName").textContent = doc.name;
-  const c = counts(doc.nodes);
-  document.getElementById("docMeta").textContent =
-    [doc.description, `${c.summarized}/${c.total} nodes summarized`,
-     `${doc.units} read units`, doc.source].filter(Boolean).join(" · ");
-  treeEl.replaceChildren(draw(doc.nodes, 0));
-  filter();
 }
 
 function setAll(hidden) {
@@ -189,45 +427,40 @@ function setAll(hidden) {
     twist.textContent = hidden ? "▸" : "▾");
 }
 
-function paint(target, text, needle) {
+function paint(target, text, term) {
   if (!target) return;
-  if (!needle) { target.textContent = text; return; }
-  const parts = text.toLowerCase().split(needle);
+  if (!term) { target.textContent = text; return; }
+  const parts = text.toLowerCase().split(term);
   const fragment = document.createDocumentFragment();
   let at = 0;
   parts.forEach((part, index) => {
     fragment.append(text.slice(at, at + part.length));
     at += part.length;
     if (index < parts.length - 1) {
-      fragment.append(element("mark", "", text.slice(at, at + needle.length)));
-      at += needle.length;
+      fragment.append(element("mark", "", text.slice(at, at + term.length)));
+      at += term.length;
     }
   });
   target.replaceChildren(fragment);
 }
 
-function filter() {
-  const needle = q.value.trim().toLowerCase();
+function listFilter() {
+  const text = needle();
   const missingOnly = onlyMissing.checked;
-  let shown = 0;
   const walk = (box) => {
     let anyVisible = false;
     for (const wrap of box.children) {
-      if (!wrap.dataset.text) continue;
+      if (wrap.dataset.title === undefined) continue;
       const kids = wrap.querySelector(":scope > .node");
       const childVisible = kids ? walk(kids) : false;
-      const hit = (!needle || wrap.dataset.text.includes(needle)) &&
-                  (!missingOnly || wrap.dataset.missing === "1");
+      const hit = matches(wrap.dataset.title, wrap.dataset.summary, text, missingOnly);
       const visible = hit || childVisible;
       wrap.classList.toggle("hidden", !visible);
       if (visible) {
-        paint(wrap.querySelector(":scope > .row > .title"),
-              wrap.dataset.title, needle);
-        paint(wrap.querySelector(":scope > .sum"), wrap.dataset.summary,
-              needle);
+        paint(wrap.querySelector(":scope > .row > .title"), wrap.dataset.title, text);
+        paint(wrap.querySelector(":scope > .sum"), wrap.dataset.summary, text);
       }
-      if (hit) shown++;
-      if (kids && (needle || missingOnly) && childVisible) {
+      if (kids && (text || missingOnly) && childVisible) {
         kids.classList.remove("hidden");
         const twist = wrap.querySelector(":scope > .row > .twist");
         if (twist) twist.textContent = "▾";
@@ -237,15 +470,801 @@ function filter() {
     return anyVisible;
   };
   walk(treeEl.firstElementChild);
-  document.getElementById("foot").textContent =
-    (needle || missingOnly ? `${shown} matching nodes · ` : "") +
-    `generated ${data.generated} from ${data.store}`;
+}
+
+/* --------------------------------------------------------------- graph view */
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+const GRAPH = {
+  radius: 5.5,       // node circle
+  labelPad: 8,       // gap from the circle to its label, and from the label to its edges
+  labelSize: 12.5,   // px, section labels
+  rootSize: 15,      // px, the document's own label
+  moreGap: 6,        // gap before the "+N" count on a folded section
+  labelChars: 40,    // longer titles are cut here; the detail panel shows them whole
+  row: 30,           // vertical pitch between leaves in the tree layout
+  gap: 64,           // room left for edges between one column's labels and the next column
+  leafArc: 24,       // arc length each leaf gets on the innermost ring of the radial layout
+  ringGap: 56,       // room left for edges between one ring's labels and the next ring
+  grid: 24,          // background dot spacing at 100% zoom
+  minZoom: 0.05,
+  maxZoom: 3,
+  fitPad: 48,        // margin kept around the tree when fitting it to the board
+  readableZoom: 0.75, // a document opens no smaller than this, even when the tree then overflows
+  flight: 280,       // ms for animated camera moves
+  openLimit: 400,    // a tree with more sections than this opens folded below openDepth
+  openDepth: 2,
+};
+const board = $("board"), stage = $("stage"), world = $("world");
+const edgesG = $("edges"), nodesG = $("nodes");
+const mini = $("mini"), miniG = $("miniNodes"), miniView = $("miniView");
+const detail = $("detail"), stats = $("stats");
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+const narrow = matchMedia("(max-width: 720px)");
+const cam = {x: 0, y: 0, k: 1};
+let graph = null;       // {root, all, visible}
+let layoutMode = "tree";
+let hovered = null, selected = null;
+let hitSet = new Set(), hitList = [], hitAt = -1;
+let needsFit = true;
+
+stage.style.setProperty("--label-size", GRAPH.labelSize + "px");
+stage.style.setProperty("--root-size", GRAPH.rootSize + "px");
+
+function svg(tag, attrs, parent) {
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const [key, value] of Object.entries(attrs || {})) el.setAttribute(key, value);
+  if (parent) parent.append(el);
+  return el;
+}
+
+function buildGraph(doc) {
+  const all = [];
+  const make = (src, parent) => {
+    const node = {
+      key: all.length, id: src.id ?? null, title: src.title || "(untitled)",
+      summary: src.summary || "", start: src.start, end: src.end,
+      depth: parent ? parent.depth + 1 : 0, parent, collapsed: false,
+      isRoot: !parent, children: [],
+    };
+    all.push(node);
+    node.children = (src.nodes || []).map(child => make(child, node));
+    return node;
+  };
+  const root = make({title: doc.name, summary: doc.description, nodes: doc.nodes}, null);
+  if (all.length > GRAPH.openLimit) {
+    for (const node of all)
+      if (node.depth >= GRAPH.openDepth && node.children.length) node.collapsed = true;
+  }
+  return {root, all, visible: []};
+}
+
+const shown = node => node.collapsed ? [] : node.children;
+function eachShown(node, fn) { fn(node); for (const child of shown(node)) eachShown(child, fn); }
+function descendants(node) {
+  let total = 0;
+  for (const child of node.children) total += 1 + descendants(child);
+  return total;
+}
+function isShown(node) {
+  for (let up = node.parent; up; up = up.parent) if (up.collapsed) return false;
+  return true;
+}
+
+const measureCtx = document.createElement("canvas").getContext("2d");
+const monoFamily = getComputedStyle(document.documentElement).getPropertyValue("--mono").trim();
+function textWidth(text, size, weight) {
+  measureCtx.font = `${weight || 400} ${size}px ${monoFamily}`;
+  return measureCtx.measureText(text).width;
+}
+
+function measure(node) {
+  const title = node.title;
+  node.text = title.length > GRAPH.labelChars
+    ? title.slice(0, GRAPH.labelChars - 1) + "…" : title;
+  node.more = node.collapsed && node.children.length ? `+${descendants(node)}` : "";
+  node.w = node.isRoot
+    ? textWidth(node.text, GRAPH.rootSize, 600)
+    : textWidth(node.text, GRAPH.labelSize) +
+      (node.more ? GRAPH.moreGap + textWidth(node.more, GRAPH.labelSize) : 0);
+}
+
+// Distance from a node's centre to where its outgoing edges start: past its label,
+// so an edge never runs through the text. The root's label sits on the other side.
+function reach(node) {
+  return node.isRoot ? GRAPH.radius : GRAPH.radius + GRAPH.labelPad + node.w + GRAPH.labelPad;
+}
+
+// Widest reach per depth, over the nodes that have edges leaving them. A leaf's label
+// can run into the next column freely, because no other node shares a leaf's row.
+function reachByDepth(root) {
+  const widest = [];
+  eachShown(root, node => {
+    if (shown(node).length) widest[node.depth] = Math.max(widest[node.depth] || 0, reach(node));
+  });
+  return widest;
+}
+
+function layoutTree(root) {
+  const widest = reachByDepth(root);
+  const colX = [0];
+  for (let depth = 1; depth <= widest.length; depth++)
+    colX[depth] = colX[depth - 1] + (widest[depth - 1] || 0) + GRAPH.gap + GRAPH.radius;
+  let y = 0;
+  const place = node => {
+    node.x = colX[node.depth];
+    const kids = shown(node);
+    if (kids.length) {
+      kids.forEach(place);
+      node.y = (kids[0].y + kids[kids.length - 1].y) / 2;
+    } else {
+      node.y = y;
+      y += GRAPH.row;
+    }
+    node.angle = 0;
+  };
+  place(root);
+}
+
+function layoutRadial(root) {
+  const leaves = [];
+  eachShown(root, node => { if (!node.isRoot && !shown(node).length) leaves.push(node); });
+  const widest = reachByDepth(root);
+  const ring = [0, Math.max(leaves.length * GRAPH.leafArc / (2 * Math.PI),
+                            GRAPH.radius * 2 + GRAPH.ringGap * 2)];
+  for (let depth = 2; depth <= widest.length; depth++)
+    ring[depth] = ring[depth - 1] + (widest[depth - 1] || 0) + GRAPH.ringGap + GRAPH.radius;
+  leaves.forEach((leaf, index) =>
+    leaf.angle = (index + 0.5) / leaves.length * 2 * Math.PI - Math.PI / 2);
+  const place = node => {
+    const kids = shown(node);
+    if (kids.length) {
+      kids.forEach(place);
+      node.angle = (kids[0].angle + kids[kids.length - 1].angle) / 2;
+    }
+    node.r = ring[node.depth];
+    node.x = node.r * Math.cos(node.angle);
+    node.y = node.r * Math.sin(node.angle);
+  };
+  place(root);
+  root.angle = 0;
+}
+
+// The two far corners of a node's circle-plus-label, for fitting and the overview.
+function extent(node) {
+  const R = GRAPH.radius, far = reach(node);
+  if (layoutMode === "tree") {
+    return node.isRoot ? [[node.x - R - GRAPH.labelPad - node.w, node.y], [node.x + R, node.y]]
+                       : [[node.x - R, node.y], [node.x + far, node.y]];
+  }
+  if (node.isRoot) {
+    const below = node.y + R + GRAPH.labelPad + GRAPH.rootSize;
+    return [[node.x - node.w / 2, below], [node.x + node.w / 2, node.y - R]];
+  }
+  return [[node.x, node.y],
+          [node.x + far * Math.cos(node.angle), node.y + far * Math.sin(node.angle)]];
+}
+
+function bounds(nodes) {
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  const half = GRAPH.row / 2;
+  for (const node of nodes) {
+    for (const [x, y] of extent(node)) {
+      x0 = Math.min(x0, x - half); x1 = Math.max(x1, x + half);
+      y0 = Math.min(y0, y - half); y1 = Math.max(y1, y + half);
+    }
+  }
+  if (x0 === Infinity) return {x0: 0, y0: 0, w: 1, h: 1};
+  return {x0, y0, w: x1 - x0, h: y1 - y0};
+}
+
+function edgePath(parent, child) {
+  const R = GRAPH.radius;
+  if (layoutMode === "tree") {
+    const sx = parent.x + reach(parent), sy = parent.y;
+    const ex = child.x - R, ey = child.y, mx = (sx + ex) / 2;
+    return `M${sx},${sy} C${mx},${sy} ${mx},${ey} ${ex},${ey}`;
+  }
+  const from = parent.isRoot ? child.angle : parent.angle;
+  const r0 = parent.r + reach(parent), r1 = child.r - R, rm = (r0 + r1) / 2;
+  const at = (angle, r) => `${r * Math.cos(angle)},${r * Math.sin(angle)}`;
+  return `M${at(from, r0)} C${at(from, rm)} ${at(child.angle, rm)} ${at(child.angle, r1)}`;
+}
+
+function labelAttrs(node) {
+  const offset = GRAPH.radius + GRAPH.labelPad;
+  if (layoutMode === "tree") {
+    return node.isRoot ? {class: "label", x: -offset, "text-anchor": "end"}
+                       : {class: "label", x: offset};
+  }
+  if (node.isRoot)
+    return {class: "label", y: offset + GRAPH.rootSize / 2, "text-anchor": "middle"};
+  const degrees = node.angle * 180 / Math.PI;
+  const left = Math.cos(node.angle) < 0;   // keep text upright on the left half
+  return {class: "label", x: left ? -offset : offset,
+          "text-anchor": left ? "end" : "start",
+          transform: `rotate(${left ? degrees + 180 : degrees})`};
+}
+
+function ariaOf(node) {
+  const parts = [node.title];
+  if (node.children.length)
+    parts.push(`${descendants(node)} subsections, ${node.collapsed ? "folded" : "open"}`);
+  if (!node.isRoot && !node.summary) parts.push("no summary");
+  return parts.join(". ");
+}
+
+function render() {
+  const focusedKey = document.activeElement?.dataset?.key;
+  edgesG.replaceChildren();
+  nodesG.replaceChildren();
+  const visible = [];
+  eachShown(graph.root, node => {
+    visible.push(node);
+    node.edgeEl = null;
+    if (node.parent) {
+      const d = edgePath(node.parent, node);
+      node.edgeEl = svg("path", {class: "edge", d}, edgesG);
+      svg("path", {class: "edge-hit", d, "data-key": node.key}, edgesG);
+    }
+    const cls = ["gnode", node.isRoot && "root",
+                 !node.isRoot && !node.summary && "missing",
+                 node.more && "collapsed", hitSet.has(node) && "match",
+                 node === selected && "sel"].filter(Boolean).join(" ");
+    const el = svg("g", {class: cls, transform: `translate(${node.x},${node.y})`,
+                         tabindex: 0, role: "button", "data-key": node.key,
+                         "aria-label": ariaOf(node)}, nodesG);
+    if (node.children.length)
+      svg("circle", {class: "hitc", r: GRAPH.radius * 2.2, "data-toggle": ""}, el);
+    svg("circle", {class: "ring", r: GRAPH.radius + 3.5}, el);
+    svg("circle", {class: "dot", r: GRAPH.radius}, el);
+    const label = svg("text", labelAttrs(node), el);
+    label.append(node.text);
+    if (node.more) svg("tspan", {class: "more", dx: GRAPH.moreGap}, label).append(node.more);
+    svg("title", {}, el).textContent = node.title;
+    node.el = el;
+  });
+  graph.visible = visible;
+  if (focusedKey !== undefined) graph.all[+focusedKey]?.el?.focus({preventScroll: true});
+  renderMini();
+}
+
+function relayout() {
+  for (const node of graph.all) measure(node);
+  (layoutMode === "tree" ? layoutTree : layoutRadial)(graph.root);
+  render();
+  light(selected && isShown(selected) ? selected : null);
+  apply();
+  updateStats();
+}
+
+/* statistics */
+
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many || one + "s"}`;
+
+// Counts over everything below a node, at every depth, folded or not.
+function treeStats(node) {
+  const stats = {sections: 0, leaves: 0, summarized: 0, levels: []};
+  const walk = parent => {
+    for (const child of parent.children) {
+      stats.sections++;
+      if (!child.children.length) stats.leaves++;
+      if (child.summary) stats.summarized++;
+      const level = child.depth - node.depth - 1;
+      stats.levels[level] = (stats.levels[level] || 0) + 1;
+      walk(child);
+    }
+  };
+  walk(node);
+  return stats;
+}
+
+function updateStats() {
+  const stats = treeStats(graph.root);
+  $("statsLine").textContent = [plural(stats.sections, "section"),
+    plural(stats.levels.length, "level"), plural(stats.leaves, "leaf", "leaves")].join(" · ");
+  const levels = $("levels");
+  levels.replaceChildren();
+  const widest = Math.max(1, ...stats.levels);
+  stats.levels.forEach((count, index) => {
+    const track = element("div", "lv-track");
+    const bar = element("div", "lv-bar");
+    bar.style.width = `${count / widest * 100}%`;
+    track.append(bar);
+    const name = element("span", "lv-name", `L${index + 1}`);
+    name.setAttribute("role", "listitem");
+    name.setAttribute("aria-label", `level ${index + 1}: ${plural(count, "section")}`);
+    levels.append(name, track, element("span", "lv-n", count));
+  });
+  const missing = stats.sections - stats.summarized;
+  $("chipSummarized").lastElementChild.textContent =
+    `${stats.summarized}/${stats.sections} summarized`;
+  const chipMissing = $("chipMissing");
+  chipMissing.lastElementChild.textContent = `${missing} no summary`;
+  chipMissing.disabled = !missing && !onlyMissing.checked;
+  chipMissing.setAttribute("aria-pressed", String(onlyMissing.checked));
+  const folded = graph.all.filter(node => node.collapsed && node.children.length && isShown(node));
+  const hidden = folded.reduce((total, node) => total + descendants(node), 0);
+  const chipFolded = $("chipFolded");
+  chipFolded.lastElementChild.textContent = folded.length
+    ? `${plural(folded.length, "folded branch", "folded branches")} · ${hidden} hidden`
+    : "nothing folded";
+  chipFolded.disabled = !folded.length;
+}
+
+function setStatsOpen(open) {
+  $("statsToggle").setAttribute("aria-expanded", String(open));
+  $("statsBody").hidden = !open;
+  try { localStorage.setItem("pageindex-viewer-stats", open ? "open" : "closed"); } catch (error) {}
+}
+$("statsToggle").onclick = () =>
+  setStatsOpen($("statsToggle").getAttribute("aria-expanded") !== "true");
+$("chipMissing").onclick = () => { onlyMissing.checked = !onlyMissing.checked; filter(); };
+$("chipFolded").onclick = () => unfoldAll();
+{
+  let stored = null;
+  try { stored = localStorage.getItem("pageindex-viewer-stats"); } catch (error) {}
+  setStatsOpen(stored ? stored === "open" : !narrow.matches);
+}
+
+function detailStats(node) {
+  const doc = data.documents[current], stats = treeStats(node), rows = [];
+  if (!node.isRoot) rows.push(["Level", node.depth]);
+  if (node.children.length) {
+    rows.push(["Children", node.children.length]);
+    // only when they add something: with no grandchildren both equal the children
+    if (stats.sections > node.children.length) rows.push(["Below", stats.sections]);
+    if (stats.leaves !== stats.sections) rows.push(["Leaves", stats.leaves]);
+    rows.push(["Summarized", `${stats.summarized}/${stats.sections}`]);
+  }
+  if (!node.isRoot && node.start != null && doc.units) {
+    const span = (node.end ?? node.start) - node.start + 1, share = span / doc.units * 100;
+    rows.push(["Coverage", `${span} of ${doc.units} units (${share.toFixed(share < 10 ? 1 : 0)}%)`]);
+  }
+  const list = $("dStats");
+  list.replaceChildren();
+  for (const [term, value] of rows) list.append(element("dt", "", term), element("dd", "", value));
+  list.hidden = !rows.length;
+}
+
+// Light a node's path from the root and everything under it; the rest dims.
+function light(node) {
+  for (const el of stage.querySelectorAll(".lit, .hover")) el.classList.remove("lit", "hover");
+  stage.classList.toggle("focusing", !!node);
+  if (!node) return;
+  node.el.classList.add("hover");
+  const on = new Set();
+  for (let up = node; up; up = up.parent) on.add(up);
+  eachShown(node, below => on.add(below));
+  for (const member of on) {
+    member.el.classList.add("lit");
+    if (member.parent && on.has(member.parent)) member.edgeEl.classList.add("lit");
+  }
+}
+
+/* camera */
+
+const clampZoom = k => Math.min(GRAPH.maxZoom, Math.max(GRAPH.minZoom, k));
+let flight = 0;
+
+function apply() {
+  world.setAttribute("transform", `translate(${cam.x} ${cam.y}) scale(${cam.k})`);
+  let step = GRAPH.grid * cam.k;
+  while (step < 12) step *= 2;
+  board.style.backgroundSize = `${step}px ${step}px`;
+  board.style.backgroundPosition = `${cam.x}px ${cam.y}px`;
+  $("zoomLevel").textContent = Math.round(cam.k * 100) + "%";
+  drawMiniView();
+}
+
+// The part of the board not covered by the statistics card on the left or the
+// detail panel on the right. On a narrow screen both sit over the board instead.
+function viewport() {
+  const rect = board.getBoundingClientRect();
+  const statsOpen = !$("statsBody").hidden && !narrow.matches;
+  const left = statsOpen ? stats.offsetLeft + stats.offsetWidth : 0;
+  const right = !detail.hidden && !narrow.matches ? detail.offsetWidth + 28 : 0;
+  const w = Math.max(rect.width - left - right, 1), h = rect.height;
+  return {left, w, h, cx: left + w / 2, cy: h / 2};
+}
+
+function moveTo(target, instant) {
+  cancelAnimationFrame(flight);
+  if (instant || reduceMotion.matches) { Object.assign(cam, target); apply(); return; }
+  const from = {...cam}, t0 = performance.now();
+  const step = now => {
+    const t = Math.min(1, (now - t0) / GRAPH.flight), ease = 1 - Math.pow(1 - t, 3);
+    for (const key of ["x", "y", "k"]) cam[key] = from[key] + (target[key] - from[key]) * ease;
+    apply();
+    if (t < 1) flight = requestAnimationFrame(step);
+  };
+  flight = requestAnimationFrame(step);
+}
+
+function zoomAt(px, py, factor) {
+  cancelAnimationFrame(flight);
+  const k = clampZoom(cam.k * factor);
+  cam.x = px - (px - cam.x) * k / cam.k;
+  cam.y = py - (py - cam.y) * k / cam.k;
+  cam.k = k;
+  apply();
+}
+
+function zoomCentre(factor) {
+  const view = viewport();
+  zoomAt(view.cx, view.cy, factor);
+}
+
+function fitTo(nodes, maxZoom, instant) {
+  const box = bounds(nodes), view = viewport(), pad = GRAPH.fitPad;
+  const k = clampZoom(Math.min((view.w - 2 * pad) / box.w, (view.h - 2 * pad) / box.h, maxZoom));
+  moveTo({k, x: view.cx - (box.x0 + box.w / 2) * k,
+          y: view.cy - (box.y0 + box.h / 2) * k}, instant);
+}
+const fitAll = instant => fitTo(graph.visible, 1, instant);
+
+// The first view of a document: the whole tree when it is still legible at that size,
+// otherwise the root at a readable zoom, with the rest a drag away.
+function openView() {
+  const box = bounds(graph.visible), view = viewport(), pad = GRAPH.fitPad;
+  const fit = Math.min((view.w - 2 * pad) / box.w, (view.h - 2 * pad) / box.h, 1);
+  if (fit >= GRAPH.readableZoom) { fitAll(true); return; }
+  const k = GRAPH.readableZoom, root = graph.root;
+  const x = layoutMode === "tree" ? view.left + pad - box.x0 * k : view.cx - root.x * k;
+  moveTo({k, x, y: view.cy - root.y * k}, true);
+}
+
+function centreOn(node) {
+  const view = viewport(), k = Math.max(cam.k, 0.9);
+  const [a, b] = extent(node);
+  moveTo({k, x: view.cx - (a[0] + b[0]) / 2 * k, y: view.cy - (a[1] + b[1]) / 2 * k});
+}
+
+function onScreen(node) {
+  const view = viewport(), x = cam.x + node.x * cam.k, y = cam.y + node.y * cam.k;
+  return x > view.left + 20 && y > 20 && x < view.left + view.w - 20 && y < view.h - 20;
+}
+
+/* folding and selection */
+
+function toggle(node) {
+  if (!node.children.length) return;
+  const before = {x: cam.x + node.x * cam.k, y: cam.y + node.y * cam.k};
+  node.collapsed = !node.collapsed;
+  relayout();
+  // keep the node that was clicked where it was on screen
+  cam.x += before.x - (cam.x + node.x * cam.k);
+  cam.y += before.y - (cam.y + node.y * cam.k);
+  apply();
+  if (node === selected) showDetail(node);
+}
+
+function selectNode(node) {
+  selected = node;
+  for (const el of nodesG.querySelectorAll(".sel")) el.classList.remove("sel");
+  if (!node) { detail.hidden = true; light(null); return; }
+  node.el.classList.add("sel");
+  showDetail(node);
+  light(node);
+}
+
+function units(start, end) {
+  if (start == null) return "";
+  return start === end || end == null ? `unit ${start}` : `units ${start}–${end}`;
+}
+
+function showDetail(node) {
+  const doc = data.documents[current];
+  const crumbs = $("crumbs");
+  crumbs.replaceChildren();
+  const trail = [];
+  for (let up = node.parent; up; up = up.parent) trail.unshift(up);
+  trail.forEach((up, index) => {
+    if (index) crumbs.append(element("span", "sepr", "›"));
+    const link = element("button", "", up.text);
+    link.onclick = () => { for (let a = up; a; a = a.parent) a.collapsed = false;
+                           relayout(); selectNode(up); centreOn(up); };
+    crumbs.append(link);
+  });
+  $("dTitle").textContent = node.title;
+  const meta = node.isRoot
+    ? [doc.units != null && `${doc.units} units`, doc.source]
+    : [node.id && `#${node.id}`, units(node.start, node.end)];
+  $("dMeta").textContent = meta.filter(Boolean).join(" · ");
+  detailStats(node);
+  const sum = $("dSum");
+  sum.textContent = node.summary || (node.isRoot ? "No description." : "No summary yet.");
+  sum.classList.toggle("empty", !node.summary);
+  const fold = $("dToggle");
+  fold.hidden = !node.children.length;
+  fold.textContent = node.collapsed ? "Unfold" : "Fold";
+  detail.hidden = false;
+}
+
+$("closeDetail").onclick = () => selectNode(null);
+$("dToggle").onclick = () => selected && toggle(selected);
+$("dFocus").onclick = () => {
+  if (!selected) return;
+  const nodes = [];
+  eachShown(selected, node => nodes.push(node));
+  fitTo(nodes, 1.4);
+};
+
+/* pointer: drag anywhere to move, pinch or Ctrl/⌘ + wheel to zoom */
+
+const keyOf = target => {
+  const el = target && target.closest ? target.closest("[data-key]") : null;
+  return el && graph ? graph.all[+el.dataset.key] : null;
+};
+const touches = new Map();
+const drag = {moved: false, sx: 0, sy: 0, pinch: 0};
+
+board.addEventListener("pointerdown", e => {
+  if (e.pointerType === "mouse" && e.button > 1) return;
+  if (e.button === 1) e.preventDefault();
+  cancelAnimationFrame(flight);
+  touches.set(e.pointerId, {x: e.clientX, y: e.clientY});
+  drag.moved = false; drag.sx = e.clientX; drag.sy = e.clientY;
+  if (touches.size === 2) drag.pinch = spread();
+});
+function spread() {
+  const [a, b] = [...touches.values()];
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+board.addEventListener("pointermove", e => {
+  const prev = touches.get(e.pointerId);
+  if (!prev) return;
+  const now = {x: e.clientX, y: e.clientY};
+  touches.set(e.pointerId, now);
+  if (touches.size >= 2) {
+    const [a, b] = [...touches.values()], rect = board.getBoundingClientRect();
+    const distance = spread();
+    if (drag.pinch)
+      zoomAt((a.x + b.x) / 2 - rect.left, (a.y + b.y) / 2 - rect.top, distance / drag.pinch);
+    drag.pinch = distance;
+    drag.moved = true;
+    return;
+  }
+  if (!drag.moved) {
+    if (Math.hypot(now.x - drag.sx, now.y - drag.sy) < 4) return;
+    // capture only once it is a drag, so a plain click still lands on the node under it
+    drag.moved = true;
+    board.setPointerCapture(e.pointerId);
+    board.classList.add("panning");
+  }
+  cam.x += now.x - prev.x;
+  cam.y += now.y - prev.y;
+  apply();
+});
+const release = e => {
+  touches.delete(e.pointerId);
+  if (touches.size < 2) drag.pinch = 0;
+  if (!touches.size) board.classList.remove("panning");
+};
+board.addEventListener("pointerup", release);
+board.addEventListener("pointercancel", release);
+
+board.addEventListener("wheel", e => {
+  e.preventDefault();
+  cancelAnimationFrame(flight);
+  const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? board.clientHeight : 1;
+  if (e.ctrlKey || e.metaKey) {
+    const rect = board.getBoundingClientRect();
+    const dy = Math.max(-40, Math.min(40, e.deltaY * unit));
+    zoomAt(e.clientX - rect.left, e.clientY - rect.top, Math.exp(-dy * 0.01));
+  } else {
+    cam.x -= e.deltaX * unit;
+    cam.y -= e.deltaY * unit;
+    apply();
+  }
+}, {passive: false});
+
+stage.addEventListener("pointerover", e => {
+  if (board.classList.contains("panning")) return;
+  const node = keyOf(e.target);
+  if (node && node !== hovered) { hovered = node; light(node); }
+});
+stage.addEventListener("pointerout", e => {
+  const node = keyOf(e.target);
+  if (!node || keyOf(e.relatedTarget) === node) return;
+  hovered = null;
+  light(selected && isShown(selected) ? selected : null);
+});
+stage.addEventListener("click", e => {
+  if (drag.moved) return;
+  const node = keyOf(e.target);
+  if (!node) { selectNode(null); return; }
+  if (e.target.closest("[data-toggle]")) toggle(node);
+  else selectNode(node);
+});
+stage.addEventListener("dblclick", e => {
+  const node = keyOf(e.target);
+  if (!node || e.target.closest("[data-toggle]")) return;
+  const nodes = [];
+  eachShown(node, below => nodes.push(below));
+  fitTo(nodes, 1.4);
+});
+stage.addEventListener("focusin", e => {
+  const node = keyOf(e.target);
+  if (!node) return;
+  light(node);
+  if (!onScreen(node)) centreOn(node);
+});
+stage.addEventListener("focusout", () =>
+  light(selected && isShown(selected) ? selected : null));
+
+$("zoomIn").onclick = () => zoomCentre(1.25);
+$("zoomOut").onclick = () => zoomCentre(1 / 1.25);
+$("zoomLevel").onclick = () => zoomCentre(1 / cam.k);
+$("zoomFit").onclick = () => fitAll();
+
+document.addEventListener("keydown", e => {
+  if (activeView !== "graph" || !graph) return;
+  const typing = e.target.matches && e.target.matches("input, textarea");
+  if (e.key === "/" && !typing) { e.preventDefault(); q.focus(); return; }
+  if (typing || e.metaKey || e.ctrlKey || e.altKey) return;
+  const node = keyOf(e.target);
+  if (node && e.key === "Enter") { e.preventDefault(); selectNode(node); return; }
+  if (node && e.key === " ") { e.preventDefault(); toggle(node); return; }
+  const pan = {ArrowLeft: [80, 0], ArrowRight: [-80, 0], ArrowUp: [0, 80], ArrowDown: [0, -80]};
+  if (pan[e.key] && (node || e.target === board || e.target === document.body)) {
+    e.preventDefault();
+    cam.x += pan[e.key][0]; cam.y += pan[e.key][1]; apply();
+  } else if (e.key === "+" || e.key === "=") zoomCentre(1.25);
+  else if (e.key === "-") zoomCentre(1 / 1.25);
+  else if (e.key === "0") zoomCentre(1 / cam.k);
+  else if (e.key === "f" || e.key === "F") fitAll();
+  else if (e.key === "Escape") selectNode(null);
+});
+
+/* overview */
+
+let miniUnit = 1;
+function renderMini() {
+  const box = bounds(graph.visible);
+  mini.setAttribute("viewBox", `${box.x0} ${box.y0} ${box.w} ${box.h}`);
+  miniUnit = Math.max(box.w / (mini.clientWidth || 1), box.h / (mini.clientHeight || 1));
+  miniG.replaceChildren();
+  for (const node of graph.visible) {
+    if (node.parent)
+      svg("line", {class: "mini-edge", x1: node.parent.x, y1: node.parent.y,
+                   x2: node.x, y2: node.y}, miniG);
+  }
+  for (const node of graph.visible) {
+    const cls = ["mini-dot", !node.isRoot && !node.summary && "missing",
+                 hitSet.has(node) && "match"].filter(Boolean).join(" ");
+    svg("circle", {class: cls, cx: node.x, cy: node.y, r: miniUnit * 1.8}, miniG);
+  }
+}
+function drawMiniView() {
+  const rect = board.getBoundingClientRect();
+  miniView.setAttribute("x", -cam.x / cam.k);
+  miniView.setAttribute("y", -cam.y / cam.k);
+  miniView.setAttribute("width", rect.width / cam.k);
+  miniView.setAttribute("height", rect.height / cam.k);
+}
+function miniJump(e) {
+  const point = new DOMPoint(e.clientX, e.clientY).matrixTransform(mini.getScreenCTM().inverse());
+  const view = viewport();
+  cancelAnimationFrame(flight);
+  cam.x = view.cx - point.x * cam.k;
+  cam.y = view.cy - point.y * cam.k;
+  apply();
+}
+mini.addEventListener("pointerdown", e => { mini.setPointerCapture(e.pointerId); miniJump(e); });
+mini.addEventListener("pointermove", e => { if (mini.hasPointerCapture(e.pointerId)) miniJump(e); });
+addEventListener("resize", () => { if (graph && activeView === "graph") { renderMini(); apply(); } });
+
+/* search, shared by both views */
+
+function graphFilter() {
+  const text = needle(), missingOnly = onlyMissing.checked, active = !!(text || missingOnly);
+  hitList = active ? graph.all.filter(node =>
+    !node.isRoot && matches(node.title, node.summary, text, missingOnly)) : [];
+  hitSet = new Set(hitList);
+  hitAt = -1;
+  // unfold whatever hides a match, so every match is on the board
+  for (const node of hitList) for (let up = node.parent; up; up = up.parent) up.collapsed = false;
+  stage.classList.toggle("searching", active);
+  relayout();
+  $("hits").textContent = active
+    ? `${hitList.length} match${hitList.length === 1 ? "" : "es"}` : "";
+}
+
+function filter() {
+  listFilter();
+  graphFilter();
 }
 
 q.oninput = filter;
 onlyMissing.onchange = filter;
-document.getElementById("expand").onclick = () => { setAll(false); filter(); };
-document.getElementById("collapse").onclick = () => setAll(true);
+q.addEventListener("keydown", e => {
+  if (e.key !== "Enter" || activeView !== "graph" || !hitList.length) return;
+  e.preventDefault();
+  hitAt = (hitAt + (e.shiftKey ? -1 : 1) + hitList.length) % hitList.length;
+  const node = hitList[hitAt];
+  selectNode(node);
+  centreOn(node);
+  $("hits").textContent = `${hitAt + 1} / ${hitList.length}`;
+});
+
+function unfoldAll() {
+  for (const node of graph.all) node.collapsed = false;
+  relayout();
+  fitAll();
+}
+$("expand").onclick = () => {
+  if (activeView === "list") { setAll(false); listFilter(); return; }
+  unfoldAll();
+};
+$("collapse").onclick = () => {
+  if (activeView === "list") { setAll(true); return; }
+  for (const node of graph.all) node.collapsed = !node.isRoot && node.children.length > 0;
+  relayout();
+  fitAll();
+};
+
+function setLayout(mode) {
+  layoutMode = mode;
+  $("layTree").setAttribute("aria-pressed", String(mode === "tree"));
+  $("layRadial").setAttribute("aria-pressed", String(mode === "radial"));
+  relayout();
+  fitAll();
+}
+$("layTree").onclick = () => setLayout("tree");
+$("layRadial").onclick = () => setLayout("radial");
+
+/* views and documents */
+
+function showView(name) {
+  activeView = name;
+  $("tabGraph").setAttribute("aria-selected", String(name === "graph"));
+  $("tabList").setAttribute("aria-selected", String(name === "list"));
+  $("graphView").hidden = name !== "graph";
+  $("listView").hidden = name !== "list";
+  for (const el of document.querySelectorAll(".graph-only")) el.hidden = name !== "graph";
+  try { localStorage.setItem("pageindex-viewer-view", name); } catch (error) {}
+  if (name === "graph" && graph) {
+    renderMini();
+    if (needsFit) { needsFit = false; openView(); } else apply();
+  }
+}
+$("tabGraph").onclick = () => showView("graph");
+$("tabList").onclick = () => showView("list");
+
+function select(index) {
+  current = index;
+  const doc = data.documents[index];
+  [...docsEl.children].forEach((button, i) =>
+    button.setAttribute("aria-current", String(i === index)));
+  $("docName").textContent = doc.name;
+  const c = counts(doc.nodes);
+  const meta = $("docMeta");
+  meta.textContent = [doc.description, `${c.summarized}/${c.total} nodes summarized`,
+                      `${doc.units} read units`, doc.source].filter(Boolean).join(" · ");
+  meta.title = meta.textContent;
+  treeEl.replaceChildren(draw(doc.nodes, 0));
+  graph = buildGraph(doc);
+  selected = hovered = null;
+  detail.hidden = true;
+  filter();
+  needsFit = true;
+  if (activeView === "graph") { needsFit = false; openView(); }
+}
+
+function setTheme(dark) {
+  if (dark) document.documentElement.dataset.theme = "dark";
+  else delete document.documentElement.dataset.theme;
+  $("theme").setAttribute("aria-pressed", String(dark));
+  try { localStorage.setItem("pageindex-viewer-theme", dark ? "dark" : "light"); } catch (error) {}
+}
+$("theme").onclick = () => setTheme(document.documentElement.dataset.theme !== "dark");
+$("theme").setAttribute("aria-pressed", String(document.documentElement.dataset.theme === "dark"));
+
+$("foot").textContent = `generated ${data.generated} from ${data.store}`;
+let savedView = "graph";
+try { savedView = localStorage.getItem("pageindex-viewer-view") || "graph"; } catch (error) {}
+showView(savedView === "list" ? "list" : "graph");
 select(0);
 </script>
 </body>
