@@ -300,3 +300,7 @@ p { margin: 0; text-wrap: pretty; }
 @media (max-width: 720px) {
   .command .line { white-space: pre-wrap; overflow-wrap: anywhere; }
 }
+
+/* Japanese has no spaces, so headings would otherwise break mid-word ("文書で / も");
+   auto-phrase breaks between phrases where the browser supports it */
+:lang(ja) h1, :lang(ja) h2, :lang(ja) h3 { word-break: auto-phrase; }
