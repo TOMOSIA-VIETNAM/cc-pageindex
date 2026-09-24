@@ -359,9 +359,11 @@ other document's summaries along with the one they meant, and grows by roughly
 100 KB per document.
 
 Name the file after what it shows, so previews do not overwrite each other: the
-document's name for one document (`<document name>.html`), `pageindex-store.html`
-for the whole store. Write it in the user's working directory unless they give a
-path. Say what it contains when handing it over if they may share it: the
+document's name for one document (`<document name>.view.html`),
+`pageindex-store.view.html` for the whole store. Keep the `.view.html` ending: it
+marks the file as generated, and this repository's `.gitignore` ignores it, so a
+preview written inside a checkout is not committed by accident with the summaries
+it carries. Write it in the user's working directory unless they give a path. Say what it contains when handing it over if they may share it: the
 document's summaries and structure, not its full text.
 
 ## Commands

@@ -4,9 +4,9 @@
 __pycache__/
 *.py[cod]
 
-# Pages written by `pi.py html`: generated from a store, and they carry the
-# indexed documents' text and summaries. Regenerate rather than commit.
-index-view.html
+# Pages written by `pi.py html` (named `<name>.view.html`, as SKILL.md says): generated
+# from a store, and they carry the indexed documents' summaries and structure.
+# Regenerate rather than commit.
 *.view.html
 
 # A store placed inside the repository. The default lives in the platform's
