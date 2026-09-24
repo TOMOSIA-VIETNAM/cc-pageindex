@@ -45,8 +45,11 @@ export const viewport: Viewport = {
   ],
 };
 
-// Light unless the visitor chose dark before; applied before first paint so dark never flashes light.
-const themeScript = `try{if(localStorage.getItem(${JSON.stringify(THEME_KEY)})==="dark")document.documentElement.dataset.theme="dark"}catch(e){}`;
+// Before first paint: the theme (light unless the visitor chose dark before, so dark never
+// flashes light), and `motion` on <html> unless reduced motion is asked for, which holds the
+// scroll-in elements back until components/Motion.tsx plays them.
+const themeScript = `try{if(localStorage.getItem(${JSON.stringify(THEME_KEY)})==="dark")document.documentElement.dataset.theme="dark"}catch(e){}` +
+  `if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("motion")`;
 
 export default async function LangLayout({ children, params }: LayoutProps<"/[lang]">) {
   const { lang } = await params;

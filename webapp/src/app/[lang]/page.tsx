@@ -8,10 +8,15 @@ import { GraphFrame } from "@/components/GraphFrame";
 import { HeroFlow } from "@/components/HeroFlow";
 import { Icon, type IconName } from "@/components/Icon";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Motion } from "@/components/Motion";
+import type { CSSProperties } from "react";
 
 const featureIcons: IconName[] = ["route", "fold", "radial", "search", "chart", "shield"];
 // Every format the skill reads, and whether indexing it needs one pass of the model:
 // the rest carry their own outline.
+// Position of an element among the siblings that play in with it; see components/Motion.tsx.
+const at = (index: number) => ({ "--i": index }) as CSSProperties;
+
 const FORMATS = [
   { id: "pdf", model: false }, { id: "scan", model: true }, { id: "docx", model: false },
   { id: "pptx", model: false }, { id: "md", model: false }, { id: "txt", model: true },
@@ -53,14 +58,14 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
       <main>
         <section className="hero container">
           <div className="hero-text">
-          <p className="eyebrow">{t.hero.eyebrow}</p>
-          <h1>{t.hero.title}</h1>
-          <p className="lead">{t.hero.lead}</p>
-          <div className="hero-actions">
+          <p className="eyebrow" data-reveal="load" style={at(0)}>{t.hero.eyebrow}</p>
+          <h1 data-reveal="load" style={at(1)}>{t.hero.title}</h1>
+          <p className="lead" data-reveal="load" style={at(2)}>{t.hero.lead}</p>
+          <div className="hero-actions" data-reveal="load" style={at(3)}>
             <a className="button primary" href="#graph">{t.hero.ctaGraph}<Icon name="arrow" /></a>
             <a className="button" href={REPO_URL}><Icon name="github" />{t.hero.ctaGithub}</a>
           </div>
-          <div className="hero-command">
+          <div className="hero-command" data-reveal="load" style={at(4)}>
             <CopyCommand command={clone + "\n./install.sh"} copy={t.hero.copy} copied={t.hero.copied} />
           </div>
           </div>
@@ -73,7 +78,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         </section>
 
         <section id="graph" className="container graph-section" aria-labelledby="graph-title">
-          <div className="window">
+          <div className="window" data-reveal>
             <div className="window-bar">
               <span className="window-file"><span className="live-dot" aria-hidden="true" />{stats.name}</span>
               <span className="window-meta">{fill(t.graph.meta, { pages: stats.pages, sections: stats.sections })}</span>
@@ -83,25 +88,26 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             </div>
             <GraphFrame src={DEMO_PAGE} title={t.graph.frameTitle} />
           </div>
-          <div className="graph-caption">
+          <div className="graph-caption" data-reveal>
             <h2 id="graph-title">{t.graph.title}</h2>
             <p>{fill(t.graph.caption, { book, pages: stats.pages, sections: stats.sections, levels: stats.levels })}</p>
           </div>
         </section>
 
-        <section className="container numbers" aria-label="Sample index in numbers">
-          <Number value={stats.pages} label={t.numbers.pages} />
-          <Number value={stats.sections} label={t.numbers.sections} />
-          <Number value={stats.leaves} label={t.numbers.leaves} />
-          <Number value={pagesRead} label={t.numbers.read} accent />
-          <Number value={0} label={t.numbers.keys} />
+        <section className="container numbers" data-reveal aria-label="Sample index in numbers">
+          <Number index={0} value={stats.pages} label={t.numbers.pages} />
+          <Number index={1} value={stats.sections} label={t.numbers.sections} />
+          <Number index={2} value={stats.leaves} label={t.numbers.leaves} />
+          <Number index={3} value={pagesRead} label={t.numbers.read} accent />
+          <Number index={4} value={0} label={t.numbers.keys} />
         </section>
 
-        <section className="container band reveal" aria-labelledby="problem-title">
-          <h2 id="problem-title" className="section-title">{t.problem.title}</h2>
+        <section className="container band" aria-labelledby="problem-title">
+          <h2 id="problem-title" className="section-title" data-reveal>{t.problem.title}</h2>
           <div className="grid three">
             {t.problem.items.map((item, index) => (
-              <article key={item.title} className={`card ${index === t.problem.items.length - 1 ? "card-accent" : "card-muted"}`}>
+              <article key={item.title} data-reveal style={at(index)}
+                       className={`card ${index === t.problem.items.length - 1 ? "card-accent" : "card-muted"}`}>
                 <span className="card-index">{String(index + 1).padStart(2, "0")}</span>
                 <h3>{item.title}</h3>
                 <p>{item.body}</p>
@@ -110,12 +116,12 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           </div>
         </section>
 
-        <section id="how" className="container band reveal" aria-labelledby="how-title">
-          <h2 id="how-title" className="section-title">{t.how.title}</h2>
-          <p className="section-lead">{t.how.lead}</p>
+        <section id="how" className="container band" aria-labelledby="how-title">
+          <h2 id="how-title" className="section-title" data-reveal>{t.how.title}</h2>
+          <p className="section-lead" data-reveal>{t.how.lead}</p>
           <ol className="steps">
             {t.how.steps.map((step, index) => (
-              <li key={step.title} className="step">
+              <li key={step.title} className="step" data-reveal style={at(index)}>
                 <div className="step-head">
                   <span className="step-number">{String(index + 1).padStart(2, "0")}</span>
                   {/* the last step is the session's; the ones before it are the tool's */}
@@ -130,16 +136,16 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           </ol>
         </section>
 
-        <section className="container band reveal" aria-labelledby="example-title">
-          <h2 id="example-title" className="section-title">{fill(t.example.title, { pages: pagesRead })}</h2>
-          <p className="section-lead">{fill(t.example.lead, { read: read.length })}</p>
+        <section className="container band" aria-labelledby="example-title">
+          <h2 id="example-title" className="section-title" data-reveal>{fill(t.example.title, { pages: pagesRead })}</h2>
+          <p className="section-lead" data-reveal>{fill(t.example.lead, { read: read.length })}</p>
           <div className="example">
             <div className="chat">
-              <div className="bubble bubble-you">
+              <div className="bubble bubble-you" data-reveal style={at(0)}>
                 <span className="speaker">{t.example.you}</span>
                 <p>{t.example.question}</p>
               </div>
-              <div className="bubble bubble-claude">
+              <div className="bubble bubble-claude" data-reveal style={at(2)}>
                 <span className="speaker">Claude</span>
                 <p>{t.example.answer}</p>
                 <p className="source">
@@ -148,10 +154,10 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                 </p>
               </div>
             </div>
-            <div className="ranked">
+            <div className="ranked" data-reveal style={at(1)}>
               <p className="ranked-label">{t.example.ranked}</p>
               <ol>
-                {exampleRun.ranked.map(entry => {
+                {exampleRun.ranked.map((entry, index) => {
                   const node = stats.titles.get(entry.id)!;
                   const isRead = exampleRun.read.includes(entry.id);
                   return (
@@ -162,7 +168,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                         {isRead && <span className="badge badge-claude">{t.example.readTag}</span>}
                       </div>
                       <div className="ranked-bar" aria-hidden="true">
-                        <span style={{ width: `${(entry.score / topScore) * 100}%` }} />
+                        <span data-progress style={{ ...at(index), "--w": `${(entry.score / topScore) * 100}%` } as CSSProperties} />
                       </div>
                       <div className="ranked-meta">{fill(t.example.score, { score: entry.score.toFixed(2), from: node.start, to: node.end })}</div>
                     </li>
@@ -173,12 +179,12 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           </div>
         </section>
 
-        <section className="container band reveal" aria-labelledby="features-title">
-          <h2 id="features-title" className="section-title">{t.features.title}</h2>
-          <p className="section-lead"><code>pi.py html</code> {t.features.lead}</p>
+        <section className="container band" aria-labelledby="features-title">
+          <h2 id="features-title" className="section-title" data-reveal>{t.features.title}</h2>
+          <p className="section-lead" data-reveal><code>pi.py html</code> {t.features.lead}</p>
           <div className="grid three">
             {t.features.items.map((item, index) => (
-              <article key={item.title} className="feature">
+              <article key={item.title} className="feature" data-reveal style={at(index % 3)}>
                 <span className="feature-icon"><Icon name={featureIcons[index]} /></span>
                 <h3>{item.title}</h3>
                 <p>{item.body}</p>
@@ -187,12 +193,12 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           </div>
         </section>
 
-        <section className="container band reveal" aria-labelledby="formats-title">
-          <h2 id="formats-title" className="section-title">{t.formats.title}</h2>
-          <p className="section-lead">{t.formats.lead}</p>
+        <section className="container band" aria-labelledby="formats-title">
+          <h2 id="formats-title" className="section-title" data-reveal>{t.formats.title}</h2>
+          <p className="section-lead" data-reveal>{t.formats.lead}</p>
           <ul className="formats">
-            {FORMATS.map(({ id, model }) => (
-              <li key={id}>
+            {FORMATS.map(({ id, model }, index) => (
+              <li key={id} data-reveal style={at(index)}>
                 <span className="format-name">{t.formats.rows[id].format}</span>
                 <span className="format-source">{t.formats.rows[id].source}</span>
                 <span className={`pill ${model ? "pill-pass" : "pill-free"}`}>{model ? t.formats.pass : t.formats.free}</span>
@@ -201,22 +207,22 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           </ul>
         </section>
 
-        <section id="install" className="container band reveal" aria-labelledby="install-title">
-          <h2 id="install-title" className="section-title">{t.install.title}</h2>
-          <p className="section-lead">{t.install.lead}</p>
+        <section id="install" className="container band" aria-labelledby="install-title">
+          <h2 id="install-title" className="section-title" data-reveal>{t.install.title}</h2>
+          <p className="section-lead" data-reveal>{t.install.lead}</p>
           <div className="install">
-            <div className="install-step">
+            <div className="install-step" data-reveal style={at(0)}>
               <span className="step-number">01</span>
               <h3>{t.install.clone}</h3>
               <CopyCommand command={clone} copy={t.hero.copy} copied={t.hero.copied} />
             </div>
-            <div className="install-step">
+            <div className="install-step" data-reveal style={at(1)}>
               <span className="step-number">02</span>
               <h3>{t.install.setup}</h3>
               <CopyCommand command="./install.sh" copy={t.hero.copy} copied={t.hero.copied} />
               <p className="note">{t.install.windows}</p>
             </div>
-            <div className="install-step">
+            <div className="install-step" data-reveal style={at(2)}>
               <span className="step-number">03</span>
               <h3>{t.install.use}</h3>
               <CopyCommand command={t.install.indexPrompt} copy={t.hero.copy} copied={t.hero.copied} prompt="›" />
@@ -224,7 +230,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             </div>
           </div>
         </section>
-        <section className="container cta reveal" aria-labelledby="cta-title">
+        <section className="container cta" data-reveal aria-labelledby="cta-title">
           <h2 id="cta-title">{t.cta.title}</h2>
           <p>{t.cta.lead}</p>
           <a className="button primary" href={REPO_URL}><Icon name="github" />{t.cta.button}</a>
@@ -240,14 +246,15 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
           <p>{t.footer.sample}</p>
         </div>
       </footer>
+      <Motion />
     </>
   );
 }
 
-function Number({ value, label, accent }: { value: number; label: string; accent?: boolean }) {
+function Number({ index, value, label, accent }: { index: number; value: number; label: string; accent?: boolean }) {
   return (
     <div className={`number ${accent ? "number-accent" : ""}`}>
-      <span className="number-value">{value}</span>
+      <span className="number-value" data-count={value} style={at(index)}>{value}</span>
       <span className="number-label">{label}</span>
     </div>
   );
