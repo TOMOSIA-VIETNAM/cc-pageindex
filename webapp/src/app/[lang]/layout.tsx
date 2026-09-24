@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_JP } from "next/font/google";
 import { dictionaries, isLocale, locales, pathFor, type Locale } from "@/i18n";
-import { BRAND, ORGANIZATION, REPO_URL, SITE_URL, THEME_KEY } from "@/lib/site";
+import { BRAND, LICENSE_URL, ORGANIZATION, REPO_URL, SITE_URL, THEME_KEY } from "@/lib/site";
 import { dark, light } from "@/lib/tokens";
 import "../globals.css";
 
@@ -88,6 +88,7 @@ function structuredData(lang: Locale) {
     operatingSystem: "macOS, Linux, Windows",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     codeRepository: REPO_URL,
+    license: LICENSE_URL,
     author: { "@type": "Organization", ...ORGANIZATION },
     publisher: { "@type": "Organization", ...ORGANIZATION },
     image: `${SITE_URL}/${lang}/opengraph-image/card`,

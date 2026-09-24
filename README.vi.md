@@ -160,6 +160,11 @@ Câu trả lời luôn kèm nguồn: số trang với PDF, số slide với Powe
 | [Kho tài liệu](docs/store.md) | Nằm ở đâu, chứa gì, cách xem và xoá |
 | [Trang giới thiệu](webapp/README.md) | Mã nguồn của pagindex.vercel.app và cách deploy |
 
+## Giấy phép
+
+Mã nguồn dùng [giấy phép MIT](LICENSE). Riêng cuốn sách mẫu trong `example/` thì không: sách
+thuộc về tác giả và được đưa vào khi đã có sự cho phép — xem [example/README.md](example/README.md).
+
 ## Giới hạn
 
 Hình ảnh bên trong tài liệu chưa được đọc, trừ khi cả tài liệu là PDF scan. Câu hỏi về bố cục màn hình hay nội dung chỉ nằm trong ảnh sẽ được trả lời thiếu.
