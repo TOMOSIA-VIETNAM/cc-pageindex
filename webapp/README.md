@@ -36,6 +36,48 @@ missing or extra key fails the build.
 
 ## Deploying
 
-A Vercel project with **Root Directory** set to `webapp`. The build reads
-`../example/`, so the project must keep Vercel's default of including files outside
-the root directory.
+Production is <https://pagindex.vercel.app>, Vercel project `pageindex` in the
+`minhtang1s-projects` scope. It is deployed from a machine, not from Git: there is no Git
+integration, so a push deploys nothing. The build must run here, next to `../example/`,
+which is why it is built locally and only the output is uploaded:
+
+```bash
+cd webapp
+npx vercel build --prod
+timeout 300 npx vercel deploy --prebuilt --prod
+```
+
+`npx vercel login` once per machine; `npx vercel link --project pageindex` once per clone.
+
+### The commit at HEAD decides whether Vercel accepts the deploy
+
+Vercel reads the Git commit at `HEAD` and deploys only if that commit's author email
+belongs to a member of the Vercel project. A commit made on this machine carries the
+local `git config user.email`, which does. A merge commit made with GitHub's
+**Merge** button carries the GitHub noreply address
+(`<id>+<login>@users.noreply.github.com`), which Vercel cannot match, and the deploy is
+**blocked**: the CLI prints a URL and returns, but the deployment never goes live.
+
+So:
+
+- Deploy from a commit made locally. To merge a pull request, merge it locally and push,
+  and GitHub marks the pull request merged by itself:
+
+  ```bash
+  git checkout main && git pull --ff-only
+  git merge --no-ff feat/<branch>
+  git push origin main
+  ```
+
+  Do not use GitHub's Merge button for a commit that will be deployed. If one was used,
+  make the next change locally before deploying.
+- Before deploying, check `git log -1 --format='%ae'` prints the local email, not a
+  `users.noreply.github.com` address.
+- After deploying, confirm it is live rather than trusting the CLI's exit:
+  `npx vercel inspect <deployment url>` must say `Ready`. `UNKNOWN` there means blocked;
+  the Vercel dashboard, or the deployment's `readyStateReason` from the API, says why.
+  Then `curl -I https://pagindex.vercel.app/robots.txt` should answer 200.
+
+Linking the GitHub account to the Vercel account (Vercel → Account Settings →
+Authentication) makes GitHub's own commits acceptable too, but the rules above hold
+either way.
