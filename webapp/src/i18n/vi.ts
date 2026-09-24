@@ -134,6 +134,10 @@ const vi: Dictionary = {
     lead: "Cài một lần, index một lần, từ đó mở session Claude Code nào cũng hỏi được.",
     button: "Tải về từ GitHub",
   },
+  social: {
+    read: "chỉ đọc {pages} trang",
+    alt: "cc-pageindex: Claude đọc tài liệu dài như người thật — tài liệu thành mục lục, Claude đi đúng một nhánh, và câu trả lời kèm số trang.",
+  },
   footer: {
     builtOn: "Xây trên nền PageIndex của VectifyAI, chạy dưới dạng skill của Claude Code.",
     notOfficial: "Đây không phải sản phẩm chính thức của bên nào; tên và logo thuộc về chủ sở hữu.",

@@ -135,6 +135,10 @@ const en = {
     lead: "Install once, index once, then ask from any Claude Code session.",
     button: "Get it on GitHub",
   },
+  social: {
+    read: "{pages} pages read",
+    alt: "cc-pageindex: Claude reads long documents the way a person does — a document becomes a table of contents, one path through it is read, and the answer cites its pages.",
+  },
   footer: {
     builtOn: "Built on PageIndex by VectifyAI, run as a Claude Code skill.",
     notOfficial: "Not an official product of either; names and logos belong to their owners.",

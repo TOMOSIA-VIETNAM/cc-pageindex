@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { dictionaries, fill, isLocale, localeNames, locales, type Locale } from "@/i18n";
-import { DEMO_PAGE, demoStats, exampleRun } from "@/lib/demo";
+import { DEMO_PAGE, demoStats, exampleReads, exampleRun } from "@/lib/demo";
 import { BRAND, CLAUDE_CODE_URL, PAGEINDEX_URL, REPO_DIR, REPO_URL } from "@/lib/site";
 import { CopyCommand } from "@/components/CopyCommand";
 import { GraphFrame } from "@/components/GraphFrame";
@@ -23,8 +23,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   if (!isLocale(lang)) notFound();
   const t = dictionaries[lang];
   const stats = demoStats();
-  const read = exampleRun.read.map(id => stats.titles.get(id)!);
-  const pagesRead = read.reduce((total, node) => total + node.end - node.start + 1, 0);
+  const { read, pages: pagesRead, from: readFrom, to: readTo } = exampleReads(stats);
   const topScore = exampleRun.ranked[0].score;
   const book = stats.name.replace(/\.pdf$/i, "");
   const clone = `git clone ${REPO_URL}.git\ncd ${REPO_DIR}`;
@@ -69,7 +68,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
             pagesLabel={fill(t.hero.flowPages, { pages: stats.pages })}
             sectionsLabel={fill(t.hero.flowSections, { sections: stats.sections })}
             answerLabel={t.hero.flowAnswer}
-            citeLabel={fill(t.hero.flowCite, { from: read[0].start, to: read[read.length - 1].end })}
+            citeLabel={fill(t.hero.flowCite, { from: readFrom, to: readTo })}
           />
         </section>
 
@@ -144,7 +143,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
                 <span className="speaker">Claude</span>
                 <p>{t.example.answer}</p>
                 <p className="source">
-                  {fill(t.example.source, { from: read[0].start, to: read[read.length - 1].end })}
+                  {fill(t.example.source, { from: readFrom, to: readTo })}
                   {" · "}{read.map(node => node.title).join(" · ")}
                 </p>
               </div>

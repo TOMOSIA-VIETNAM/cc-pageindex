@@ -134,6 +134,10 @@ const ja: Dictionary = {
     lead: "インストールも、インデックスも一度だけ。あとはどの Claude Code セッションからでも聞けます。",
     button: "GitHub から入手",
   },
+  social: {
+    read: "読んだのは {pages} ページ",
+    alt: "cc-pageindex:Claude が長い文書を人と同じように読む — 文書は目次になり、一つの経路だけを読み、答えにはページが添えられます。",
+  },
   footer: {
     builtOn: "VectifyAI の PageIndex をもとに、Claude Code のスキルとして動かしています。",
     notOfficial: "どちらの公式製品でもありません。名称とロゴは各権利者に帰属します。",

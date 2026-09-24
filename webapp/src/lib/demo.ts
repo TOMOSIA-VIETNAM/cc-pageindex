@@ -54,3 +54,10 @@ export const exampleRun = {
   ],
   read: ["0036", "0037"],
 };
+
+// The sections read for the example, and the page span they cover.
+export function exampleReads(stats: ReturnType<typeof demoStats>) {
+  const read = exampleRun.read.map(id => stats.titles.get(id)!);
+  const pages = read.reduce((total, node) => total + node.end - node.start + 1, 0);
+  return { read, pages, from: read[0].start, to: read[read.length - 1].end };
+}
