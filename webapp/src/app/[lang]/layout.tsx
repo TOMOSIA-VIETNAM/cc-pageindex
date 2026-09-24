@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_JP } from "next/font/google";
 import { dictionaries, isLocale, locales } from "@/i18n";
-import { SITE_URL, THEME_KEY } from "@/lib/site";
+import { BRAND, SITE_URL, THEME_KEY } from "@/lib/site";
 import "../globals.css";
 
 const sans = IBM_Plex_Sans({ subsets: ["latin", "latin-ext", "vietnamese"], weight: ["400", "500", "600", "700"], variable: "--font-sans" });
@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
       canonical: `/${lang}`,
       languages: Object.fromEntries(locales.map(locale => [locale, `/${locale}`])),
     },
-    openGraph: { title: meta.title, description: meta.description, url: `/${lang}`, siteName: "pageindex", type: "website" },
+    openGraph: { title: meta.title, description: meta.description, url: `/${lang}`, siteName: BRAND, type: "website" },
   };
 }
 

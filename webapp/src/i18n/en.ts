@@ -3,13 +3,13 @@
 
 const en = {
   meta: {
-    title: "pageindex — read long documents the way a person does, in Claude Code",
+    title: "cc-pageindex — Claude reads long documents the way a person does",
     description:
       "A Claude Code skill that turns PDFs, Word files, decks and spec folders into a table-of-contents tree, ranks sections locally with no model call, and reads only the pages that answer. No API key.",
   },
   nav: {
     how: "How it works",
-    graph: "Graph",
+    graph: "Try it",
     install: "Install",
     github: "GitHub",
     theme: "Switch theme",
@@ -30,22 +30,22 @@ const en = {
     flowCite: "pages {from}–{to}",
   },
   graph: {
-    title: "This is a real index.",
+    title: "A real index, not a mock-up.",
     caption:
-      "{book} — {pages} pages became {sections} sections on {levels} levels. Hover a node to trace its path, click a circle to fold a branch, click a title to read its summary.",
+      "{book}: {pages} pages, split into {sections} sections over {levels} levels. Hover a section to see the path from the root, click a circle to fold a branch, click a title to read its summary.",
     meta: "{pages} pages · {sections} sections",
-    open: "Open the full viewer",
+    open: "Open full screen",
     frameTitle: "Interactive section graph of the sample book",
   },
   numbers: {
     pages: "pages in the book",
     sections: "sections in the tree",
-    leaves: "leaf sections",
-    read: "pages read to answer the question below",
-    keys: "API keys",
+    leaves: "sections with nothing under them",
+    read: "pages Claude actually read to answer the question below",
+    keys: "API keys needed",
   },
   problem: {
-    title: "Long documents break the usual ways of asking",
+    title: "Every usual way of asking a long document falls short",
     items: [
       {
         title: "Paste it all in",
@@ -62,8 +62,8 @@ const en = {
     ],
   },
   how: {
-    title: "Two layers, one clean line between them",
-    lead: "The tool does the mechanical work and never calls a model. Your Claude Code session writes every word.",
+    title: "The tool does the chores. Claude does the thinking.",
+    lead: "The tool only does mechanical work and never calls a model. Every word of the answer comes from your own Claude Code session.",
     tool: "tool",
     session: "Claude",
     steps: [
@@ -76,7 +76,7 @@ const en = {
         body: "Each question is matched against titles and summaries by rarity-weighted term overlap; Japanese and Chinese are split into two-character pieces. The same question ranks the same way every time.",
       },
       {
-        title: "Read and cite",
+        title: "Read first, then answer",
         body: "Claude opens only the top sections, checks they really answer, and replies with the page, slide, or file and line — citations you can follow back.",
       },
     ],
@@ -86,7 +86,7 @@ const en = {
     lead: "A recorded run against the sample book. The tool ranks every section without a model; Claude reads {read} of them and answers.",
     you: "You",
     question: "How does a shokunin combine Kaizen with AI?",
-    ranked: "Ranked by the tool — no model call",
+    ranked: "Sections scored by the tool — no model call",
     readTag: "read",
     answer:
       "They don't pick one. A shokunin keeps Kaizen — improving in small, continuous steps, the 1% principle of (1.01)^365 — and treats AI as a tool that amplifies that effort. Improvement only lasts once it becomes a shared standard, like the wedge that stops a cannon sliding back while the team hauls it uphill.",
@@ -106,8 +106,8 @@ const en = {
     ],
   },
   formats: {
-    title: "Reads what your documents already are",
-    lead: "Most formats carry their own outline, so indexing them costs nothing. Two need Claude to read once.",
+    title: "Uses the structure your documents already have",
+    lead: "Most formats already carry an outline, so indexing them costs nothing. Only two need Claude to read through them once.",
     free: "no model pass",
     pass: "one model pass",
     rows: {
@@ -121,18 +121,18 @@ const en = {
     },
   },
   install: {
-    title: "Install in a minute",
-    lead: "Needs uv or Python 3.10+. The script builds a private environment and links the skill into ~/.claude/skills.",
+    title: "Installed in about a minute",
+    lead: "All you need is uv or Python 3.10+. The script sets up its own Python environment and links the skill into ~/.claude/skills.",
     clone: "Clone",
     setup: "Install",
     windows: "On Windows, run .\\install.ps1 instead.",
-    use: "Then ask, from any directory",
+    use: "Then just ask, from any folder",
     indexPrompt: "Use the pageindex skill to index ~/Documents/report-2025.pdf",
     askPrompt: "Use the pageindex skill. What was Q3 revenue in the 2025 report?",
   },
   cta: {
-    title: "Point it at your longest document.",
-    lead: "Install once, index once, and ask from any Claude Code session after that.",
+    title: "Try it on the longest document you have.",
+    lead: "Install once, index once, then ask from any Claude Code session.",
     button: "Get it on GitHub",
   },
   footer: {

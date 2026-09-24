@@ -1,3 +1,6 @@
+// The project's name as the site shows it; the skill itself is invoked as `pageindex`.
+export const BRAND = "cc-pageindex";
+
 // Where the project lives; every link and install command on the site uses these.
 export const REPO_URL = "https://github.com/tms-minhtang1/cc-pageindex";
 export const REPO_DIR = "cc-pageindex";

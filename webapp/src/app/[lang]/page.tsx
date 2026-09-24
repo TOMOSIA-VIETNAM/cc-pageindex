@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { dictionaries, fill, isLocale, localeNames, locales, type Locale } from "@/i18n";
 import { DEMO_PAGE, demoStats, exampleRun } from "@/lib/demo";
-import { CLAUDE_CODE_URL, PAGEINDEX_URL, REPO_DIR, REPO_URL } from "@/lib/site";
+import { BRAND, CLAUDE_CODE_URL, PAGEINDEX_URL, REPO_DIR, REPO_URL } from "@/lib/site";
 import { CopyCommand } from "@/components/CopyCommand";
 import { GraphFrame } from "@/components/GraphFrame";
 import { HeroFlow } from "@/components/HeroFlow";
@@ -33,8 +33,8 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
     <>
       <header className="nav">
         <div className="container nav-inner">
-          <Link href={`/${lang}`} className="wordmark" aria-label="pageindex">
-            <span className="wordmark-dot" aria-hidden="true" />pageindex
+          <Link href={`/${lang}`} className="wordmark" aria-label={BRAND}>
+            <span className="wordmark-dot" aria-hidden="true" />{BRAND}
           </Link>
           <nav className="nav-links" aria-label="Sections">
             <a href="#how">{t.nav.how}</a>
