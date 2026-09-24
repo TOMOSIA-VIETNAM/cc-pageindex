@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="webapp/src/app/%5Blang%5D/icon.svg" alt="" width="56">
+  <img src="webapp/public/icon/favicon.svg" alt="" width="56">
 </p>
 
 <h1 align="center">cc-pageindex</h1>

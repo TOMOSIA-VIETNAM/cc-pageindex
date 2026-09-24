@@ -3,7 +3,7 @@
 
 const en = {
   meta: {
-    title: "cc-pageindex — Claude reads long documents the way a person does",
+    title: "cc-pageindex — read long documents the way a person does",
     description:
       "A Claude Code skill that turns PDFs, Word files, decks and spec folders into a table-of-contents tree, ranks sections locally with no model call, and reads only the pages that answer. No API key.",
   },

@@ -1,7 +1,10 @@
 import { ImageResponse } from "next/og";
 import { dictionaries, fill, isLocale } from "@/i18n";
 import { demoStats, exampleReads } from "@/lib/demo";
-import { BRAND, SITE_URL } from "@/lib/site";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { BRAND, MARK_PATH, SITE_URL } from "@/lib/site";
+import { light } from "@/lib/tokens";
 
 // The card social networks show when a page is shared: the wordmark, the page's own
 // headline in its language, and the sample book's numbers from document to answer.
@@ -15,8 +18,10 @@ export async function generateImageMetadata({ params }: { params: Promise<{ lang
   return [{ id: "card", alt, size, contentType }];
 }
 
-// The same palette as the site in its light theme.
-const ink = "#1c1b19", muted = "#6d6a64", accent = "#5b45e0", bg = "#f7f6f2", line = "#d6d3cb";
+// The site's light palette, read from globals.css, and its brand mark, embedded as the file itself.
+const { ink, muted, accent, bg, dot: line, "bg-raised": raised } = light;
+const litFill = `${accent}24`;
+const mark = `data:image/svg+xml;base64,${readFileSync(join(process.cwd(), MARK_PATH)).toString("base64")}`;
 
 // Satori, which draws the card, needs the font files themselves, and only the glyphs the
 // card uses: Google Fonts serves exactly that subset when asked with `text=`.
@@ -50,11 +55,7 @@ export default async function Image({ params }: { params: Promise<{ lang: string
                     backgroundImage: `radial-gradient(circle, ${line} 1.6px, transparent 1.8px)`, backgroundSize: "30px 30px",
                     padding: "64px 72px", fontFamily: "Headline", color: ink, position: "relative" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <svg width="56" height="56" viewBox="0 0 32 32">
-            <rect width="32" height="32" rx="8" fill={ink} />
-            <circle cx="13" cy="13" r="6" fill="none" stroke="#a892ff" strokeWidth="3" />
-            <circle cx="23" cy="22" r="3.2" fill="#a892ff" />
-          </svg>
+          <img src={mark} width={56} height={56} alt="" />
           <span style={{ fontFamily: "Mono", fontSize: 34, fontWeight: 600 }}>{BRAND}</span>
         </div>
 
@@ -73,7 +74,7 @@ export default async function Image({ params }: { params: Promise<{ lang: string
             <circle key={`n${cx}${cy}`} cx={cx} cy={cy} r="10" fill={bg} stroke={ink} strokeWidth="3" />
           ))}
           {[[30, 165], [130, 270], [250, 205]].map(([cx, cy]) => (
-            <circle key={`l${cx}${cy}`} cx={cx} cy={cy} r="11" fill="#ebe7ff" stroke={accent} strokeWidth="4" />
+            <circle key={`l${cx}${cy}`} cx={cx} cy={cy} r="11" fill={litFill} stroke={accent} strokeWidth="4" />
           ))}
         </svg>
 
@@ -90,7 +91,7 @@ export default async function Image({ params }: { params: Promise<{ lang: string
               <div key={step} style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 {index > 0 && <span style={{ color: accent }}>→</span>}
                 <span style={{ padding: "10px 18px", borderRadius: 12, border: `2px solid ${index === steps.length - 1 ? accent : line}`,
-                               background: index === steps.length - 1 ? "#ebe7ff" : "#ffffff",
+                               background: index === steps.length - 1 ? litFill : raised,
                                color: index === steps.length - 1 ? accent : ink }}>{step}</span>
               </div>
             ))}

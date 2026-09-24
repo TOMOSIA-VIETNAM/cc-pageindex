@@ -2,7 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { IBM_Plex_Mono, IBM_Plex_Sans, IBM_Plex_Sans_JP } from "next/font/google";
 import { dictionaries, isLocale, locales, pathFor, type Locale } from "@/i18n";
-import { BRAND, REPO_URL, SITE_URL, THEME_KEY } from "@/lib/site";
+import { BRAND, ORGANIZATION, REPO_URL, SITE_URL, THEME_KEY } from "@/lib/site";
+import { dark, light } from "@/lib/tokens";
 import "../globals.css";
 
 const sans = IBM_Plex_Sans({ subsets: ["latin", "latin-ext", "vietnamese"], weight: ["400", "500", "600", "700"], variable: "--font-sans" });
@@ -25,6 +26,12 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
     title: meta.title,
     description: meta.description,
     applicationName: BRAND,
+    authors: [ORGANIZATION],
+    publisher: ORGANIZATION.name,
+    icons: {
+      icon: [{ url: "/icon/favicon.svg", type: "image/svg+xml" }, { url: "/icon/icon-48.png", sizes: "48x48", type: "image/png" }],
+      apple: { url: "/icon/apple-touch-icon.png", sizes: "180x180" },
+    },
     keywords: ["Claude Code", "Claude Code skill", "PageIndex", "vectorless RAG", "document QA", "PDF", "table of contents", "no API key"],
     alternates: {
       canonical: pathFor(lang),
@@ -40,8 +47,8 @@ export async function generateMetadata({ params }: LayoutProps<"/[lang]">): Prom
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f6f2" },
-    { media: "(prefers-color-scheme: dark)", color: "#131317" },
+    { media: "(prefers-color-scheme: light)", color: light.bg },
+    { media: "(prefers-color-scheme: dark)", color: dark.bg },
   ],
 };
 
@@ -81,6 +88,8 @@ function structuredData(lang: Locale) {
     operatingSystem: "macOS, Linux, Windows",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     codeRepository: REPO_URL,
+    author: { "@type": "Organization", ...ORGANIZATION },
+    publisher: { "@type": "Organization", ...ORGANIZATION },
     image: `${SITE_URL}/${lang}/opengraph-image/card`,
   }).replace(/</g, "\\u003c");
 }
