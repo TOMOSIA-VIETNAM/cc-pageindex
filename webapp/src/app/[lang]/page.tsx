@@ -254,14 +254,17 @@ function Number({ value, label, accent }: { value: number; label: string; accent
   );
 }
 
+// Plain links, not client-side navigation: each language is its own root layout, and a
+// client transition kept the old scroll offset, which lands mid-page on text of another length.
+// A fresh load opens the chosen language at the top.
 function LanguageSwitch({ current, label }: { current: Locale; label: string }) {
   return (
     <nav className="lang" aria-label={label}>
       {locales.map(locale => (
-        <Link key={locale} href={`/${locale}`} hrefLang={locale} lang={locale} title={localeNames[locale]}
-              aria-current={locale === current ? "page" : undefined}>
+        <a key={locale} href={`/${locale}`} hrefLang={locale} lang={locale} title={localeNames[locale]}
+           aria-current={locale === current ? "page" : undefined}>
           {locale.toUpperCase()}
-        </Link>
+        </a>
       ))}
     </nav>
   );
