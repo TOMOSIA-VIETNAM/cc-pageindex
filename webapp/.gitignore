@@ -43,3 +43,5 @@ next-env.d.ts
 # copied from ../example/preview-node-index.html by scripts/sync-demo.mjs before
 # every dev and build; that example is the one source
 /public/demo/
+# rendered from public/icon/favicon.svg by scripts/build-icons.mjs before every dev and build
+/public/icon/*.png

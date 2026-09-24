@@ -10,6 +10,24 @@ npm run dev      # http://localhost:3000
 npm run build
 ```
 
+## Icons and share cards
+
+`public/icon/favicon.svg` is the brand mark and the one place it is drawn:
+`scripts/build-icons.mjs` renders the PNG icons from it (48, apple-touch 180, and the
+manifest's 192 and 512) before every `dev` and `build`, and the share cards embed the same
+file. The cards themselves are drawn at build time by `src/app/[lang]/opengraph-image.tsx`,
+one per language; colours come from `src/app/globals.css` through `src/lib/tokens.ts`.
+
+After a deploy, check every language still unfurls into its own card:
+
+```bash
+npm run check:share                           # production
+npm run check:share -- http://127.0.0.1:3000  # a local build
+```
+
+Facebook's Sharing Debugger and LinkedIn's Post Inspector show the card as they see it and
+refresh their cache; the card URL carries a content hash, so a redrawn card is fetched anew.
+
 ## Where the sample comes from
 
 The interactive graph is the real viewer page, not a copy of it. `pi.py html` writes

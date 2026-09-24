@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "sync-demo": "node scripts/sync-demo.mjs",
-    "predev": "node scripts/sync-demo.mjs",
+    "predev": "node scripts/sync-demo.mjs && node scripts/build-icons.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/sync-demo.mjs",
+    "prebuild": "node scripts/sync-demo.mjs && node scripts/build-icons.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "check:share": "node scripts/check-share.mjs"
   },
   "dependencies": {
     "next": "16.3.6",

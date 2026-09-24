@@ -8,5 +8,6 @@ import { syncViewers } from "./ThemeToggle";
 // frame can finish loading before this page hydrates and its load event is then missed.
 export function GraphFrame({ src, title }: { src: string; title: string }) {
   useEffect(syncViewers, []);
-  return <iframe data-viewer src={`${src}?embed`} title={title} className="graph-frame" onLoad={syncViewers} />;
+  // lazy: on a phone the board sits below the first screen, and drawing it is the heaviest work on the page
+  return <iframe data-viewer src={`${src}?embed`} title={title} className="graph-frame" loading="lazy" onLoad={syncViewers} />;
 }
