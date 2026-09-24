@@ -1,0 +1,27 @@
+{
+  "name": "pageindex-site",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "sync-demo": "node scripts/sync-demo.mjs",
+    "predev": "node scripts/sync-demo.mjs",
+    "dev": "next dev",
+    "prebuild": "node scripts/sync-demo.mjs",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "next": "16.3.6",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.6",
+    "typescript": "^5"
+  }
+}
