@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="https://pagindex.vercel.app/en"><b>Website</b></a> ·
+  <a href="https://pagindex.vercel.app"><b>Website</b></a> ·
   <a href="https://pagindex.vercel.app/demo/shokunin.html">Try the graph</a> ·
   <a href="#installed-in-about-a-minute">Install</a>
 </p>
@@ -26,7 +26,7 @@
 </p>
 
 <p align="center">
-  <a href="https://pagindex.vercel.app/en"><img src="assets/landing-hero.en.jpg" alt="The cc-pageindex website: a document becomes a table of contents, then an answer with its pages" width="860"></a>
+  <a href="https://pagindex.vercel.app"><img src="assets/landing-hero.en.jpg" alt="The cc-pageindex website: a document becomes a table of contents, then an answer with its pages" width="860"></a>
 </p>
 
 Nobody rereads a whole book to answer one question. You open the table of contents, flip to the right chapter, read a few pages — and you remember where you found it.

@@ -12,6 +12,10 @@ export const localeNames: Record<Locale, string> = { en: "English", vi: "Tiếng
 
 export const isLocale = (value: string): value is Locale => value in dictionaries;
 
+// Where each language lives: English at the root, the others under their own prefix.
+// next.config.ts serves the root from the English page and sends /en back to the root.
+export const pathFor = (locale: Locale) => (locale === defaultLocale ? "/" : `/${locale}`);
+
 export function fill(template: string, values: Record<string, string | number>) {
   return template.replace(/\{(\w+)\}/g, (whole, key) => (key in values ? String(values[key]) : whole));
 }
