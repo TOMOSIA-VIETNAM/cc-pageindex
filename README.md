@@ -1,25 +1,37 @@
-# cc-pageindex
+<p align="center">
+  <img src="webapp/src/app/%5Blang%5D/icon.svg" alt="" width="56">
+</p>
+
+<h1 align="center">cc-pageindex</h1>
 
 <p align="center">
-  <a href="https://pageindex.ai/"><img src="assets/pageindex.png" alt="PageIndex" height="22" style="vertical-align:middle"></a>
-  &nbsp;&nbsp;<strong>×</strong>&nbsp;&nbsp;
-  <a href="https://claude.com/claude-code"><img src="assets/claude.svg" alt="Claude" height="22" style="vertical-align:middle"></a>
-  &nbsp;<strong>Claude Code</strong>
+  <b>Tài liệu 300 trang, Claude chỉ đọc đúng vài trang cần thiết.</b><br>
+  Skill cho Claude Code · không cần API key
+</p>
+
+<p align="center">
+  <a href="https://pagindex.vercel.app/vi"><b>Trang giới thiệu</b></a> ·
+  <a href="https://pagindex.vercel.app/demo/shokunin.html">Kéo thử đồ thị</a> ·
+  <a href="#cài-mất-chừng-một-phút">Cài đặt</a>
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Claude%20Code-skill-d97757" alt="Claude Code skill">
-  <img src="https://img.shields.io/badge/PageIndex-vectorless%20RAG-4e86d2" alt="PageIndex">
+  <img src="https://img.shields.io/badge/API%20key-kh%C3%B4ng%20c%E1%BA%A7n-5b45e0" alt="Không cần API key">
   <img src="https://img.shields.io/badge/python-3.10%2B-3776ab?logo=python&logoColor=white" alt="Python 3.10+">
   <img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-lightgrey" alt="macOS, Linux, Windows">
   <img src="https://img.shields.io/badge/pdf%20%C2%B7%20docx%20%C2%B7%20pptx%20%C2%B7%20adoc%20%C2%B7%20md%20%C2%B7%20txt-informational" alt="Định dạng hỗ trợ">
 </p>
 
-> Một bộ spec ba trăm trang chẳng trả lời được gì cho tới khi có người mở đúng trang. Dán trọn nó vào chat thì đốt token và tràn context, mà càng dài model càng đọc lướt. Không đưa tài liệu thì nó vẫn trả lời, trôi chảy và sai.
->
-> Người thật không làm vậy. Họ liếc mục lục, nhảy thẳng tới mục cần, đọc vài trang rồi trả lời — và chỉ được ra mình lấy từ đâu. Skill này cho Claude làm đúng như thế.
+<p align="center">
+  <a href="https://pagindex.vercel.app/vi"><img src="assets/landing-hero.jpg" alt="Trang giới thiệu cc-pageindex: tài liệu thành mục lục, rồi thành câu trả lời kèm số trang" width="860"></a>
+</p>
 
-Dùng được với báo cáo, hợp đồng, spec màn hình tiếng Nhật, sách nội bộ — bất cứ thứ gì dài tới mức bạn không muốn đọc lại từ đầu.
+Để trả lời một câu hỏi, chẳng ai đọc lại cả cuốn sách. Người ta mở mục lục, lật tới đúng chương, đọc vài trang là xong — và nhớ luôn mình lấy thông tin ở đâu.
+
+Claude thì không có thói quen đó. Dán cả bộ spec 300 trang vào thì tốn token, tràn context, mà càng dài nó càng đọc lướt. Không dán thì nó vẫn trả lời, rất trôi chảy, và sai. **cc-pageindex** dạy Claude đọc như người thật: nhìn mục lục, mở đúng mục, đọc xong mới trả lời, kèm số trang để bạn kiểm lại.
+
+Dùng được cho báo cáo, hợp đồng, spec màn hình tiếng Nhật, sách nội bộ — thứ gì đủ dài để bạn ngại đọc lại từ đầu.
 
 ```
 Bạn:    Trong spec 会員管理, 退会処理 cập nhật cột email thế nào?
@@ -30,38 +42,94 @@ Claude: Ghi email thành "<địa chỉ cũ>_<thời điểm hiện tại>", đ�
         Nguồn: 2.1.会員詳細画面_機能詳細.adoc, dòng 110.
 ```
 
-## Vì sao không phải vector RAG
+## Hỏi về tài liệu dài, cách quen thuộc nào cũng hụt
 
-Cách quen thuộc là băm tài liệu thành từng đoạn, nhúng mỗi đoạn thành một vector, rồi lấy những đoạn nằm gần câu hỏi nhất trong không gian đó. Cái giá phải trả là cấu trúc: một điều khoản bị cắt rời khỏi mục nó thuộc về, một bảng bị đứt làm đôi, và người đọc mất luôn manh mối rằng đoạn này nằm trong chương nào. Tệ hơn, "gần giống về ngôn từ" không đồng nghĩa với "chỗ chứa câu trả lời" — hỏi quy định nào áp dụng cho một trường hợp, thì đoạn giống câu hỏi nhất thường là đoạn nhắc lại chính câu hỏi, còn đoạn quy định lại dùng từ khác hẳn. Chưa kể bạn phải nuôi thêm một embedding model và một vector database, rồi index lại mỗi lần tài liệu đổi.
+| | Cách làm | Vấn đề |
+| --- | --- | --- |
+| ✗ | **Dán hết vào khung chat** | Tốn token, tràn context, tài liệu càng dài model càng đọc lướt và bỏ sót. |
+| ✗ | **Cắt nhỏ rồi tìm bằng vector** | Mỗi đoạn bị tách khỏi chương của nó, bảng biểu đứt làm đôi. Đoạn “nghe na ná” câu hỏi chưa chắc đã là đoạn có câu trả lời. Chưa kể phải nuôi thêm embedding model, vector database, và index lại mỗi lần tài liệu đổi. |
+| ✓ | **Lần theo mục lục** | Tài liệu tử tế nào cũng có sẵn mục lục. Giữ nguyên nó, việc tìm câu trả lời chỉ còn là chọn đúng mục — và đã biết mình đọc ở đâu thì trích nguồn là chuyện đương nhiên. |
 
-PageIndex bỏ hẳn lớp đó. Tài liệu nghiêm túc nào cũng đã có sẵn cấu trúc — mục lục của PDF, style Heading của Word, cấp tiêu đề của AsciiDoc — nên thay vì phá đi rồi dựng lại bằng vector, nó giữ nguyên và biến việc tìm kiếm thành việc đi trong cây mục lục. Claude nhìn cây, chọn mục, mở ra đọc. Vì biết mình đã mở mục nào nên trích dẫn đi kèm là chuyện đương nhiên, không phải tính năng gắn thêm.
+Cái khác không nằm ở chỗ model thông minh hơn, mà ở chỗ nó đang đọc đúng trang.
+
+## Việc tay chân để máy lo, việc suy nghĩ để Claude
+
+Công cụ chỉ làm phần cơ học và không bao giờ gọi model. Từng chữ trong câu trả lời đều do chính session Claude Code của bạn viết — nên không cần API key nào.
+
+1. **Index một lần là xong** · *công cụ*
+   Dựng mục lục từ bố cục của PDF, style Heading của Word, cấp tiêu đề AsciiDoc hay tiêu đề từng slide, rồi lưu ngay trên máy bạn. Gặp bản scan hay file text trơn thì Claude đọc qua một lượt và tự đặt tiêu đề.
+2. **Tìm mục ngay trên máy** · *công cụ*
+   Câu hỏi được đem so với tên và tóm tắt của từng mục, từ nào càng hiếm càng được tính nặng. Tiếng Nhật, tiếng Trung được tách thành từng cụm hai chữ. Hỏi lại đúng câu cũ, kết quả vẫn y như cũ.
+3. **Đọc xong mới trả lời** · *Claude*
+   Chỉ mở vài mục đứng đầu, xem chúng có thật sự trả lời được không, rồi đáp kèm số trang, số slide, hoặc tên file và số dòng.
+
+Chi tiết cơ chế nằm ở [Cách nó làm việc](docs/how-it-works.md).
+
+## Một câu hỏi, chỉ cần đọc 4 trang
+
+Lần chạy thật trên cuốn *SHOKUNIN IT – Cách người TOMOSIA làm việc* (131 trang, 78 mục). Công cụ chấm điểm toàn bộ các mục, không gọi model:
+
+```
+#0036  CHƯƠNG 3: CẢI TIẾN – KAIZEN VÀ SỨC MẠNH CỦA AI      13.91   tr. 49–50   ← đọc
+#0037  KAIZEN – ĐI LÊN TỪ NHỮNG BƯỚC CHÂN NHỎ               8.78   tr. 51–52   ← đọc
+#0042  AI LÀ NGƯỜI SỬ DỤNG AI HIỆU QUẢ NHẤT ?                7.93   tr. 61–62
+```
+
+Claude mở hai mục đầu — 4 trang trên 131 — rồi trả lời:
+
+> **Shokunin kết hợp Kaizen với AI như thế nào?**
+>
+> Không phải chọn một trong hai. Người shokunin giữ tinh thần Kaizen — cải tiến từng chút nhưng không ngừng, như nguyên lý mỗi ngày tốt hơn 1%, tức (1.01)^365 — và dùng AI để khuếch đại chính nỗ lực đó. Có điều, cải tiến chỉ bền khi nó trở thành tiêu chuẩn chung của cả đội, giống miếng chèn giữ khẩu pháo khỏi tụt dốc trong lúc cả tiểu đội đang kéo pháo lên.
+>
+> <sub>Nguồn: trang 49–52</sub>
+
+## Đồ thị này có sẵn trong skill
+
+Bảo Claude *“preview tài liệu”*, hoặc tự chạy `pi.py html`, bạn sẽ có một file HTML duy nhất, mở offline được. Trong đó mục lục hiện thành đồ thị trên một mặt bảng kéo tự do như draw.io.
 
 <p align="center">
-  <a href="https://pageindex.ai/"><img src="assets/pageindex-flow.png" alt="Tài liệu, đi trong cây mục lục, trả lời kèm bằng chứng" width="820"></a>
+  <a href="https://pagindex.vercel.app/demo/shokunin.html"><img src="assets/graph-view.jpg" alt="Đồ thị mục lục của cuốn sách mẫu, một nhánh đang được làm sáng" width="860"></a>
 </p>
-<p align="center"><sub>Tài liệu &rarr; đi trong cây mục lục &rarr; trả lời kèm trang trích dẫn. Hình của <a href="https://pageindex.ai/">pageindex.ai</a>.</sub></p>
+<p align="center"><sub><a href="https://pagindex.vercel.app/demo/shokunin.html">Bấm vào ảnh để kéo thử bản thật</a></sub></p>
 
-Còn nếu chỉ hỏi Claude mà không có lớp này? Nó chỉ nắm được những gì bạn kịp dán vào, và phần còn lại nó lấp bằng suy đoán — nghe rất thuyết phục. Sự khác biệt không nằm ở chỗ model thông minh hơn, mà ở chỗ nó đang đọc đúng trang.
+- **Thấy ngay đường đi** — rê chuột vào một mục, đường từ gốc tới đó chạy sáng lên, kèm toàn bộ mục con.
+- **Gập bớt cho gọn** — bấm vòng tròn để gập một nhánh; mục vừa bấm vẫn đứng yên chỗ cũ.
+- **Dạng cây hay dạng tròn** — trái sang phải để dễ đọc tên mục, xoè tròn để thấy toàn cảnh.
+- **Tìm và rà soát** — mục khớp sáng lên và tự mở nhánh, Enter để nhảy qua từng kết quả, một cú bấm lọc ra mục chưa có tóm tắt.
+- **Số liệu ngay trước mắt** — mỗi cấp bao nhiêu mục, nhánh nào đang gập, mỗi mục chiếm bao nhiêu phần tài liệu.
+- **Một file, chạy offline** — không server, không CDN, dữ liệu không rời khỏi máy. Có giao diện sáng và tối, dùng được bằng chuột, bàn phím lẫn cảm ứng.
 
-Chi tiết cơ chế: [Cách nó làm việc](docs/how-it-works.md).
+## Tài liệu có sẵn cấu trúc gì, dùng luôn cấu trúc đó
 
-## Cài đặt
+| Định dạng | Mục lục lấy từ đâu | Chi phí index |
+| --- | --- | --- |
+| PDF có chữ | bố cục và bookmark | không tốn model |
+| PDF scan | Claude đọc ảnh từng trang | Claude đọc 1 lượt |
+| Word `.docx` | style Heading 1–9 | không tốn model |
+| PowerPoint `.pptx` | mỗi slide là một mục | không tốn model |
+| Markdown | các tiêu đề `#` | không tốn model |
+| File text trơn | Claude tự đặt tiêu đề | Claude đọc 1 lượt |
+| Thư mục AsciiDoc | cấp tiêu đề `=`, trích nguồn theo file và dòng | không tốn model |
 
-Cần **[uv](https://github.com/astral-sh/uv)** hoặc **Python 3.10+**. Có uv thì khỏi cài Python, uv tự tải bản nó cần.
+Vì sao lại chia như vậy: [Định dạng tài liệu](docs/formats.md).
+
+## Cài mất chừng một phút
+
+Chỉ cần có **[uv](https://github.com/astral-sh/uv)** hoặc **Python 3.10 trở lên**. Có uv thì khỏi lo Python, uv tự tải bản nó cần.
 
 ```bash
-git clone git@github.com:tms-minhtang1/cc-pageindex.git
+git clone https://github.com/tms-minhtang1/cc-pageindex.git
 cd cc-pageindex
 ./install.sh
 ```
 
-Windows: `.\install.ps1`. Gỡ: `./install.sh --uninstall`.
+Dùng Windows thì chạy `.\install.ps1`. Muốn gỡ: `./install.sh --uninstall`.
 
-Script dựng môi trường Python riêng rồi liên kết skill vào `~/.claude/skills/`. Sau đó mở session Claude Code ở thư mục nào cũng dùng được.
+Script sẽ tự dựng môi trường Python riêng và gắn skill vào `~/.claude/skills/`. Xong là mở session Claude Code ở thư mục nào cũng dùng được.
 
-## Dùng
+## Rồi cứ thế hỏi
 
-**Index — một lần cho mỗi tài liệu:**
+**Index — mỗi tài liệu một lần:**
 
 ```
 Dùng skill pageindex, index file ~/Documents/bao-cao-2025.pdf
@@ -73,22 +141,27 @@ Dùng skill pageindex, index file ~/Documents/bao-cao-2025.pdf
 Dùng skill pageindex. Doanh thu quý 3 trong báo cáo 2025 là bao nhiêu?
 ```
 
-Claude trả lời kèm trích dẫn: số trang với PDF, số slide với PowerPoint, tên file và dòng với AsciiDoc. Lần theo trích dẫn để kiểm chứng.
+**Xem mục lục dạng đồ thị:**
 
-Nhận `.pdf` (kể cả bản scan), `.docx`, `.pptx`, `.md`, `.txt`, và thư mục `.adoc`.
+```
+Dùng skill pageindex, preview báo cáo 2025
+```
+
+Câu trả lời luôn kèm nguồn: số trang với PDF, số slide với PowerPoint, tên file và số dòng với AsciiDoc. Lần theo đó là kiểm lại được.
 
 ## Tìm hiểu thêm
 
 | | |
 | --- | --- |
 | [Định dạng tài liệu](docs/formats.md) | Loại nào index miễn phí, loại nào tốn token, và vì sao |
-| [Cách nó làm việc](docs/how-it-works.md) | Công cụ làm gì, Claude làm gì, luồng trả lời một câu hỏi |
+| [Cách nó làm việc](docs/how-it-works.md) | Công cụ làm gì, Claude làm gì, một câu hỏi được trả lời ra sao |
 | [Kho tài liệu](docs/store.md) | Nằm ở đâu, chứa gì, cách xem và xoá |
+| [Trang giới thiệu](webapp/README.md) | Mã nguồn của pagindex.vercel.app và cách deploy |
 
 ## Giới hạn
 
-Ảnh trong tài liệu chưa được đọc, trừ khi tài liệu là PDF bản scan. Câu hỏi về bố cục màn hình hay nội dung nằm trong ảnh sẽ trả lời thiếu.
+Hình ảnh bên trong tài liệu chưa được đọc, trừ khi cả tài liệu là PDF scan. Câu hỏi về bố cục màn hình hay nội dung chỉ nằm trong ảnh sẽ được trả lời thiếu.
 
 ---
 
-Dựng trên [PageIndex](https://pageindex.ai/) ([source](https://github.com/VectifyAI/PageIndex)) — tree-index và truy xuất không cần vector — chạy như một skill của [Claude Code](https://claude.com/claude-code). Đây không phải sản phẩm chính thức của hai bên; logo thuộc về chủ sở hữu tương ứng.
+<sub>Xây trên nền [PageIndex](https://github.com/VectifyAI/PageIndex) của VectifyAI, chạy dưới dạng skill của [Claude Code](https://claude.com/claude-code). Đây không phải sản phẩm chính thức của bên nào; tên và logo thuộc về chủ sở hữu. Sách mẫu *SHOKUNIN IT – Cách người TOMOSIA làm việc* của tác giả Lưu Tuấn Anh (TOMOSIA), được sử dụng khi đã có sự cho phép.</sub>
