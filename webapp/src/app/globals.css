@@ -53,9 +53,9 @@ p { margin: 0; text-wrap: pretty; }
   stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
 /* navigation */
-.nav { position: sticky; top: 0; z-index: 10; background: color-mix(in srgb, var(--bg) 94%, transparent);
-  backdrop-filter: saturate(1.4) blur(10px); -webkit-backdrop-filter: saturate(1.4) blur(10px);
-  border-bottom: 1px solid var(--line); }
+/* solid rather than a blurred glass: backdrop blur is repainted on every scrolled frame,
+   which phones feel as stutter */
+.nav { position: sticky; top: 0; z-index: 10; background: var(--bg); border-bottom: 1px solid var(--line); }
 .nav-inner { display: flex; align-items: center; gap: 24px; height: 60px; }
 .wordmark { display: inline-flex; align-items: center; gap: 9px; font: 600 17px/1 var(--font-code);
   text-decoration: none; letter-spacing: -0.01em; }
@@ -115,10 +115,14 @@ p { margin: 0; text-wrap: pretty; }
   background: var(--bg-raised); font: 13px/1.3 var(--font-code); }
 .window-file { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; min-width: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none;
-  box-shadow: 0 0 0 0 var(--accent); animation: pulse 2.4s ease-out infinite; }
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
-  70%, 100% { box-shadow: 0 0 0 8px transparent; } }
+/* the pulse is a ring scaled and faded on its own layer, which the compositor animates without
+   repainting the page, unlike an animated box-shadow */
+.live-dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex: none; }
+.live-dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--accent);
+  animation: pulse 2.4s ease-out infinite; will-change: transform, opacity; }
+@keyframes pulse { from { transform: scale(1); opacity: .45; } 70%, to { transform: scale(3); opacity: 0; } }
+/* endless animations pause once scrolled off screen; components/Motion.tsx marks [data-live] */
+[data-live].is-off .flow-lit, .live-dot[data-live].is-off::after { animation-play-state: paused; }
 .window-meta { color: var(--muted); white-space: nowrap; }
 .window-open { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; color: var(--muted);
   text-decoration: none; white-space: nowrap; min-height: 32px; transition: color .15s; }
@@ -252,7 +256,7 @@ p { margin: 0; text-wrap: pretty; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .live-dot { animation: none; }
+  .live-dot::after { animation: none; opacity: 0; }
   * { transition: none !important; }
 }
 

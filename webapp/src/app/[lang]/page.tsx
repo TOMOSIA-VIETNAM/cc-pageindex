@@ -80,7 +80,7 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
         <section id="graph" className="container graph-section" aria-labelledby="graph-title">
           <div className="window" data-reveal>
             <div className="window-bar">
-              <span className="window-file"><span className="live-dot" aria-hidden="true" />{stats.name}</span>
+              <span className="window-file"><span className="live-dot" data-live aria-hidden="true" />{stats.name}</span>
               <span className="window-meta">{fill(t.graph.meta, { pages: stats.pages, sections: stats.sections })}</span>
               <a className="window-open" href={DEMO_PAGE} target="_blank" rel="noopener">
                 {t.graph.open}<Icon name="external" />
