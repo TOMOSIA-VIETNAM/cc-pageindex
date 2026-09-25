@@ -22,7 +22,7 @@ const curve = (a: { x: number; y: number }, b: { x: number; y: number }) => {
 export function HeroFlow({ pagesLabel, sectionsLabel, citeLabel, answerLabel }: Props) {
   const litLeaf = leaves.find(leaf => leaf.lit)!;
   return (
-    <svg className="hero-flow" data-reveal="load" viewBox="0 0 480 440" role="img" aria-label={`${pagesLabel} → ${sectionsLabel} → ${citeLabel}`}>
+    <svg className="hero-flow" data-reveal="load" data-live viewBox="0 0 480 440" role="img" aria-label={`${pagesLabel} → ${sectionsLabel} → ${citeLabel}`}>
       {/* the document */}
       <g className="flow-doc">
         <rect x="18" y="150" width="120" height="150" rx="10" className="flow-sheet flow-sheet-back" transform="rotate(-6 78 225)" />

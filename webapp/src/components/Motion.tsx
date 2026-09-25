@@ -8,6 +8,8 @@ import { useEffect } from "react";
 //                    is on screen before this script has loaded (the hero)
 //   [data-count]     counts up from 0 to its value, siblings starting one after another by `--i`
 //   [data-progress]  fills from 0 to the width in its `--w`
+//   [data-live]      gets `is-off` while off screen, so endless animations inside it pause
+//                    instead of repainting every frame for nothing; they run until this loads
 // The server renders every final state. Only <html class="motion">, set before first
 // paint unless the visitor asked for reduced motion, holds them back until they play,
 // so without script, or with reduced motion, nothing waits.
@@ -43,7 +45,11 @@ export function Motion() {
       }
     }, { rootMargin: "0px 0px -10% 0px", threshold: 0.12 });
     for (const el of targets) observer.observe(el);
-    return () => observer.disconnect();
+    const live = new IntersectionObserver(entries => {
+      for (const entry of entries) entry.target.classList.toggle("is-off", !entry.isIntersecting);
+    });
+    for (const el of document.querySelectorAll("[data-live]")) live.observe(el);
+    return () => { observer.disconnect(); live.disconnect(); };
   }, []);
   return null;
 }
